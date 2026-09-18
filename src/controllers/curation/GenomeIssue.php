@@ -79,7 +79,14 @@ function showEditForm($mgdb) {
   $DBConn = connect_to_database();
   
   // Dealing with a faulty gene model or genome location?
-  if ($gene_model) {
+  //
+  // Present-or-absent, not truthy: getCGIParam() hands back '' for a parameter
+  // that is in the URL with no value and false for one that is not there at
+  // all. A link that names the parameter but not a gene model --
+  // /curation/GenomeIssue?gene_model_id= -- means "the gene model form, blank",
+  // which is how the home page and the gene model issue list both ask for it.
+  // Under the old truthiness test that link opened the assembly form instead.
+  if ($gene_model !== false) {
     $tmpl->get('gene-model-issue')->unmute();
     $tmpl->get('gene-model')->replace($gene_model);
     

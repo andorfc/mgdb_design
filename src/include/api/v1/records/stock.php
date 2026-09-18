@@ -549,7 +549,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['references'])) {
     $references = array();
     $sth = make_query($DBConn, "
-      SELECT r.id, r.name, r.title, r.year, r.doi, r.author_desc, t.name AS contents,
+      SELECT r.id, r.name, r.title, r.year, " . mgdbReferenceDoiSql('r') . " AS doi, " . mgdbReferencePubmedSql('r') . " AS pubmed, r.author_desc, t.name AS contents,
              t_type.name AS pub_type,
              -- Same shape the literature search returns, so a card built from
              -- either source previews the same text. idx_reference_ab_id keeps
@@ -571,13 +571,6 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     MgdbApi::countQuery();
     while ($row = retrieve_row($sth)) {
       $doi = MgdbApi::text($row['doi']);
-      if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
-        $doi = $m[1];
-      } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string) $row['name'], $m)) {
-        $doi = $m[1];
-      } else {
-        $doi = null;
-      }
       $references[] = array(
         'type' => 'reference',
         'id' => MgdbApi::int($row['id']),
@@ -586,6 +579,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'authors' => MgdbApi::text($row['author_desc']),
         'year' => MgdbApi::int($row['year']),
         'doi' => $doi,
+        'pubmed' => MgdbApi::text($row['pubmed']),
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
         'abstract' => MgdbApi::text($row['abstract']),

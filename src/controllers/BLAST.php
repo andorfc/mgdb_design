@@ -179,6 +179,10 @@ function blast_edit_search_fields($job_id, $system) {
     $bauplan->includeScript('/js/mgdb-chrome.js');
   }
   if ($blast_is_form) {
+    /* BLAST.js is still the form engine and uses jQuery. Keep that dependency
+       page-local so the shared modern shell stays dependency-free. Version
+       3.7.1 is compatible with the APIs used by this script. */
+    $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
     $bauplan->includeScript('/js/mgdb-blast.js?v=' . (int) @filemtime($doc_root . '/js/mgdb-blast.js'));
   }
   if ($blast_is_results) {

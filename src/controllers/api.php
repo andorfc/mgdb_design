@@ -45,6 +45,8 @@
   include_once('./include/marker_record_lib.php');
   include_once('./include/phenotype_record_lib.php');
   include_once('./include/pan_gene_record_lib.php');
+  /* The DOI and PubMed ID every record's references section reads. */
+  include_once('./include/reference_ids_lib.php');
   define('MGDB_API', true);
   include_once('./include/api/v1/lib/mgdb_api.php');
 
@@ -271,7 +273,7 @@ function api_record_registry() {
       'example' => 'Zm00001eb067740',
       'html' => '/gene_center/gene/{id}',
       'sections' => array('overview', 'structure', 'function', 'expression', 'variation', 'pan_gene',
-                          'orthologs', 'locus', 'references', 'xrefs', 'sequences'),
+                          'orthologs', 'paralogs', 'locus', 'references', 'xrefs', 'sequences'),
       'identifiers' => array(
         'gene model name (Zm00001eb067740)', 'transcript name (Zm00001eb067740_T001)',
         'protein name (Zm00001eb067740_P001)', 'classical gene symbol (lg1)',
@@ -504,7 +506,9 @@ function api_data_registry() {
         '{genome}/{id}' => 'One protein. A transcript gives its protein; a gene gives its canonical protein.',
         '{genome}/entry/{accession}' => 'Every protein carrying an InterPro entry or a member signature (PF, PTHR, cd, ...). isoforms=canonical (default) or all; limit up to 500 and offset.',
         '{genome}/region/{sequence}:{start}-{end}' => 'Canonical-protein domains projected onto the genome, split at introns.',
-        '{genome}/batch?ids=' => 'Up to 200 proteins, transcripts or genes.'
+        '{genome}/batch?ids=' => 'Up to 200 proteins, transcripts or genes.',
+        '{genome}/class/{name}' => 'Every gene in one of the domain atlas functional classes, by slug (immunity-nlr-nbs-lrr) or name; without a name, the classes and their gene counts. A gene can be in several classes. format=tsv for a download.',
+        '{genome}/immunity/{class}' => 'Every gene given one immunity call (NLR, RLK, RLP, PR, ...); subclass= narrows it (CNL). Without a class, the calls and their subclass counts. One call per gene. format=tsv for a download.'
       ),
       'sections' => array('matches', 'entries', 'sites', 'go', 'pathways', 'genomic', 'classes'),
       'identifiers' => array('protein (Zm00001eb067740_P001)', 'transcript: its protein', 'gene: its canonical protein',

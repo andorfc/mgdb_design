@@ -82,41 +82,117 @@ function panGeneArrayLiteral($values) {
    union is an indexed equality lookup, and each records how it matched so the
    results can say why a row is there.
 
+   Shared with the all-data search (search/searchall/searchall_lib.php), so an
+   identifier that finds a pan-gene here finds the same pan-gene from the
+   header search, and the two report the same number.
+
    protein values in the view sometimes carry a trailing newline, so the
    literal and newline-suffixed forms are both matched — btrim() would work but
    would give up the index on 2.7 million rows.
    ------------------------------------------------------------------------- */
 
+/* The spellings of a term worth probing for, since the columns are indexed as
+   stored and a lower() comparison would give the indexes up.
+
+   Measured, not guessed, over every distinct value: a reader who types an
+   identifier in lower or upper case reaches 100% of the 2,280,526 gene models,
+   2,280,526 transcripts and 97,184 exemplars through these forms — gene models
+   are lower (pan-zea…), upper (GRMZM2G…, AC…) or capitalized (Zm00001eb…),
+   and transcripts add an upper-case _T suffix to a capitalized id. The only
+   stored values these miss are mixed-case ones such as the locus dnaJ28 (196
+   of 22,427 loci) and AlphaFold file names in the protein column; typed as
+   stored, those still match, because the term itself is always probed. No two
+   distinct gene models, proteins or loci differ only by case, so widening the
+   match cannot merge two identifiers. */
+function panGeneTermVariants($term) {
+    $lower = strtolower($term);
+    $variants = array($term, $lower, strtoupper($term), ucfirst($lower));
+    foreach (array($lower, ucfirst($lower)) as $value) {
+        $variants[] = preg_replace('/_t(\d+)$/', '_T$1', $value);
+    }
+    return array_values(array_unique($variants));
+}
+
+function panGeneParamList(&$params, &$counter, $values) {
+    $names = array();
+    foreach ($values as $value) {
+        $names[] = panGeneParam($params, $counter, $value, 't');
+    }
+    return implode(', ', $names);
+}
+
 function panGeneSimpleMatchSql($term, &$params, &$counter) {
     // PDO rewrites named placeholders to positional ones for Postgres, so each
     // occurrence of the term gets a parameter of its own rather than reusing
-    // one name seven times.
-    $gene       = panGeneParam($params, $counter, $term, 't');
-    $transcript = panGeneParam($params, $counter, $term, 't');
-    $protein    = panGeneParam($params, $counter, $term, 't');
-    $proteinNl  = panGeneParam($params, $counter, $term . "\n", 't');
-    $exemplar   = panGeneParam($params, $counter, $term, 't');
-    $panGene    = panGeneParam($params, $counter, $term, 't');
-    $locus      = panGeneParam($params, $counter, panGeneArrayLiteral(array($term)), 't');
+    // one name in several arms.
+    $variants = panGeneTermVariants($term);
+    $withNewline = array();
+    foreach ($variants as $value) {
+        $withNewline[] = $value;
+        $withNewline[] = $value . "\n";
+    }
+
+    $gene       = panGeneParamList($params, $counter, $variants);
+    $transcript = panGeneParamList($params, $counter, $variants);
+    $protein    = panGeneParamList($params, $counter, $withNewline);
+    $panGene    = panGeneParamList($params, $counter, $variants);
+    $locus      = panGeneParam($params, $counter, panGeneArrayLiteral($variants), 't');
+
+    /* The exemplar is the one column with no index — pan_gene_search_i1..i8
+       cover every other one — and matching it directly was a 160-200 ms
+       parallel scan of the whole view on every search, hit or miss. It was the
+       entire cost of a typical lookup.
+
+       Two facts, checked over the whole view, let it go through indexes
+       instead:
+         - every one of the 97,184 exemplars ends in _T<digits>, so a term
+           without that suffix cannot be one and the arm is left out;
+         - 97,122 exemplars are a transcript of their own pan-gene, which the
+           transcript index finds. The other 62 are malformed names
+           (AC204254.3_FGTT001_T001) that are no transcript anywhere, so they
+           are read from chado.pan_gene_exemplar — which agrees with the view
+           on all 97,184 — and only when no transcript matched.
+
+       The scan sits in a MATERIALIZED CTE so that test is a one-time filter
+       *above* it. Written inline the planner put the test inside a parallel
+       Gather, and launching the workers cost 6 ms per statement even though
+       they never read a row. Now a real transcript costs nothing extra, and a
+       transcript-shaped miss pays the 20 ms scan. */
+    $exemplarArm = '';
+    if (preg_match('/_t\d+$/i', $term)) {
+        $exemplar  = panGeneParamList($params, $counter, $variants);
+        $fallback  = panGeneParamList($params, $counter, $variants);
+        $anyTranscript = panGeneParamList($params, $counter, $variants);
+        $exemplarArm = "
+      UNION
+      SELECT DISTINCT pan_gene_name, 'exemplar'::text
+      FROM chado.pan_gene_search
+      WHERE transcript_name IN ($exemplar) AND exemplar_gene_model = transcript_name
+      UNION
+      SELECT pan_gene_name, 'exemplar'::text FROM (
+        WITH unlisted AS MATERIALIZED (
+          SELECT DISTINCT pan_gene_name FROM chado.pan_gene_exemplar
+          WHERE exemplar_gene_model IN ($fallback))
+        SELECT pan_gene_name FROM unlisted
+        WHERE NOT EXISTS (SELECT 1 FROM chado.pan_gene_search
+                           WHERE transcript_name IN ($anyTranscript))) unlisted_exemplar";
+    }
 
     return "
       SELECT DISTINCT pan_gene_name, 'gene model'::text AS matched_as
-      FROM chado.pan_gene_search WHERE gene_model_name = $gene
+      FROM chado.pan_gene_search WHERE gene_model_name IN ($gene)
       UNION
       SELECT DISTINCT pan_gene_name, 'transcript'::text
-      FROM chado.pan_gene_search WHERE transcript_name = $transcript
+      FROM chado.pan_gene_search WHERE transcript_name IN ($transcript)
       UNION
       SELECT DISTINCT pan_gene_name, 'protein'::text
-      FROM chado.pan_gene_search WHERE protein IN ($protein, $proteinNl)
-      UNION
-      SELECT DISTINCT pan_gene_name, 'exemplar'::text
-      FROM chado.pan_gene_search WHERE exemplar_gene_model = $exemplar
+      FROM chado.pan_gene_search WHERE protein IN ($protein)" . $exemplarArm . "
       UNION
       SELECT DISTINCT pan_gene_name, 'pan-gene'::text
-      FROM chado.pan_gene_search WHERE pan_gene_name = $panGene
+      FROM chado.pan_gene_search WHERE pan_gene_name IN ($panGene)
       UNION
       SELECT DISTINCT pan_gene_name, 'locus'::text
-      FROM chado.pan_gene_loci WHERE loci @> $locus::varchar[]";
+      FROM chado.pan_gene_loci WHERE loci && $locus::varchar[]";
 }
 
 /* -------------------------------------------------------------------------
@@ -279,17 +355,36 @@ function panGeneAdvancedPickedSql($where, $needsAssemblies = true) {
       GROUP BY pgs.pan_gene_name";
 }
 
-/* The simple search resolves one identifier, so its match set is small and the
-   second pass to pick up the per-pan-gene columns costs almost nothing. */
+/* The per-pan-gene columns for the matched set, read from one row of each
+   matched pan-gene.
+
+   This used to join the match to the whole view and GROUP BY the seven
+   columns. Fine for one pan-gene; but the protein column also holds pathway
+   and EC identifiers — PWY-3781 reaches 548 pan-genes, GLYCOLYSIS 262 — and
+   once the planner expected that many it hash-joined against all 2.7 million
+   rows of the view: 1.6 s to build the hash, paid again by the count, 4.0 s
+   for the search. A LATERAL probe of pan_gene_search_i3 per matched pan-gene
+   reads only their own rows.
+
+   LIMIT 1 returns what the GROUP BY returned because every one of these
+   columns is constant within a pan_gene_name — checked over all 97,184, with
+   no NULL mixed in (see panGeneAdvancedPickedSql). And a pan-gene with no row
+   in the view drops out exactly as it did from the inner join. */
 function panGeneSimplePickedSql($matchSql) {
     return "
-      SELECT s.pan_gene_name, s.pan_gene_analysis, s.pan_gene_count,
+      SELECT m.pan_gene_name, s.pan_gene_analysis, s.pan_gene_count,
              s.exemplar_gene_model, s.assembly_count, s.max_annots, s.loci,
-             string_agg(DISTINCT m.matched_as, ', ' ORDER BY m.matched_as) AS matched_as
-      FROM chado.pan_gene_search s
-        INNER JOIN ($matchSql) m ON m.pan_gene_name = s.pan_gene_name
-      GROUP BY s.pan_gene_name, s.pan_gene_analysis, s.pan_gene_count,
-               s.exemplar_gene_model, s.assembly_count, s.max_annots, s.loci";
+             m.matched_as
+      FROM (SELECT pan_gene_name,
+                   string_agg(DISTINCT matched_as, ', ' ORDER BY matched_as) AS matched_as
+            FROM ($matchSql) mm
+            GROUP BY pan_gene_name) m
+        CROSS JOIN LATERAL (
+          SELECT x.pan_gene_analysis, x.pan_gene_count, x.exemplar_gene_model,
+                 x.assembly_count, x.max_annots, x.loci
+          FROM chado.pan_gene_search x
+          WHERE x.pan_gene_name = m.pan_gene_name
+          LIMIT 1) s";
 }
 
 /* -------------------------------------------------------------------------

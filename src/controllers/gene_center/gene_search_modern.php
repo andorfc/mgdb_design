@@ -86,6 +86,9 @@ $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-gene.js?v=' . $v_js);
 $bauplan->includeScript('/js/mgdb-blast.js?v=' . (int) @filemtime($doc_root . '/js/mgdb-blast.js'));
+/* The embedded BLAST form still uses the site-owned legacy form engine. Keep
+   its jQuery dependency on this page instead of loading it from the shell. */
+$bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/controllers/BLAST/BLAST.js');
 $bauplan->head('<meta name="description" content="Search maize genes and gene models by name, identifier, sequence or genome position. Translate identifiers between annotations, download gene model sets, and report gene model problems.">');
 

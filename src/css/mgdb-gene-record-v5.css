@@ -1,0 +1,364 @@
+/* file: mgdb-gene-record-v5.css
+ *
+ * purpose: the navigation of the /gene_center/gene_v5 mockup -- four view tabs
+ *          with the section bubble bar of the open view under them, sticky
+ *          together at the top of the page.
+ *
+ *          The header panel above it is NOT styled here. v5's <main> carries
+ *          .mgdb-gene-record-v4-page, so mgdb-gene-record-v4.css does that job
+ *          and the two pages cannot drift apart.
+ *
+ *          The tabs are the shape drawn for /gene_center/gene_openai: glyph,
+ *          title, and a line saying what is in the view. The bubbles are the
+ *          shell's own .mgdb-section-tabs, which is what /gene_center/gene_v2
+ *          and every other record page use; the rules below only fit that bar
+ *          inside the block rather than restyling it.
+ *
+ *          --v5-nav-h is written by js/mgdb-gene-record-v5.js from the block's
+ *          measured height, and is what a section jump clears. The bar wraps to
+ *          two rows on the wider views, so the height cannot be a constant.
+ */
+
+.mgdb-gene-record-v5-page { --v5-nav-h: 122px; }
+
+/* --------------------------------------------------------------------------
+   The sticky block
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v5-page .v5-nav {
+  position: sticky;
+  z-index: 40;
+  top: 0;
+  /* No margins. <main> is a flex column with a 32px gap, and flex items do not
+     collapse margins -- they add to the gap. So `space-4 0 space-5` put 48px
+     above this block and 56px below it while everything else on the page sat
+     at 32, which showed up as extra padding over whatever followed (the Note
+     box, on a record that has one). Zero here leaves the page's own rhythm to
+     do the spacing. */
+  margin: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 10px 30px rgba(22, 54, 41, .11);
+  backdrop-filter: blur(12px);
+}
+
+/* --------------------------------------------------------------------------
+   Row one: the four views
+
+   A grid of four equal columns rather than a flex row, so the four tabs are
+   the same width whatever their titles are -- "Pan-gene" and "Genetic
+   information" differ by 11 characters and a flex row would have sized them
+   to match. The 1px gap over a line-coloured ground is the divider.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v5-page .v5-views {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+  background: var(--mgdb-line);
+}
+
+.mgdb-gene-record-v5-page .v5-views button {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 66px;
+  gap: 8px;
+  align-items: center;
+  /* 12/8 rather than 14/10: the longest description is 246px of text and the
+     quarter-width column gives it 243, so the whitespace either side is what
+     had to give. Trimming it is free -- nothing here is legibility. */
+  padding: 11px 12px;
+  border: 0;
+  background: #fff;
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The gold underline of the open view. Always present, transparent until the
+   tab is the selected one, so selecting a tab moves no other tab by a pixel. */
+.mgdb-gene-record-v5-page .v5-views button::after {
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  left: 12px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+  content: "";
+}
+
+.mgdb-gene-record-v5-page .v5-views button:hover { background: #f7f9f7; color: var(--mgdb-green-dark); }
+.mgdb-gene-record-v5-page .v5-views button[aria-selected="true"] { background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); }
+.mgdb-gene-record-v5-page .v5-views button[aria-selected="true"]::after { background: var(--mgdb-gold); }
+.mgdb-gene-record-v5-page .v5-views button:focus-visible { z-index: 1; outline: 3px solid rgba(231, 166, 26, .55); outline-offset: -3px; }
+
+.mgdb-gene-record-v5-page .v5-views svg {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+.mgdb-gene-record-v5-page .v5-views span { display: grid; min-width: 0; }
+.mgdb-gene-record-v5-page .v5-views strong { font-size: var(--mgdb-text-sm); line-height: 1.25; }
+/* Weight 400, not 500. The longest description is 45 characters in a
+   quarter-width column and the regular face is the narrower one -- worth about
+   five pixels, which is the difference between fitting at the page's full
+   width and ending in an ellipsis there. A muted secondary line reads better
+   at 400 anyway. */
+.mgdb-gene-record-v5-page .v5-views small {
+  overflow: hidden;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Row two: the sections of the open view
+
+   The shell's bubble bar, unchanged in look. What is undone here is the
+   shell's own stickiness and its outer margins: the bar is already inside a
+   sticky block, and a second sticky element inside the first would stop
+   travelling with it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs {
+  position: static;
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(215, 221, 216, .65);
+  border-radius: 0 0 var(--mgdb-radius) var(--mgdb-radius);
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs[hidden] { display: none; }
+
+/* A bubble on the sunken ground needs its own white fill; the shell's rule
+   paints it --mgdb-surface, which is the same colour the bar sat on now that
+   it has moved in here.
+
+   :not(.is-current) is load-bearing. Written as a bare `a`, this selector is
+   three classes to the shell's two (.mgdb-section-tabs a.is-current), so it
+   also repainted the open bubble -- which kept the shell's white text and its
+   gold spine and so rendered as an empty outlined box. Excluding the open one
+   leaves the shell to fill it dark green, which is how every other bar on the
+   site marks the section you are in. */
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a:not(.is-current) {
+  background: #fff;
+}
+
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a {
+  min-height: 34px;
+  padding: 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
+}
+
+/* --------------------------------------------------------------------------
+   The panels, and where a jump lands
+
+   scroll-margin-top is the block's measured height plus the 8px the shell
+   uses everywhere else, written by the page script.
+
+   The runaway guard that belongs with it is in the script and not here. As
+   min(var(--v5-nav-h), 40vh) this resolved to 0px wherever the viewport
+   reports no height -- a hidden pane, an off-screen render -- and every jump
+   then landed its heading underneath the bar.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v5-page .v5-panels[hidden] { display: none; }
+.mgdb-gene-record-v5-page .v5-panels > section[id] { scroll-margin-top: var(--v5-nav-h); }
+
+.mgdb-gene-record-v5-page .v5-stub {
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-5);
+  border: 1px dashed var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-gene-record-v5-page .v5-stub .mgdb-section-heading { margin-bottom: var(--mgdb-space-2); }
+.mgdb-gene-record-v5-page .v5-stub-note { margin: 0; color: var(--mgdb-muted); font-family: inherit; font-size: var(--mgdb-text-sm); }
+
+.mgdb-gene-record-v5-page .v5-note {
+  margin: var(--mgdb-space-6) 0 0;
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+
+   Under 1000px the line under each title is the first thing to go: four of
+   them do not fit, and the title alone still says which view it is. Under
+   680px the tabs stack glyph over title and the block loses its side borders,
+   the way every other bar on the site does at that width.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .mgdb-gene-record-v5-page .v5-views small { display: none; }
+  .mgdb-gene-record-v5-page .v5-views button { min-height: 56px; }
+}
+
+@media (max-width: 680px) {
+  .mgdb-gene-record-v5-page .v5-nav {
+    margin-right: calc(-1 * var(--mgdb-space-2));
+    margin-left: calc(-1 * var(--mgdb-space-2));
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+  .mgdb-gene-record-v5-page .v5-views {
+    border-radius: 0;
+  }
+  .mgdb-gene-record-v5-page .v5-views button {
+    display: grid;
+    min-height: 58px;
+    padding: 8px 4px;
+    place-items: center;
+    text-align: center;
+  }
+  .mgdb-gene-record-v5-page .v5-views button svg { width: 21px; height: 21px; }
+  .mgdb-gene-record-v5-page .v5-views button span { display: block; }
+  .mgdb-gene-record-v5-page .v5-views strong { display: block; font-size: 11px; }
+
+  /* The bubbles stop wrapping and scroll sideways instead. Four rows of them
+     on a phone is more sticky chrome than page. */
+  .mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    border-radius: 0;
+    scrollbar-width: thin;
+  }
+  .mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a { flex: 0 0 auto; }
+}
+
+/* --------------------------------------------------------------------------
+   When a section has nothing in it
+
+   Three different facts, told apart because they lead somewhere different:
+
+     No data            MaizeGDB has the category and this record has nothing
+                        in it. Neutral grey.
+     Not in this build  the data exists for maize but was never generated for
+                        the assembly or annotation on screen -- an old B73
+                        build has no proteomics, no qTeller, no model scores.
+                        Blue, the shell's information tone, because it points
+                        somewhere: the current annotation may have it.
+     Not applicable     the section is about a gene model and this record is a
+                        classical gene with none linked, or the reverse. Grey,
+                        and the sentence says which half is missing.
+
+   None of them is wine. That colour is spoken for by the two header callouts,
+   which mean "there is more here than you can see"; an empty section means the
+   opposite, and a page that shouts both ways teaches neither.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v5-page .v5-nodata {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-4);
+  border: 1px dashed var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-gene-record-v5-page .v5-nodata p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-record-v5-page .v5-nodata-tag {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mgdb-gene-record-v5-page .v5-nodata-build {
+  border-color: #c9dced;
+  background: var(--mgdb-status-info-soft);
+}
+
+.mgdb-gene-record-v5-page .v5-nodata-build .v5-nodata-tag {
+  background: #d6e7f3;
+  color: var(--mgdb-status-info);
+}
+
+/* An empty section keeps its heading but loses the weight of one that has
+   something to read. */
+.mgdb-gene-record-v5-page .v5-section.is-empty .mgdb-section-heading h2 {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xl);
+}
+
+/* Its bubble stays in the bar -- the bar is the same on every record, which is
+   the point of it -- but says from the outside that there is nothing behind
+   it, so the reader is not sent to an empty section to find out. */
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a.is-empty {
+  border-style: dashed;
+  color: var(--mgdb-muted) !important;
+  font-weight: 400;
+}
+
+/* Hover firms the border and leaves the text alone: a bubble with data keeps
+   its text colour under the pointer, and so does this one. */
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a.is-empty:hover {
+  border-style: solid;
+}
+
+/* Open, it is filled dark green like any other open bubble, and its text
+   goes white with it. The grey above is !important to beat the shell's ink,
+   so without this it also beat the shell's white and left grey on green. */
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a.is-empty.is-current,
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs a.is-empty.is-current:hover {
+  border-style: solid;
+  color: #fff !important;
+}
+
+/* The count badge the script fills from meta.counts. */
+.mgdb-gene-record-v5-page .mgdb-section-tabs.v5-tabs .mgdb-tab-count {
+  min-width: 1.2rem;
+  margin-left: 6px;
+  font-size: 11px;
+}
+
+/* The section shell the renderers write into. */
+.mgdb-gene-record-v5-page .v5-section {
+  margin-bottom: var(--mgdb-space-6);
+  scroll-margin-top: var(--v5-nav-h);
+}
+
+.mgdb-gene-record-v5-page .v5-report { margin: var(--mgdb-space-5) 0 0; text-align: right; }
+
+/* Gene model scores, Range view: which isoform a row scores, when the block
+   carries more than one. */
+.mgdb-gene-record-v5-page .gene-score-feature {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--mgdb-muted, #5b655e);
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-gene-record-v5-page .gene-score-feature .mgdb-pill { font-family: var(--mgdb-font); }

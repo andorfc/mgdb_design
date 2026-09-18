@@ -27,7 +27,7 @@ $$SYNTAX-LEVEL 2
       <div>
         <h2 id="redesign-status-summary-title">The whole site</h2>
       </div>
-      <p>A page counts as modern when it opts in to the modern document shell and loads the shared design system. Partial means it has one of the two and not the other. Retired means the URL still answers, with a permanent redirect to wherever its content went, but has no page of its own &#8212; so it is counted out of the percentage rather than against it.</p>
+      <p>A page counts as modern when it opts in to the modern document shell and loads the shared design system. Progress covers the active redesign scope: modern pages, pages still to convert, and routes whose record page is modern but whose search page is not. Retired routes, machine endpoints, and unlinked legacy routes are excluded because none is a page waiting for redesign work.</p>
     </div>
 
     <div class="mgdb-metric-grid">
@@ -39,7 +39,7 @@ $$SYNTAX-LEVEL 2
       <div class="mgdb-metric">
         <span class="mgdb-label">Modern</span>
         <span class="mgdb-metric-value">$(modern-count)</span>
-        <span class="mgdb-small mgdb-muted">$(percent-modern)% of the pages that still exist</span>
+        <span class="mgdb-small mgdb-muted">$(percent-modern)% of the active redesign scope</span>
       </div>
       <div class="mgdb-metric mgdb-metric-quiet">
         <span class="mgdb-label">Partial</span>
@@ -76,8 +76,7 @@ $$SYNTAX-LEVEL 2
       <p class="mgdb-small mgdb-muted">
         <span class="status-key status-key-modern">Modern</span>
         <span class="status-key status-key-partial">Partial</span>
-        <span class="status-key status-key-legacy">Legacy</span>
-        <span class="status-key status-key-retired">Retired</span>
+        <span class="status-key status-key-legacy">Still incomplete</span>
       </p>
     </div>
   </section>
@@ -87,7 +86,7 @@ $$SYNTAX-LEVEL 2
       <div>
         <h2 id="redesign-status-category-title">Progress by category</h2>
       </div>
-      <p>The data hubs are the largest single block of work and the most linked-to part of the site, so they move the total more than anything else on this list.</p>
+      <p>Progress uses the same active scope as the headline. Unlinked and retired routes remain visible in the table, but do not lower the percentage; half-converted routes remain in scope until their search page is modern too.</p>
     </div>
 
     <div class="mgdb-table-scroll">
@@ -97,10 +96,10 @@ $$SYNTAX-LEVEL 2
           <tr>
             <th scope="col" data-sort="text"><button type="button">Category</button></th>
             <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Modern</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Partial</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Legacy</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">To convert</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Record done</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Not linked</button></th>
             <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Retired</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Total</button></th>
             <th scope="col" data-sort="number"><button type="button">Progress</button></th>
           </tr>
         </thead>

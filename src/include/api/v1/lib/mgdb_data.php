@@ -51,7 +51,8 @@ class MgdbData {
     'go' => 'go',   /* the GO reference index (tools/go_index.py); no genome level */
     'domains' => 'domains',
     'expression' => 'expression',
-    'gene-positions' => 'gene_positions'  /* tools/gene_positions_index.py */
+    'gene-positions' => 'gene_positions',  /* tools/gene_positions_index.py */
+    'paralogs' => 'paralogs'   /* homeolog pairs and tandem arrays (tools/paralogs_index.py); no data route */
   );
 
   /* ---------------------------------------------------------------------

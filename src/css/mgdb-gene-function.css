@@ -354,6 +354,8 @@ a.gf-arch-pill:hover { text-decoration: underline; color: #fff; }
 .gf-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--mgdb-space-3); }
 
 .gf-card {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
   border: 1px solid var(--gf-rule);
@@ -361,6 +363,29 @@ a.gf-arch-pill:hover { text-decoration: underline; color: #fff; }
   border-radius: var(--mgdb-radius-sm, 6px);
   background: var(--mgdb-surface, #fff);
 }
+/* A flex column does not collapse margins: the strip's top margin is what
+   the number's bottom margin left of the 6px it had as a block. */
+.gf-card > .gf-strip { margin-top: 2px; }
+
+/* The download links sit at the foot of the card, level across a row of
+   cards whose notes differ in length. */
+.gf-card-dl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: var(--mgdb-space-3); }
+.mgdb-page .gf-card-dl a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;     /* a flex item drops the arrow's leading space */
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--gf-rule);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: var(--mgdb-surface-sunken, #f5f1e9);
+  color: var(--gf-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.mgdb-page .gf-card-dl a:hover,
+.mgdb-page .gf-card-dl a:focus-visible { border-color: var(--gf-bp); background: var(--mgdb-surface, #fff); }
 
 .gf-card-immunity { border-left-color: var(--gf-cc); }
 .gf-card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 10px; }

@@ -488,37 +488,33 @@
   outline-offset: 2px;
 }
 
-/* The two actions are one block of equal controls, never a wrapped pair: a
-   "Copy DOI" broken across two lines in a narrow column looks like a fault.
+/* The actions stack, one button per line (2026-09-18, Carson). Side by side
+   they needed a 20rem column, which left the title -- the column people read
+   -- 238px on a 1280px screen. Stacked, the column is one button wide.
 
-   A two-column grid rather than a flex row, because equal is the requirement:
+   One grid track rather than a flex column, because equal is the requirement:
    "View paper" carries the shell's off-site arrow and "Copy DOI" does not, so
-   sized to their content one is always a few pixels wider than the other. 1fr
-   1fr makes them the same by construction whatever the labels become.
+   sized to their content one is always a few pixels wider than the other. A
+   single 1fr track makes every button the column's width by construction.
 
    NOT called .mgdb-ref-actions. That class is the card view's own button row,
    and mgdb-modern.css styles `.mgdb-ref-actions .mgdb-ref-copy` -- two classes
    deep, so it beats anything written here with one, and the copy button came
    out 44px tall beside a 32px link. */
-/* The column is given a real width, and that is what makes the two buttons
-   the same size.
+/* The column is given a real width. `width: 1%` shrinks it to its content,
+   which leaves the grid no definite width to fill, and the buttons fall back
+   to their own sizes.
 
-   `width: 1%` shrinks the column to its content, which leaves the grid with no
-   definite width to divide -- so `1fr 1fr` fell back to sizing each track to
-   its own content and the pair came out 127px beside 86px. `minmax(max-content,
-   1fr)` was worse for the same reason. With a definite 18rem the two tracks
-   split it evenly and the labels decide nothing.
-
-   20rem, not 18: a grid track cannot go below its own min-content, and at
-   18rem the tracks worked out to 124px while "View paper" plus the shell's
-   off-site arrow needs 127 -- so the first track pushed out to 127 and the
-   second took what was left, 121. The column has to be wide enough that an
-   even split already clears the longer label. 20rem gives each track 140. */
-.mgdb-rec-table .mgdb-ref-col-actions { width: 20rem; white-space: nowrap; }
+   11rem: the cell is border-box with 16px of padding a side, and the widest
+   label, "View paper" plus the off-site arrow, needs 127px at this size. 11rem
+   leaves the buttons 144px. No nowrap on the cell -- the buttons carry their
+   own -- so "No DOI or PubMed ID on file" wraps inside it rather than widening
+   it back out. */
+.mgdb-rec-table .mgdb-ref-col-actions { width: 11rem; }
 
 .mgdb-ref-cellactions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--mgdb-space-2);
   align-items: stretch;
 }
@@ -529,10 +525,6 @@
   padding: 0 var(--mgdb-space-3);
   font-size: var(--mgdb-text-xs);
   white-space: nowrap;
-}
-
-@media (max-width: 900px) {
-  .mgdb-ref-cellactions { grid-template-columns: 1fr; }
 }
 
 .mgdb-rec-table .mgdb-rec-links {

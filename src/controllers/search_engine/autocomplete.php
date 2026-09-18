@@ -8,6 +8,9 @@
  */
 
 ini_set('display_errors', '0');
+/* For saPanGeneRows(): the pan-gene suggestions are the results page's own
+   pan-gene rows, so the two cannot disagree about what matched. */
+include_once(__DIR__ . '/../../search/searchall/searchall_lib.php');
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
 header('X-Content-Type-Options: nosniff');
@@ -285,7 +288,7 @@ function acRecordItem($group, $candidate, $row, $meta) {
 
 $query = trim((string)$term);
 $type = strtolower(trim((string)$type));
-$allowedTypes = array('anything', 'gene_product', 'gene_model', 'genome', 'locus', 'probe',
+$allowedTypes = array('anything', 'gene_product', 'gene_model', 'pan_gene', 'genome', 'locus', 'probe',
   'qtl_exp', 'stock', 'reference', 'term', 'phenotype', 'variation', 'map', 'person', 'id', 'goog');
 if (!in_array($type, $allowedTypes)) $type = 'anything';
 if (function_exists('mb_substr')) $query = mb_substr($query, 0, 80, 'UTF-8');
@@ -299,6 +302,7 @@ if ($query === '' || (($type !== 'id') && strlen($query) < 2) || $type === 'goog
    its icon sprite on — see templates/home/search-box-modern.bau. */
 $groupMeta = array(
   'gene_model' => array('label' => 'Genes', 'badge' => 'GENE'),
+  'pan_gene' => array('label' => 'Pan-genes', 'badge' => 'PAN-GENE'),
   'genome' => array('label' => 'Genomes', 'badge' => 'GENOME'),
   'locus' => array('label' => 'Loci', 'badge' => 'LOCUS'),
   'probe' => array('label' => 'Markers and probes', 'badge' => 'MARKER'),
@@ -638,6 +642,50 @@ try {
     else unset($groupsByKey['locus']);
   }
 
+  /*
+   * Pan-genes, matched the way the pan-gene hub matches them: a locus, gene
+   * model, transcript, protein, exemplar or pan-gene name, typed in full. The
+   * rows are the results page's own (saPanGeneRows), so the dropdown and the
+   * page it leads to list the same pan-genes. Nothing is offered for a
+   * partial identifier, because the hub and the page would find nothing for
+   * it either.
+   *
+   * Every arm is an index probe: about 3 ms for a term that is not a pan-gene
+   * identifier, which is most keystrokes. Runs after the gene group so that
+   * an exact gene stays the top hit — for "lg1" the gene record, not its
+   * pan-gene, is what the reader asked for.
+   */
+  if ($type === 'anything' || $type === 'pan_gene') {
+    $panGenes = saPanGeneRows($DBConn, $query, 1, 4);
+    $items = array();
+    foreach ($panGenes['rows'] as $row) {
+      $loci = $row['loci'];
+      $items[] = array(
+        'label' => acCleanText($row['name'], 150),
+        'secondary' => acJoinText(array(
+          number_format($row['member_count']) . ($row['member_count'] === 1 ? ' member gene model' : ' member gene models'),
+          $loci ? (count($loci) === 1 ? 'Locus ' : 'Loci ') . implode(', ', $loci) : '',
+          $row['matched_as'] ? 'Matched on ' . implode(', ', $row['matched_as']) : '',
+        )),
+        'url' => $row['url'],
+        'cat' => 'pan_gene',
+        'badge' => $groupMeta['pan_gene']['badge'],
+        'exact' => true,
+      );
+    }
+    /* One pan-gene is an answer, not a list: an accession such as A0A1D6DVJ6
+       names nothing else on the site. */
+    if ($topHit === null && (int)$panGenes['total'] === 1 && $items) {
+      $topHit = $items[0] + array('action' => 'Go to pan-gene record');
+    }
+    if ($items) {
+      $groupsByKey['pan_gene'] = array(
+        'key' => 'pan_gene', 'label' => $groupMeta['pan_gene']['label'], 'cat' => 'pan_gene',
+        'items' => $items,
+      );
+    }
+  }
+
   if ($type === 'anything' || $type === 'genome') {
     /* Ranked, not alphabetical. The previous order was: exact name, then names
        starting with the query, then everything else by name -- and with
@@ -710,7 +758,7 @@ try {
      groups that can each run to thousands of rows. Only the group order moves
      -- an exact stock name is still promoted as the top hit above all of
      them, which is what "B73" the germplasm record is. */
-  $priority = array('id', 'gene_model', 'genome', 'locus', 'stock', 'probe', 'reference', 'qtl_exp',
+  $priority = array('id', 'gene_model', 'pan_gene', 'genome', 'locus', 'stock', 'probe', 'reference', 'qtl_exp',
                     'term', 'phenotype', 'variation', 'gene_product', 'map', 'person');
   foreach ($priority as $key) if (isset($groupsByKey[$key])) $groups[] = $groupsByKey[$key];
 

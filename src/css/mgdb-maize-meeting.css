@@ -647,7 +647,21 @@
   cursor: pointer;
 }
 
-.mgdb-meeting-page .meeting-event-go::after {
+/* ::before, not ::after, and that is load-bearing.
+   
+   This overlay used to be ::after -- and `.mgdb-page a[href^="http"]::after`
+   in mgdb-modern.css writes the external-link arrow into exactly that
+   pseudo-element. The arrow won the `content` declaration, so the invisible
+   click target became a visible glyph, and because the overlay is
+   `position: absolute; inset: 0` against the card, it painted in the CARD'S
+   TOP-LEFT CORNER, over the photograph. The arrow was not stray: it belongs to
+   "Visit the 2027 meeting website" and was being dragged out of the line of
+   text by the overlay's positioning.
+   
+   On ::before the overlay is out of the arrow's way, so the card stays
+   clickable and the arrow sits inline after the link text where every other
+   external link on the site puts it. */
+.mgdb-meeting-page .meeting-event-go::before {
   content: "";
   position: absolute;
   inset: 0;

@@ -211,7 +211,7 @@ if (isset($want['loci'])) {
 if (isset($want['references'])) {
   $references = array();
   $ref_sth = make_query($DBConn, "
-    SELECT r.id, r.name, r.title, r.year, r.doi, r.author_desc,
+    SELECT r.id, r.name, r.title, r.year, " . mgdbReferenceDoiSql('r') . " AS doi, " . mgdbReferencePubmedSql('r') . " AS pubmed, r.author_desc,
            t.name AS contents, t_type.name AS pub_type
     FROM mgdb.id_reference ir
     JOIN mgdb.reference r ON r.id = ir.reference
@@ -223,13 +223,6 @@ if (isset($want['references'])) {
   MgdbApi::countQuery();
   while ($r_row = retrieve_row($ref_sth)) {
     $doi = MgdbApi::text($r_row['doi']);
-    if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
-      $doi = $m[1];
-    } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string) $r_row['name'], $m)) {
-      $doi = $m[1];
-    } else {
-      $doi = null;
-    }
     $references[] = array(
       'type' => 'reference',
       'id' => MgdbApi::int($r_row['id']),
@@ -238,6 +231,7 @@ if (isset($want['references'])) {
       'authors' => MgdbApi::text($r_row['author_desc']),
       'year' => MgdbApi::int($r_row['year']),
       'doi' => $doi,
+      'pubmed' => MgdbApi::text($r_row['pubmed']),
       'pub_type' => MgdbApi::text($r_row['pub_type']) ?: 'Journal article',
       'relevance' => MgdbApi::text($r_row['contents']),
       'html' => '/data_center/reference?id=' . (int) $r_row['id']

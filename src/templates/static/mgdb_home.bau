@@ -255,36 +255,119 @@ $$SYNTAX-LEVEL 2
       </ul>
 
       <div class="mgdb-index" data-home-panel="tasks" hidden>
-        <div role="list">
+        <!-- Each task names one thing a reader comes here to do and links the
+             page, and where the page is long, the section, that does it. The
+             section anchors are the hubs' own tab targets, so the shared
+             tab-offset script lands them below the sticky bar; a form or a
+             panel inside a section has no scroll margin and would land behind
+             it, which is why the translator is linked as its section
+             \(#gene-lists\) and not as its form. The four bands carry the same
+             tints, in the same order, as the Key Resources panel below. -->
+        <h3 class="mgdb-index-band" id="home-task-genes">Genes and sequences</h3>
+        <div role="list" aria-labelledby="home-task-genes">
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-genes"></use></svg></span>
-            <strong>Find a gene by symbol</strong>
-            <span class="mgdb-index-desc">Look a gene up by name, symbol, or model</span>
+            <strong>Find a gene by name or symbol</strong>
+            <span class="mgdb-index-desc">Look a gene up by name, symbol, or gene model ID</span>
           </a>
-          <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene#translate">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene#gene-lists">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-genomes"></use></svg></span>
-            <strong>Translate gene models between assemblies</strong>
-            <span class="mgdb-index-desc">Move a model from one assembly to another</span>
+            <strong>Translate gene model IDs between annotations</strong>
+            <span class="mgdb-index-desc">Convert a list of IDs from one annotation set to another</span>
           </a>
-          <a class="mgdb-index-row" role="listitem" href="$(server-url)/data_center/stock">
-            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
-            <strong>Order seed from the Stock Center</strong>
-            <span class="mgdb-index-desc">Seed requests from the Maize Genetics Cooperation Stock Center</span>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene#gene-region">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-loci"></use></svg></span>
+            <strong>Find gene models in a genome region</strong>
+            <span class="mgdb-index-desc">A chromosome and position range on any assembly</span>
           </a>
-          <a class="mgdb-index-row" role="listitem" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/BLAST">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
-            <strong class="mgdb-external">B73 genome downloads<span class="mgdb-visually-hidden"> &#40;opens download.maizegdb.org&#41;</span></strong>
-            <span class="mgdb-index-desc">Assemblies, annotations, and supporting files</span>
+            <strong>BLAST a sequence against maize genomes</strong>
+            <span class="mgdb-index-desc">Nucleotide or protein search of every hosted assembly</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/genomebrowser#browser-launch">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-genome-browsers"></use></svg></span>
+            <strong>Browse a genome region in JBrowse</strong>
+            <span class="mgdb-index-desc">Pick an assembly and coordinates to open JBrowse 2</span>
+          </a>
+        </div>
+        <h3 class="mgdb-index-band" id="home-task-variation">Variation and function</h3>
+        <div role="list" aria-labelledby="home-task-variation">
+          <a class="mgdb-index-row" role="listitem" href="https://snptools.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
+            <strong class="mgdb-external">Mine alleles across diverse lines<span class="mgdb-visually-hidden"> &#40;opens snptools.maizegdb.org&#41;</span></strong>
+            <span class="mgdb-index-desc">SNPTools variant browsing and allele mining</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://wgs.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-datasets-and-downloads"></use></svg></span>
+            <strong class="mgdb-external">Build a VCF for a region of B73<span class="mgdb-visually-hidden"> &#40;opens wgs.maizegdb.org&#41;</span></strong>
+            <span class="mgdb-index-desc">SNPversity 2.1 genotypes for a chosen set of accessions</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/effect/maize_v2/">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-artificial-intelligence"></use></svg></span>
+            <strong>Predict the effect of a variant</strong>
+            <span class="mgdb-index-desc">PanEffect language-model scores across the pan-genome</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://feta.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-enrichment-feta"></use></svg></span>
+            <strong class="mgdb-external">Test a gene list for GO or pathway enrichment<span class="mgdb-visually-hidden"> &#40;opens feta.maizegdb.org&#41;</span></strong>
+            <span class="mgdb-index-desc">FETA enrichment with GO, KEGG, and Reactome terms</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://qteller.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-expression-profile"></use></svg></span>
+            <strong class="mgdb-external">Compare expression across tissues<span class="mgdb-visually-hidden"> &#40;opens qteller.maizegdb.org&#41;</span></strong>
+            <span class="mgdb-index-desc">qTeller RNA-seq atlases from multiple data sources</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/pan_gene_center/pan_gene">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-pan-genes"></use></svg></span>
+            <strong>Find the pan-gene group for a gene</strong>
+            <span class="mgdb-index-desc">Orthologs and gene families across Zea assemblies</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/data_center/protein_structure">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-protein-structures"></use></svg></span>
+            <strong>View a predicted protein structure</strong>
+            <span class="mgdb-index-desc">AlphaFold models and complexes, Foldseek and FATCAT</span>
+          </a>
+        </div>
+        <h3 class="mgdb-index-band" id="home-task-stocks">Stocks and phenotypes</h3>
+        <div role="list" aria-labelledby="home-task-stocks">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/ordering/coop_order">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
+            <strong>Request seed from the Stock Center</strong>
+            <span class="mgdb-index-desc">Order form for the Maize Genetics Cooperation Stock Center</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/data_center/phenotype">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-phenotypes"></use></svg></span>
+            <strong>Find a mutant phenotype</strong>
+            <span class="mgdb-index-desc">Observable traits, mutant phenotypes, and plant anatomy</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/insertion">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
+            <strong>Find a transposon insertion in a gene</strong>
+            <span class="mgdb-index-desc">UniformMu, Ac/Ds, and Ds-GFP hits by gene model or region</span>
+          </a>
+        </div>
+        <h3 class="mgdb-index-band" id="home-task-data">Data and support</h3>
+        <div role="list" aria-labelledby="home-task-data">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/download#downloads-b73">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-datasets-and-downloads"></use></svg></span>
+            <strong>Download the B73 genome</strong>
+            <span class="mgdb-index-desc">Assembly and annotation files, B73 v1 through v5</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/nomenclature_summary">
-            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-references"></use></svg></span>
-            <strong>Nomenclature summary</strong>
-            <span class="mgdb-index-desc">How assemblies and annotations are named</span>
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-nomenclature"></use></svg></span>
+            <strong>Decode assembly and gene model names</strong>
+            <span class="mgdb-index-desc">How to read a gene model ID such as Zm00001eb378140</span>
           </a>
-          <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/geneModelIssues">
-            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
-            <strong>Report a gene model issue</strong>
-            <span class="mgdb-index-desc">Flag a problem with an annotation</span>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/GenomeIssue">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-genomes"></use></svg></span>
+            <strong>Report an assembly problem</strong>
+            <span class="mgdb-index-desc">A location on a reference assembly, and what is wrong there</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/GenomeIssue?gene_model_id=">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-genes"></use></svg></span>
+            <strong>Report a gene model problem</strong>
+            <span class="mgdb-index-desc">A gene model ID, and what is wrong with its annotation</span>
           </a>
         </div>
       </div>
@@ -298,6 +381,14 @@ $$SYNTAX-LEVEL 2
                occurrence in the body template that nothing set, so the row
                rendered href="" and reloaded the homepage. The Quick Links card
                above has always written the route out for the same reason. -->
+          ;; jbrowse.maizegdb.org is a MaizeGDB subdomain, so it opens in a new
+          ;; tab like the megamenu's JBrowse link but carries no external arrow \(see
+          ;; templates/home/megamenu_modern/genomes.bau, same URL\).
+          <a class="mgdb-index-row" role="listitem" href="https://jbrowse.maizegdb.org/?data=v5" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-genome-browsers"></use></svg></span>
+            <strong>B73 JBrowse</strong>
+            <span class="mgdb-index-desc">B73 version 5, JBrowse 1</span>
+          </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/BLAST">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
             <strong>BLAST</strong>
@@ -417,9 +508,6 @@ $$SYNTAX-LEVEL 2
     <section class="mgdb-home-crops-strip" aria-labelledby="usda-db-title">
       <div class="mgdb-home-crops-strip-head">
         <h2 id="usda-db-title" class="mgdb-home-crops-title">USDA-ARS databases</h2>
-        <a class="mgdb-home-usda-link" href="https://www.usda.gov/" target="_blank" rel="noopener" title="United States Department of Agriculture">
-          <img src="/images/usda-v2-color-lockup.svg" alt="United States Department of Agriculture" height="34" />
-        </a>
       </div>
       <ul class="mgdb-home-crops-logos">
         <li>

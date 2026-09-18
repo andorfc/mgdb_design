@@ -334,7 +334,7 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/term_record_lib.php');
   if (isset($want['references'])) {
     $references = array();
     $sth = make_query($DBConn, "
-      SELECT r.id, r.name, r.title, r.year, r.doi, r.author_desc, t.name AS contents,
+      SELECT r.id, r.name, r.title, r.year, " . mgdbReferenceDoiSql('r') . " AS doi, " . mgdbReferencePubmedSql('r') . " AS pubmed, r.author_desc, t.name AS contents,
              t_type.name AS pub_type,
              (
                SELECT substring(regexp_replace(string_agg(
@@ -351,17 +351,9 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/term_record_lib.php');
       ORDER BY r.year DESC NULLS LAST, LOWER(r.name)", 1, array('id' => $id));
     MgdbApi::countQuery();
     while ($row = retrieve_row($sth)) {
-      /* The DOI is stored inconsistently -- bare, prefixed with "doi:", or as a
-         full doi.org URL, and sometimes only inside the citation string. One
-         pattern pulls the bare DOI out of any of those. */
+      /* Column, then ext_db_key, then the citation text: see
+         include/reference_ids_lib.php. */
       $doi = MgdbApi::text($row['doi']);
-      if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
-        $doi = $m[1];
-      } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string) $row['name'], $m)) {
-        $doi = $m[1];
-      } else {
-        $doi = null;
-      }
       $references[] = array(
         'type' => 'reference',
         'id' => MgdbApi::int($row['id']),
@@ -370,6 +362,7 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/term_record_lib.php');
         'authors' => MgdbApi::text($row['author_desc']),
         'year' => MgdbApi::int($row['year']),
         'doi' => $doi,
+        'pubmed' => MgdbApi::text($row['pubmed']),
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
         'abstract' => MgdbApi::text($row['abstract']),

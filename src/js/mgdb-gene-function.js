@@ -637,6 +637,7 @@
             ? 'This protein carries ' + c.entries_here.map(function (e) { return '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">' + esc(e.accession) + '</a> ' + esc(e.name); }).join(', ') +
               ' of the class’s ' + c.entries_in_class + ' entries.'
             : '')));
+        card.appendChild(downloads([[c.download, c.genes_here, 'gene model IDs']]));
         cards.appendChild(card);
       });
       if (classes.immunity) {
@@ -648,6 +649,8 @@
         icard.appendChild(html('div', 'gf-card-note',
           (im.subclass ? 'Subclass <strong>' + esc(im.subclass) + '</strong>' + (im.subclass_genes_here != null ? ' (' + num(im.subclass_genes_here) + ' in ' + esc(classes.genome_label) + ')' : '') + '. ' : '') +
           'The immunity call is exclusive: one class per gene, by domain-architecture precedence.'));
+        icard.appendChild(downloads([[im.download, im.genes_here, im.label + ' gene model IDs'],
+                                     [im.subclass_download, im.subclass_genes_here, im.subclass + ' gene model IDs']]));
         cards.appendChild(icard);
       }
       if (cards.childNodes.length) { cb.appendChild(cards); }
@@ -678,6 +681,22 @@
         cb.appendChild(ul);
       }
       container.appendChild(cb);
+    }
+
+    /* Each count's member list, as a TSV of gene model IDs from the domains
+       route. [url, count, what] per link; a list the server did not offer
+       (no extract for this genome, or an empty class) gets no link. */
+    function downloads(items) {
+      var row = html('div', 'gf-card-dl');
+      items.forEach(function (it) {
+        if (!it[0] || !it[1]) { return; }
+        var a = html('a', null, 'Download ' + num(it[1]) + ' ' + esc(it[2]));
+        a.href = it[0];
+        a.setAttribute('download', '');
+        a.title = 'A TSV of every gene model counted here, in ' + classes.genome_label;
+        row.appendChild(a);
+      });
+      return row.childNodes.length ? row : document.createTextNode('');
     }
 
     function founderStrip(founders, what) {

@@ -1,0 +1,516 @@
+/* ==========================================================================
+   Gene record Gemini mockup — /gene_center/gene_gemini/{id}
+   --------------------------------------------------------------------------
+   Four-view modern layout:
+     1. Visual overview (enhanced visuals, AlphaFold, plots, metrics)
+     2. Gene model (classic order, modern tables & lists only)
+     3. Pan-gene (presence matrix + cross-assembly member & synteny tables)
+     4. Genetic information (classic locus data, multi-locus support)
+   ========================================================================== */
+
+:root {
+  --gemini-view-toggle-h: 60px;
+  --gemini-subnav-h: 46px;
+  --gemini-total-sticky-h: 106px;
+}
+
+.mgdb-gene-gemini-page {
+  --mgdb-tab-offset: var(--gemini-total-sticky-h);
+}
+
+.mgdb-gene-gemini-page section[id] {
+  scroll-margin-top: calc(var(--gemini-total-sticky-h) + 12px);
+}
+
+/* --------------------------------------------------------------------------
+   Hero & Karyotype
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section.mgdb-hub-record-hero.gemini-hero {
+  background: linear-gradient(135deg, #e8f5ec 0%, #f4faf6 60%, #eef6f0 100%);
+  border-bottom: 1px solid #cfe3d6;
+}
+
+.gemini-hero-body {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+}
+
+.gemini-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);
+  gap: var(--mgdb-space-5) var(--mgdb-space-6);
+  align-items: start;
+}
+
+.gemini-hero-main {
+  min-width: 0;
+}
+
+.gemini-badge-row {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.gemini-pill-tag {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  font-size: var(--mgdb-text-xs);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.gemini-pill-subtle {
+  background: rgba(0, 0, 0, .05);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.gemini-ideogram {
+  min-width: 0;
+  padding: var(--mgdb-space-4);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius);
+  background: rgba(255, 255, 255, .85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+}
+
+.gemini-ideogram h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.gemini-karyotype {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px;
+  height: 94px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gemini-chr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  height: 100%;
+}
+
+.gemini-chr-bar {
+  position: relative;
+  width: 10px;
+  border-radius: 5px;
+  background: #d4ded6;
+  transition: background .2s ease;
+}
+
+.gemini-chr.is-here .gemini-chr-bar {
+  background: var(--mgdb-green);
+  box-shadow: 0 0 6px rgba(40, 93, 70, .4);
+}
+
+.gemini-chr-pin {
+  position: absolute;
+  right: -5px;
+  left: -5px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(0, 0, 0, .3);
+}
+
+.gemini-chr-label {
+  margin-top: 4px;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.gemini-chr.is-here .gemini-chr-label {
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+
+.gemini-chrline {
+  position: relative;
+  height: 12px;
+  margin: var(--mgdb-space-3) 0 var(--mgdb-space-1);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #d7e6da, #bfd5c5);
+}
+
+.gemini-chrline-pin {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 2px #fff, 0 1px 4px rgba(0, 0, 0, .3);
+}
+
+.gemini-chrline-ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gemini-ideogram-caption {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-normal);
+}
+
+.gemini-ideogram-caption strong {
+  color: var(--mgdb-ink);
+}
+
+/* Quick Glance Stat Cards */
+.gemini-glance {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid #cfe3d6;
+}
+
+.gemini-glance-tile {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid #cfe3d6;
+  border-left: 3px solid var(--tile-color, var(--mgdb-green));
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .9);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.gemini-glance-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .06);
+  border-color: #b8d4c1;
+}
+
+.gemini-glance-tile strong {
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-lg);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.gemini-glance-tile span {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.gemini-glance-tile small {
+  color: var(--mgdb-muted);
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------------------
+   Primary View Switcher (Sticky at top: 0)
+   -------------------------------------------------------------------------- */
+
+.gemini-view-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(250, 252, 250, .96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--mgdb-line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+}
+
+.gemini-view-container {
+  max-width: var(--mgdb-page-max);
+  margin: 0 auto;
+  padding: var(--mgdb-space-2) var(--mgdb-space-4);
+}
+
+.gemini-view-toggle-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+}
+
+.gemini-view-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--mgdb-radius);
+  background: #e6eee8;
+  border: 1px solid #cedcd1;
+}
+
+.gemini-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 8px var(--mgdb-space-4);
+  border: none;
+  border-radius: var(--mgdb-radius-sm);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+
+.gemini-tab-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--mgdb-muted);
+  transition: color .15s ease;
+}
+
+.gemini-tab-btn:hover:not(.is-active) {
+  background: rgba(255, 255, 255, .6);
+  color: var(--mgdb-ink);
+}
+
+.gemini-tab-btn.is-active {
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+
+.gemini-tab-btn.is-active svg {
+  color: var(--mgdb-green);
+}
+
+.gemini-locus-pills {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.gemini-locus-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.gemini-locus-chip:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+  color: var(--mgdb-green-dark);
+}
+
+.gemini-locus-chip.is-active {
+  background: var(--mgdb-green);
+  border-color: var(--mgdb-green);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Sub-Navigation Bars (Sticky right below view switcher)
+   -------------------------------------------------------------------------- */
+
+.gemini-sticky-subnav {
+  position: sticky;
+  top: 56px;
+  z-index: 40;
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--mgdb-line);
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .02);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.gemini-sticky-subnav a {
+  padding: 6px var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-ink-soft);
+  transition: all .15s ease;
+}
+
+.gemini-sticky-subnav a:hover {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.gemini-sticky-subnav a.is-current {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  border-bottom: 2px solid var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   View Panels
+   -------------------------------------------------------------------------- */
+
+.gemini-view-panel {
+  display: block;
+}
+
+.gemini-view-panel[hidden] {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Gene Model View (Tab 2) & Classic Table Enhancements
+   -------------------------------------------------------------------------- */
+
+.gemini-table-card {
+  margin-top: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  box-shadow: var(--hub-shadow);
+  overflow: hidden;
+}
+
+.gemini-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.gemini-table-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.gemini-table-badge {
+  display: inline-flex;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #e2ede4;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.gemini-table-filter {
+  padding: 4px 8px;
+  font-size: var(--mgdb-text-xs);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-xs);
+  background: #ffffff;
+}
+
+.gemini-dl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  padding: var(--mgdb-space-4);
+}
+
+.gemini-dl-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gemini-dl-item dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.gemini-dl-item dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   Pan-gene View Enhancements
+   -------------------------------------------------------------------------- */
+
+.gemini-pangenome-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  background: #f0f7f2;
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.gemini-pg-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gemini-pg-stat strong {
+  font-size: var(--mgdb-text-xl);
+  color: var(--mgdb-green-dark);
+}
+
+.gemini-pg-stat span {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 860px) {
+  .gemini-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .gemini-view-toggle-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .gemini-view-toggle {
+    overflow-x: auto;
+  }
+}

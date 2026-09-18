@@ -19,6 +19,13 @@
  *                                                          canonical-protein domains
  *                                                          projected onto the genome
  *            /api/v1/data/domains/{genome}/batch?ids=      up to 200 proteins
+ *            /api/v1/data/domains/{genome}/class           the domain atlas's
+ *                                                          functional classes
+ *            /api/v1/data/domains/{genome}/class/{name}    every gene in one
+ *                                                          (a slug or the name)
+ *            /api/v1/data/domains/{genome}/immunity        the immunity calls
+ *            /api/v1/data/domains/{genome}/immunity/{class}[?subclass=]
+ *                                                          every gene called one
  *
  *          Five readings of the same rows: matches (raw member-database
  *          hits), entries (matches collapsed onto InterPro entries; draw
@@ -32,6 +39,8 @@
  *
  * history:
  *  09/12/26  claude  created
+ *  09/17/26  claude  class and immunity member lists, from the
+ *                    atlas_members/ extract tools/atlas_classes.py writes
  */
 
 // Reachable only through controllers/api.php.
@@ -95,6 +104,10 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     dm_region($dm_genome, $dm_manifest, implode('/', array_slice($dm_rest, 1)));
   } elseif ($dm_action === 'batch') {
     dm_batch($dm_genome, $dm_manifest, $DM_SECTIONS);
+  } elseif ($dm_action === 'class') {
+    dm_class($dm_genome, $dm_manifest, implode('/', array_slice($dm_rest, 1)));
+  } elseif ($dm_action === 'immunity') {
+    dm_immunity($dm_genome, $dm_manifest, implode('/', array_slice($dm_rest, 1)));
   } else {
     dm_one($dm_genome, $dm_manifest, implode('/', $dm_rest), $DM_SECTIONS);
   }
@@ -321,6 +334,154 @@ function dm_entry($genome, $manifest, $rawAcc) {
           'tsv' => $base . '/api/v1/data/domains/' . $genome . '/entry/' . rawurlencode($doc['accession']) . '?format=tsv&isoforms=' . $isoforms),
     MgdbData::fileReadsMeta($meta), 86400);
 }//dm_entry
+
+/////
+// GET /api/v1/data/domains/{genome}/class[/{name}]
+// GET /api/v1/data/domains/{genome}/immunity[/{class}][?subclass=]
+/////
+
+/* The member lists behind the class and immunity counts on the gene record,
+   from data/domains/atlas_members/{genome}.json. Classes are non-exclusive
+   (a gene can be in several); an immunity call is one class per gene. */
+function dm_members($genome) {
+  $dir = MgdbData::dir('domains');
+  $doc = ($dir === null) ? null : MgdbData::readJson($dir . '/atlas_members/' . $genome . '.json');
+  if ($doc === null) {
+    MgdbApi::problem(404, 'no-class-lists', 'No class lists',
+      'The domain atlas has no class or immunity lists for this genome.', array('genome' => $genome));
+  }
+  return $doc;
+}//dm_members
+
+/* A class name as a path segment: "Immunity: NLR (NBS-LRR)" is
+   immunity-nlr-nbs-lrr. Unique across the atlas's 36 classes. */
+function dm_class_slug($name) {
+  return trim(preg_replace('/[^a-z0-9]+/', '-', strtolower((string) $name)), '-');
+}//dm_class_slug
+
+function dm_class($genome, $manifest, $raw) {
+  $base = MgdbApi::baseUrl();
+  $doc = dm_members($genome);
+  $format = MgdbData::format(array('json', 'tsv'));
+  $raw = trim(rawurldecode((string) $raw));
+  $meta = MgdbData::meta('domains', $genome, $manifest, array(
+    'atlas_generated' => $doc['atlas_generated'], 'counting_unit' => $doc['counting_unit']));
+
+  if ($raw === '') {
+    $list = array();
+    foreach ($doc['classes'] as $name => $genes) {
+      $slug = dm_class_slug($name);
+      $list[] = array('name' => $name, 'slug' => $slug,
+                      'group' => isset($doc['groups'][$name]) ? $doc['groups'][$name] : null,
+                      'genes' => count($genes),
+                      'self' => $base . '/api/v1/data/domains/' . $genome . '/class/' . $slug);
+    }
+    if ($format === 'tsv') {
+      MgdbApi::sendText(MgdbData::tsv(array('name', 'slug', 'group', 'genes'), $list),
+        'text/tab-separated-values; charset=utf-8', 86400, $genome . '_classes.tsv');
+    }
+    MgdbApi::sendData(array('type' => 'domain_classes', 'id' => $genome, 'attributes' => array('class_count' => count($list)),
+                            'sections' => array('classes' => $list)),
+      array('immunity' => $base . '/api/v1/data/domains/' . $genome . '/immunity'), MgdbData::fileReadsMeta($meta), 86400);
+  }
+
+  $want = strtolower($raw);
+  $name = null;
+  foreach (array_keys($doc['classes']) as $n) {
+    if (strtolower($n) === $want || dm_class_slug($n) === dm_class_slug($raw)) { $name = $n; break; }
+  }
+  if ($name === null) {
+    MgdbApi::problem(404, 'unknown-class', 'Unknown class',
+      'No domain atlas class by that name in this genome. The class list is at /api/v1/data/domains/' . $genome . '/class.',
+      array('class' => $raw));
+  }
+  $slug = dm_class_slug($name);
+  $genes = $doc['classes'][$name];
+  if ($format === 'tsv') {
+    $rows = array();
+    foreach ($genes as $g) { $rows[] = array('gene_model' => $g, 'class' => $name, 'genome' => $genome); }
+    MgdbApi::sendText(MgdbData::tsv(array('gene_model', 'class', 'genome'), $rows),
+      'text/tab-separated-values; charset=utf-8', 86400, $genome . '_' . $slug . '.tsv');
+  }
+  MgdbApi::sendData(
+    array('type' => 'domain_class', 'id' => $slug,
+          'attributes' => array('name' => $name, 'group' => isset($doc['groups'][$name]) ? $doc['groups'][$name] : null,
+                                'genome' => $genome, 'gene_count' => count($genes)),
+          'sections' => array('genes' => $genes)),
+    array('tsv' => $base . '/api/v1/data/domains/' . $genome . '/class/' . $slug . '?format=tsv',
+          'classes' => $base . '/api/v1/data/domains/' . $genome . '/class'),
+    MgdbData::fileReadsMeta($meta), 86400);
+}//dm_class
+
+function dm_immunity($genome, $manifest, $raw) {
+  $base = MgdbApi::baseUrl();
+  $doc = dm_members($genome);
+  $format = MgdbData::format(array('json', 'tsv'));
+  $labels = isset($doc['immunity_labels']) ? $doc['immunity_labels'] : array();
+  $raw = trim(rawurldecode((string) $raw));
+  $subRaw = trim((string) MgdbApi::query('subclass', ''));
+  $meta = MgdbData::meta('domains', $genome, $manifest, array(
+    'atlas_generated' => $doc['atlas_generated'], 'counting_unit' => $doc['counting_unit']));
+
+  if ($raw === '') {
+    $list = array();
+    foreach ($doc['immunity'] as $cls => $calls) {
+      $subs = array();
+      foreach ($calls as $c) {
+        $k = $c['subclass'] === null ? '' : $c['subclass'];
+        $subs[$k] = isset($subs[$k]) ? $subs[$k] + 1 : 1;
+      }
+      ksort($subs);
+      $list[] = array('class' => $cls, 'label' => isset($labels[$cls]) ? $labels[$cls] : $cls, 'genes' => count($calls),
+                      'subclasses' => $subs, 'self' => $base . '/api/v1/data/domains/' . $genome . '/immunity/' . rawurlencode($cls));
+    }
+    MgdbApi::sendData(array('type' => 'immunity_classes', 'id' => $genome, 'attributes' => array('class_count' => count($list)),
+                            'sections' => array('classes' => $list)),
+      array('classes' => $base . '/api/v1/data/domains/' . $genome . '/class'), MgdbData::fileReadsMeta($meta), 86400);
+  }
+
+  $cls = null;
+  foreach (array_keys($doc['immunity']) as $c) {
+    if (strtolower($c) === strtolower($raw)) { $cls = $c; break; }
+  }
+  if ($cls === null) {
+    MgdbApi::problem(404, 'unknown-immunity-class', 'Unknown immunity class',
+      'No immunity call by that class in this genome. The classes are at /api/v1/data/domains/' . $genome . '/immunity.',
+      array('class' => $raw, 'classes' => array_keys($doc['immunity'])));
+  }
+  $calls = $doc['immunity'][$cls];
+  $sub = null;
+  if ($subRaw !== '') {
+    foreach ($calls as $c) {
+      if ($c['subclass'] !== null && strtolower($c['subclass']) === strtolower($subRaw)) { $sub = $c['subclass']; break; }
+    }
+    if ($sub === null) {
+      MgdbApi::problem(404, 'unknown-subclass', 'Unknown subclass',
+        'No ' . $cls . ' call in this genome has that subclass.', array('class' => $cls, 'subclass' => $subRaw));
+    }
+    $calls = array_values(array_filter($calls, function ($c) use ($sub) { return $c['subclass'] === $sub; }));
+  }
+  $label = isset($labels[$cls]) ? $labels[$cls] : $cls;
+  $query = '?format=tsv' . ($sub !== null ? '&subclass=' . rawurlencode($sub) : '');
+  if ($format === 'tsv') {
+    $rows = array();
+    foreach ($calls as $c) {
+      $rows[] = array('gene_model' => $c['gene'], 'class' => $cls, 'subclass' => $c['subclass'],
+                      'evidence' => implode(',', $c['evidence']), 'genome' => $genome);
+    }
+    MgdbApi::sendText(MgdbData::tsv(array('gene_model', 'class', 'subclass', 'evidence', 'genome'), $rows),
+      'text/tab-separated-values; charset=utf-8', 86400,
+      $genome . '_immunity_' . strtolower($cls) . ($sub !== null ? '_' . dm_class_slug($sub) : '') . '.tsv');
+  }
+  MgdbApi::sendData(
+    array('type' => 'immunity_class', 'id' => $cls . ($sub !== null ? '/' . $sub : ''),
+          'attributes' => array('class' => $cls, 'label' => $label, 'subclass' => $sub, 'genome' => $genome,
+                                'gene_count' => count($calls)),
+          'sections' => array('genes' => $calls)),
+    array('tsv' => $base . '/api/v1/data/domains/' . $genome . '/immunity/' . rawurlencode($cls) . $query,
+          'classes' => $base . '/api/v1/data/domains/' . $genome . '/immunity'),
+    MgdbData::fileReadsMeta($meta), 86400);
+}//dm_immunity
 
 /////
 // GET /api/v1/data/domains/{genome}/region/{seq}:{start}-{end}

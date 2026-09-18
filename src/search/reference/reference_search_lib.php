@@ -98,6 +98,8 @@ function referenceResolveEntities($DBConn, $term) {
     return $rows ?: array();
 }
 
+include_once(__DIR__ . '/../../include/reference_ids_lib.php');
+
 //
 // The DOI of a reference, from both places the database keeps one.
 //
@@ -107,23 +109,13 @@ function referenceResolveEntities($DBConn, $term) {
 // both. Reading the column alone, which every query on this page used to do,
 // reported DOI coverage of 0.9% when it is 15.5%.
 //
-// Both stores are free text and both hold junk: "none", "dup", "doi", "123",
-// "1", values wrapped as "doi: 10.x/y", "DOI 10.x/y" or
-// "https://doi.org/10.x/y", one with a stray leading slash, and a handful
-// mangled with invisible characters. Rather than print those as identifiers,
-// the DOI is extracted by pattern -- a 10.NNNN prefix and a suffix -- and
-// trailing sentence punctuation removed. Anything that does not match is not
-// a DOI and comes back NULL.
+// The definition itself is shared with every record page's references
+// section, in include/reference_ids_lib.php, which says what it reads and
+// why. It moved there on 2026-09-18, when the record pages turned out to have
+// a narrower copy of their own that never read ext_db_key.
 //
 function referenceDoiSql($alias = 'r') {
-    return "NULLIF(regexp_replace(COALESCE(
-              substring(btrim($alias.doi) from '10[.][0-9]{4,9}/[^[:space:]]+'),
-              substring((
-                SELECT xd.key FROM mgdb.ext_db_key xd
-                WHERE xd.id=$alias.id AND xd.db_person=2738676
-                ORDER BY xd.auto_num LIMIT 1
-              ) from '10[.][0-9]{4,9}/[^[:space:]]+')
-            ), '[.,;]+$', ''), '')";
+    return mgdbReferenceDoiSql($alias);
 }
 
 function referenceBuildFilters($DBConn) {

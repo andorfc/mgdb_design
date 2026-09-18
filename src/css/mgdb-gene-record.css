@@ -180,15 +180,52 @@
   margin-top: var(--mgdb-space-3);
 }
 
+/* "Open at the BAR" is a button, not a download link.
+
+   It used to borrow .mgdb-rec-tsv, which is the class on the "Download TSV"
+   link in every collection header. Inside a toolbar that class takes a border,
+   a radius and a 36px box -- so it looked like a button -- while keeping the
+   underline of the link it really was, so it looked like both at once. And the
+   box was `display: block` with only horizontal padding, which left a 22px
+   line of text sitting at the top of a 36px box rather than in the middle.
+
+   .mgdb-button is the design system's own control and centres its content both
+   ways by construction. The height comes down from the button's 44px to the
+   36px of the view toggle beside it, which is still well clear of the 24px
+   WCAG 2.5.8 minimum; a lone 44px control in a row of 36px ones reads as a
+   mistake. */
+.mgdb-gene-record-page .gene-record-efp-toolbar .gene-record-efp-open {
+  min-height: 36px;
+  height: 36px;
+  padding: 0 var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The toolbar's two controls sit at opposite ends: the scale toggle is the
+   control for the figure, the BAR link leaves the page. */
+.mgdb-gene-record-page .gene-record-efp-toolbar .gene-record-efp-open {
+  margin-left: auto;
+}
+
+/* The atlases are a row of peers, one per tissue set, and they belong to the
+   figure below them. Given a ground of their own so that reads, and matched to
+   the height of the toolbar above: at 32px under a 36px row they looked like
+   two unrelated strips rather than a control and its options. */
 .mgdb-gene-record-page .gene-record-efp-atlases {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
 }
 
 .mgdb-gene-record-page .gene-record-efp-atlas {
-  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
   padding: 2px var(--mgdb-space-3);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-sm);
@@ -204,10 +241,13 @@
   background: var(--mgdb-surface-alt);
 }
 
+/* The chosen atlas is marked the way the shell marks a chosen section tab:
+   dark green fill and a gold spine, so one convention covers both. */
 .mgdb-gene-record-page .gene-record-efp-atlas[aria-pressed="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
   color: #fff;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
 /* The figure is as wide as the section and as tall as it needs to be. The BAR

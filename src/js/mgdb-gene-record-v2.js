@@ -1,0 +1,2100 @@
+/* ==========================================================================
+   Gene record, version 2 mockup — /gene_center/gene_v2/{id}
+   --------------------------------------------------------------------------
+   Glue over js/mgdb-record.js, as the live gene record page is. One call to
+   /api/v1/records/gene/{id} feeds four views of the same record:
+
+     visual        Overview, Gene and Protein Structure, Function, Expression,
+                   Variation, Orthologs, Mutant Phenotype Images, References,
+                   Sequences and downloads, Gene model scores, Metrics --
+                   every figure the record has, plus the core facts
+     gene_model    the legacy gene model page's sections in its order, as
+                   tables and lists only: Overview, Annotations and scores,
+                   Insertions, Expression, SNPs and traits, Proteomics,
+                   Sequence
+     pan_gene      the pan-gene section of the live page joined with what the
+                   legacy Pan-genome tab carried: members, the data on them,
+                   orthologs, viewers
+     genetic       the classical gene's sections in the legacy order, one set
+                   per locus when a model carries several
+
+   Every section is a direct child of <main> tagged with data-view, so the
+   Data Hub shell styles it; this script shows one view's sections and one
+   view's tab bar at a time, keeps a single scrollspy over the active bar,
+   and measures the two sticky bars into the scroll offset.
+
+   Two further requests are made only when their view is opened: the pan-gene
+   record for the member dataset matrix, and each additional classical gene.
+
+   Nothing here reads the DOM at module scope.
+   ========================================================================== */
+
+(function (window, document) {
+  'use strict';
+
+  var MGDB = window.MGDB;
+  var R = window.MGDBRecord;
+  if (!MGDB || !R) { return; }
+
+  var els = {};
+  var main = null;
+  var payload = null;
+  var state = {
+    view: 'visual',        // visual | gene_model | pan_gene | genetic
+    locus: null,           // active locus id in the genetic view
+    loci: [],              // [{id, name, full_name, type, html}]
+    locusLoaded: {},       // id -> 'loading' | 'done' | 'failed'
+    panLoaded: null,       // null | 'loading' | 'done' | 'failed'
+    rendered: {},          // section id -> true when it has content
+    views: [],             // the views that have anything in them
+    bars: {}               // data-view -> its tab bar element
+  };
+
+  var KIND_LABELS = {
+    gene_model: 'Gene model', gene_model_and_locus: 'Gene model and classical gene',
+    locus: 'Classical gene', withdrawn: 'Withdrawn gene model'
+  };
+  var CURRENT_B73 = 'Zm-B73-REFERENCE-NAM-5.0';
+
+  var ICON = {
+    visual: '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.6" fill="currentColor"/></svg>',
+    gene_model: '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16M8 8v9" stroke="currentColor" stroke-width="1.6"/></svg>',
+    pan_gene: '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="5" cy="10" r="2.2" fill="currentColor"/><circle cx="15" cy="5" r="2.2" fill="currentColor"/><circle cx="15" cy="15" r="2.2" fill="currentColor"/><path d="M7 9l6-3M7 11l6 3" stroke="currentColor" stroke-width="1.6"/></svg>',
+    genetic: '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6 2c0 4 8 4 8 8s-8 4-8 8M14 2c0 4-8 4-8 8s8 4 8 8" stroke="currentColor" stroke-width="1.6"/><path d="M7 6h6M7 14h6" stroke="currentColor" stroke-width="1.6"/></svg>'
+  };
+
+  var VIEW_LABELS = {
+    visual: 'Visual overview', gene_model: 'Gene model', pan_gene: 'Pan-gene', genetic: 'Genetic information'
+  };
+
+  /* Section order per view. The visual view keeps the version-1 ids so the
+     3,300 deep links /new_genes builds still land. */
+  var ORDER = {
+    visual: ['gene-record-overview', 'gene-record-structure', 'gene-record-function',
+             'gene-record-expression', 'gene-record-variation', 'gene-record-orthologs',
+             'gene-record-images', 'gene-record-references', 'gene-record-sequences',
+             'gene-record-provenance', 'gene-record-metrics'],
+    gene_model: ['gm-overview', 'gm-annotations', 'gm-insertions', 'gm-expression',
+                 'gm-snps', 'gm-proteomics', 'gm-sequence', 'gm-xrefs'],
+    pan_gene: ['pg-overview', 'pg-members', 'pg-datasets', 'pg-orthologs', 'pg-viewers']
+  };
+  var SHARED = ['gene-record-resources', 'gene-record-api'];
+
+  var LABELS = {
+    'gene-record-overview': 'Overview', 'gene-record-structure': 'Structure',
+    'gene-record-function': 'Function', 'gene-record-expression': 'Expression',
+    'gene-record-variation': 'Variation', 'gene-record-orthologs': 'Orthologs',
+    'gene-record-images': 'Mutant Phenotype Images', 'gene-record-references': 'References',
+    'gene-record-sequences': 'Sequences', 'gene-record-provenance': 'Gene model scores',
+    'gene-record-metrics': 'Metrics',
+    'gm-overview': 'Overview', 'gm-annotations': 'Annotations and scores', 'gm-insertions': 'Insertions',
+    'gm-expression': 'Expression', 'gm-snps': 'SNPs and traits', 'gm-proteomics': 'Proteomics',
+    'gm-sequence': 'Sequence', 'gm-xrefs': 'Cross-references',
+    'pg-overview': 'Overview', 'pg-members': 'Related gene models', 'pg-datasets': 'Member datasets',
+    'pg-orthologs': 'Orthologs', 'pg-viewers': 'Viewers and downloads',
+    'gene-record-resources': 'Related resources', 'gene-record-api': 'API'
+  };
+
+  /* Which meta.counts feed which tab badge. */
+  var TAB_COUNTS = {
+    'gene-record-structure': ['transcripts', 'protein_domains'],
+    'gene-record-function': ['ontology', 'gene_products'],
+    'gene-record-variation': ['insertions', 'snp_traits', 'alleles'],
+    'gene-record-orthologs': ['orthologs'],
+    'gene-record-images': ['images'],
+    'gene-record-references': ['references'],
+    'gm-annotations': ['ontology', 'protein_domains'],
+    'gm-insertions': ['insertions'],
+    'gm-snps': ['snp_traits'],
+    'gm-xrefs': ['xrefs'],
+    'pg-members': ['pan_gene_members'],
+    'pg-orthologs': ['orthologs']
+  };
+
+  var LOCUS_KEYS = ['overview', 'annotations', 'references', 'alleles', 'stocks', 'map', 'nearby', 'genetic', 'external'];
+  var LOCUS_HEADINGS = {
+    overview: 'Overview', annotations: 'Annotations', references: 'References',
+    alleles: 'Alleles and variations', stocks: 'Stocks', map: 'Map coordinates',
+    nearby: 'Nearby loci', genetic: 'Additional genetic information', external: 'External links'
+  };
+  var LOCUS_TAB_LABELS = {
+    overview: 'Overview', annotations: 'Annotations', references: 'References',
+    alleles: 'Alleles', stocks: 'Stocks', map: 'Map coordinates',
+    nearby: 'Nearby loci', genetic: 'Additional genetic information', external: 'External links'
+  };
+
+  /* ------------------------------------------------------------------------
+     Small helpers
+     ------------------------------------------------------------------------ */
+
+  function num(value) { return (value === null || value === undefined) ? '' : R.number(value); }
+  function mb(bp) { return (Number(bp) / 1e6).toFixed(Number(bp) >= 1e8 ? 0 : 1) + ' Mb'; }
+  function qs(sel, root) { return (root || document).querySelector(sel); }
+  function qsa(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function body(id) { return R.byId(id + '-body'); }
+
+  function blockHtml(title, count, inner, extraHead) {
+    return '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>' + R.escape(title) +
+      (count !== null && count !== undefined && count !== '' ? '<span class="mgdb-rec-block-count">' + R.escape(String(count)) + '</span>' : '') +
+      '</h3>' + (extraHead || '') + '</div>' + inner + '</div>';
+  }
+
+  function statusLine(text) { return '<p class="mgdb-rec-block-status">' + R.escape(text) + '</p>'; }
+
+  /* A line under a figure pointing at the table behind it in another view. */
+  function crosslink(target, text, sectionId, linkText) {
+    target.insertAdjacentHTML('beforeend',
+      '<p class="v2-crosslink">' + R.escape(text) + ' <button class="v2-jump" type="button" data-jump="' +
+      R.escape(sectionId) + '">' + R.escape(linkText) + '</button></p>');
+  }
+
+  function locationText(row) {
+    if (!row || row.start == null) { return ''; }
+    return (row.chromosome ? row.chromosome + ':' : '') + R.number(row.start) +
+      (row.end != null && row.end !== row.start ? '–' + R.number(row.end) : '');
+  }
+
+  function refNames(refs) {
+    return (refs || []).map(function (r) { return r && r.name; }).filter(Boolean).join(', ');
+  }
+
+  function refLinks(refs) {
+    var list = (refs || []).filter(function (r) { return r && r.name; });
+    if (!list.length) { return '<span class="mgdb-muted">—</span>'; }
+    return list.map(function (r) { return r.html ? R.link(r.html, r.name) : R.escape(r.name); }).join(', ');
+  }
+
+  function mark(rendered, id) { if (rendered) { state.rendered[id] = true; } return rendered; }
+
+  /* ------------------------------------------------------------------------
+     Views: which sections show, which bar sticks, where the offset lands
+     ------------------------------------------------------------------------ */
+
+  function dataViewFor(viewKey) {
+    return viewKey === 'genetic' ? ('locus-' + state.locus) : viewKey;
+  }
+
+  function viewKeyFor(dataView) {
+    return /^locus-/.test(dataView) ? 'genetic' : dataView;
+  }
+
+  function activeBar() { return state.bars[dataViewFor(state.view)] || null; }
+
+  function syncOffsets() {
+    var swH = (els.views && !els.views.hidden) ? els.views.getBoundingClientRect().height : 0;
+    main.style.setProperty('--v2-switch-h', Math.round(swH) + 'px');
+    var bar = activeBar();
+    var barH = (bar && !bar.hidden) ? bar.getBoundingClientRect().height : 0;
+    main.style.setProperty('--v2-tab-offset', Math.round(swH + barH + 8) + 'px');
+  }
+
+  function showView(viewKey, opts) {
+    opts = opts || {};
+    if (viewKey === 'genetic' && !state.locus && state.loci.length) { state.locus = state.loci[0].id; }
+    if (state.views.indexOf(viewKey) === -1) { viewKey = 'visual'; }
+    var previous = state.view;
+    state.view = viewKey;
+    var dv = dataViewFor(viewKey);
+
+    qsa('section[data-view]', main).forEach(function (section) {
+      var v = section.getAttribute('data-view');
+      var inView = (v === '*') || (v === dv);
+      section.hidden = !(inView && (v === '*' || state.rendered[section.id]));
+    });
+    Object.keys(state.bars).forEach(function (key) {
+      var bar = state.bars[key];
+      bar.hidden = (key !== dv) || bar.children.length < 2;
+    });
+
+    qsa('.mgdb-view-btn', els.viewsToggle).forEach(function (btn) {
+      btn.setAttribute('aria-pressed', String(btn.getAttribute('data-view') === viewKey));
+    });
+    var manyLoci = state.loci.length > 1;
+    R.show(els.locusSwitch, viewKey === 'genetic' && manyLoci);
+    if (manyLoci) {
+      qsa('.mgdb-chip', els.locusSwitch).forEach(function (chip) {
+        chip.setAttribute('aria-pressed', String(Number(chip.getAttribute('data-locus')) === Number(state.locus)));
+      });
+    }
+
+    if (viewKey === 'pan_gene' && !state.panLoaded) { loadPanExtra(); }
+    if (viewKey === 'genetic' && state.locus && !state.locusLoaded[state.locus]) { loadLocus(state.locus); }
+
+    spyBind(activeBar());
+    syncOffsets();
+
+    /* The reader may be deep in one view when they switch; the new view
+       starts under the switcher, so bring them there rather than leaving them
+       at an arbitrary depth of a different set of sections. */
+    if (opts.fromUser && previous !== viewKey && window.scrollY > els.views.offsetTop) {
+      window.scrollTo({ top: Math.max(0, els.views.offsetTop - 4), behavior: 'auto' });
+    }
+
+    if (!opts.keepUrl) {
+      var url = new URL(window.location.href);
+      url.searchParams.set('view', viewKey);
+      if (viewKey === 'genetic' && manyLoci) { url.searchParams.set('locus', String(state.locus)); }
+      else { url.searchParams.delete('locus'); }
+      if (opts.hash !== undefined) { url.hash = opts.hash; }
+      try { window.history.replaceState(null, '', url.toString()); } catch (e) { /* file:// or a sandbox */ }
+    }
+    MGDB.announce(VIEW_LABELS[viewKey] + ' view.');
+  }
+
+  /* Open the view a section lives in and scroll to it. Used by the glance
+     tiles and the crosslinks under the figures. */
+  function jumpTo(sectionId) {
+    var section = R.byId(sectionId);
+    if (!section) { return; }
+    var dv = section.getAttribute('data-view') || 'visual';
+    if (/^locus-/.test(dv)) { state.locus = Number(dv.slice(6)); }
+    showView(dv === '*' ? state.view : viewKeyFor(dv), { hash: '#' + sectionId });
+    window.requestAnimationFrame(function () {
+      spy.held = section;
+      spyMark(section);
+      section.scrollIntoView({ block: 'start', behavior: 'auto' });
+      window.setTimeout(function () { spy.heldScroll = window.scrollY; }, 300);
+    });
+  }
+
+  /* ------------------------------------------------------------------------
+     Tab bars and the one scrollspy
+
+     Modelled on tabs() in js/mgdb-record.js, but there is one spy for the
+     whole page and it watches only the active view's bar; the shell's own
+     offset watcher is not used because it would measure whichever bar it
+     found first, and here there are several, one of them beneath another
+     sticky bar.
+     ------------------------------------------------------------------------ */
+
+  function buildBar(bar, order, labels, counts, tabCounts) {
+    var ids = order.filter(function (id) { return state.rendered[id]; }).concat(SHARED);
+    bar.innerHTML = ids.map(function (id) {
+      var total = 0;
+      ((tabCounts || {})[id] || []).forEach(function (k) { total += Number((counts || {})[k] || 0); });
+      return '<a href="#' + id + '">' + R.escape(labels[id] || LABELS[id] || id) +
+        (total > 0 ? '<span class="mgdb-rec-tab-count">' + R.number(total) + '</span>' : '') + '</a>';
+    }).join('');
+    qsa('a', bar).forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var section = R.byId(tab.getAttribute('href').slice(1));
+        if (!section) { return; }
+        spy.held = section;
+        spyMark(section);
+        window.setTimeout(function () { spy.heldScroll = window.scrollY; }, 400);
+      });
+    });
+    if (window.ResizeObserver && !bar.hasAttribute('data-observed')) {
+      bar.setAttribute('data-observed', '');
+      new window.ResizeObserver(function () { syncOffsets(); }).observe(bar);
+    }
+  }
+
+  var spy = { bar: null, pairs: [], held: null, heldScroll: 0 };
+
+  function spyBind(bar) {
+    spy.bar = bar;
+    spy.pairs = [];
+    spy.held = null;
+    if (!bar) { return; }
+    qsa('a', bar).forEach(function (tab) {
+      var section = R.byId((tab.getAttribute('href') || '').slice(1));
+      if (section) { spy.pairs.push({ tab: tab, section: section }); }
+    });
+    spyUpdate();
+  }
+
+  function spyMark(target) {
+    spy.pairs.forEach(function (pair) {
+      var current = pair.section === target;
+      pair.tab.classList.toggle('is-current', current);
+      if (current) { pair.tab.setAttribute('aria-current', 'true'); } else { pair.tab.removeAttribute('aria-current'); }
+    });
+  }
+
+  function spyLine() {
+    var first = spy.pairs.length ? spy.pairs[0].section : null;
+    var margin = first ? (parseFloat(window.getComputedStyle(first).scrollMarginTop) || 0) : 0;
+    var stack = (els.views && !els.views.hidden ? els.views.offsetHeight : 0) + (spy.bar ? spy.bar.offsetHeight : 0);
+    return Math.max(stack + 8, margin + 4);
+  }
+
+  function spyUpdate() {
+    if (!spy.pairs.length) { return; }
+    if (spy.held && Math.abs(window.scrollY - spy.heldScroll) < 4) { return; }
+    spy.held = null;
+    var line = window.scrollY + spyLine();
+    var current = spy.pairs[0].section;
+    spy.pairs.forEach(function (pair) {
+      if (pair.section.hidden) { return; }
+      if (pair.section.offsetTop <= line) { current = pair.section; }
+    });
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      current = spy.pairs[spy.pairs.length - 1].section;
+    }
+    spyMark(current);
+  }
+
+  /* ------------------------------------------------------------------------
+     The view switcher and the classical-gene chips
+     ------------------------------------------------------------------------ */
+
+  function buildSwitcher() {
+    var keys = ['visual', 'gene_model', 'pan_gene', 'genetic'].filter(function (k) { return state.views.indexOf(k) !== -1; });
+    els.viewsToggle.innerHTML = keys.map(function (key) {
+      var count;
+      if (key === 'genetic') {
+        count = state.loci.length > 1 ? state.loci.length + ' genes' : '';
+      } else {
+        count = String(ORDER[key].filter(function (id) { return state.rendered[id]; }).length);
+      }
+      return '<button class="mgdb-view-btn" type="button" data-view="' + key + '" aria-pressed="false">' +
+        ICON[key] + R.escape(VIEW_LABELS[key]) +
+        (count ? '<span class="v2-switch-count">' + R.escape(count) + '</span>' : '') + '</button>';
+    }).join('');
+    qsa('.mgdb-view-btn', els.viewsToggle).forEach(function (btn) {
+      btn.addEventListener('click', function () { showView(btn.getAttribute('data-view'), { fromUser: true }); });
+    });
+
+    if (state.loci.length > 1) {
+      els.locusSwitch.innerHTML = '<span>Classical gene</span>' + state.loci.map(function (l) {
+        return '<button class="mgdb-chip" type="button" data-locus="' + l.id + '" aria-pressed="false" title="' +
+          R.escape(l.full_name || l.name) + '">' + R.escape(l.name) + '</button>';
+      }).join('');
+      qsa('.mgdb-chip', els.locusSwitch).forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          state.locus = Number(chip.getAttribute('data-locus'));
+          showView('genetic', { fromUser: true });
+        });
+      });
+    }
+    R.show(els.views, keys.length > 1);
+    if (window.ResizeObserver) {
+      new window.ResizeObserver(function () { syncOffsets(); }).observe(els.views);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Header: function line, synonyms, version notice, report link
+     ------------------------------------------------------------------------ */
+
+  function renderHeader(data, sections) {
+    var attributes = data.attributes || {};
+    var fn = sections.function || {};
+    var locus = sections.locus || {};
+    if (fn.summary) {
+      if (els.subtitle && !els.subtitle.textContent.trim()) {
+        els.subtitle.textContent = fn.summary;
+      } else {
+        els.functionLine.textContent = fn.summary;
+        R.show(els.functionLine, true);
+      }
+    }
+    var synonyms = (locus.synonyms || []).map(function (s) { return typeof s === 'string' ? s : (s.name || s.value); })
+      .filter(function (s) { return s && s !== attributes.full_name; });
+    if (synonyms.length) {
+      els.synonyms.innerHTML = 'Also known as ' + synonyms.map(function (s) { return '<strong>' + R.escape(s) + '</strong>'; })
+        .join(' <span class="mgdb-muted" aria-hidden="true">&middot;</span> ') + '.';
+      R.show(els.synonyms, true);
+    }
+
+    var assembly = attributes.assembly || '';
+    if (assembly && assembly.indexOf('B73') !== -1 && assembly !== CURRENT_B73) {
+      var models = (locus.associated_gene_models || []).filter(function (m) { return m.assembly === CURRENT_B73; });
+      var link = models.length
+        ? ' The current B73 annotation of this gene is ' +
+          R.link('/gene_center/gene_v2/' + encodeURIComponent(models[0].name), models[0].name) + '.'
+        : '';
+      els.versionNotice.innerHTML = '<div><strong>An earlier B73 assembly</strong>' +
+        '<span>This record is the ' + R.escape(assembly) + ' annotation. B73 has been assembled and ' +
+        'annotated several times, and each release numbers its genes differently.' + link + '</span></div>';
+      R.show(els.versionNotice, true);
+    }
+
+    if (els.report && attributes.feature_id) {
+      els.report.setAttribute('href', '/curation/GeneModelIssue/edit?gene_model_id=' +
+        encodeURIComponent(attributes.feature_id) + '&gene_model_version=' +
+        encodeURIComponent(attributes.annotation || '') + '&auto_num=');
+    }
+  }
+
+  /* The karyotype: ten chromosomes to scale, this one filled, the gene
+     pinned; then the chromosome alone with the pin placed to the base pair.
+     Lengths come from the controller (data attributes), read from the
+     chromosome features of the same assembly. */
+  function renderIdeogram(overview, locus) {
+    var chr = main.getAttribute('data-chr');
+    var length = Number(main.getAttribute('data-chr-length')) || 0;
+    var karyotype = [];
+    try { karyotype = JSON.parse(main.getAttribute('data-karyotype') || '[]'); } catch (e) { karyotype = []; }
+    if (!chr || !length || !overview || overview.start == null) { return false; }
+
+    var start = Number(overview.start), end = Number(overview.end);
+    var frac = Math.max(0, Math.min(1, start / length));
+    var maxLen = karyotype.reduce(function (m, c) { return Math.max(m, Number(c[1]) || 0); }, length);
+    var bars = '';
+    if (karyotype.length >= 2) {
+      bars = '<ul class="v2-karyotype" aria-label="Chromosomes of this assembly, to scale">' + karyotype.map(function (c) {
+        var here = c[0] === chr;
+        var h = Math.round(100 * Number(c[1]) / maxLen);
+        return '<li class="v2-chr' + (here ? ' is-here' : '') + '" title="' + R.escape(c[0] + ', ' + R.number(c[1]) + ' bp') + '">' +
+          '<div class="v2-chr-bar" style="height:' + h + '%">' +
+          (here ? '<span class="v2-chr-pin" style="top:' + (frac * 100).toFixed(1) + '%"></span>' : '') +
+          '</div><span class="v2-chr-label">' + R.escape(c[0].replace(/^chr/i, '')) + '</span></li>';
+      }).join('') + '</ul>';
+    }
+    var bin = locus && locus.bin ? ' &middot; bin <strong>' + R.escape(locus.bin) + '</strong>' : '';
+    els.ideogram.innerHTML =
+      '<h3>In the genome</h3>' + bars +
+      '<div class="v2-chrline" role="img" aria-label="' + R.escape(chr + ', ' + mb(length) + ', the gene at ' + mb(start)) + '">' +
+        '<span class="v2-chrline-pin" style="left:' + (frac * 100).toFixed(2) + '%"></span></div>' +
+      '<div class="v2-chrline-ends"><span>' + R.escape(chr) + ' &middot; 0</span><span>' + R.escape(mb(length)) + '</span></div>' +
+      '<p class="v2-ideogram-caption"><strong>' + R.escape(chr) + '</strong> at <strong>' + R.escape(mb(start)) + '</strong>' +
+        ' of ' + R.escape(mb(length)) + bin +
+        (end > start ? ' &middot; spans <strong>' + R.number(end - start) + ' bp</strong>' : '') +
+        (overview.strand ? ' &middot; ' + (overview.strand === '-' ? 'minus' : 'plus') + ' strand' : '') + '</p>';
+    R.show(els.ideogram, true);
+    return true;
+  }
+
+  /* At a glance: one tile per count that is not zero, each opening the
+     section that holds the rows. */
+  function renderGlance(counts, sections, hasGeneModel) {
+    var pan = sections.pan_gene || {};
+    var tiles = [
+      ['transcripts', 'Transcripts', 'gene-record-structure', 'green'],
+      ['protein_domains', 'Protein domains', 'gene-record-structure', 'leaf'],
+      ['ontology', 'Ontology terms', 'gene-record-function', 'green'],
+      ['insertions', 'Insertions', 'gene-record-variation', 'gold'],
+      ['snp_traits', 'SNP–trait links', 'gene-record-variation', 'blue'],
+      ['alleles', 'Alleles', 'gene-record-variation', 'wine'],
+      ['pan_gene_members', 'Pan-gene members', 'pg-overview', 'orange',
+        pan.assembly_count ? 'in ' + R.number(pan.assembly_count) + ' assemblies' : ''],
+      ['orthologs', 'Orthologs', 'gene-record-orthologs', 'leaf'],
+      ['references', 'Publications', 'gene-record-references', 'burgundy'],
+      ['stocks', 'Stocks', null, 'gold'],
+      ['images', 'Images', 'gene-record-images', 'blue'],
+      ['map_positions', 'Map positions', null, 'green'],
+      ['locus_gene_models', 'Annotations of this gene', null, 'orange']
+    ];
+    var html = tiles.map(function (t) {
+      var n = Number(counts[t[0]] || 0);
+      if (!n) { return ''; }
+      var target = t[2];
+      if (!target && state.locus) {
+        target = 'locus-' + state.locus + '-' + ({ stocks: 'stocks', map_positions: 'map', locus_gene_models: 'overview' })[t[0]];
+      }
+      if (target && !R.byId(target)) { target = null; }
+      var inner = '<strong>' + R.number(n) + '</strong><span>' + R.escape(t[1]) + '</span>' + (t[4] ? '<small>' + R.escape(t[4]) + '</small>' : '');
+      return target
+        ? '<button class="v2-glance-tile is-' + t[3] + '" type="button" role="listitem" data-jump="' + target + '">' + inner + '</button>'
+        : '<div class="v2-glance-tile is-' + t[3] + '" role="listitem">' + inner + '</div>';
+    }).join('');
+    if (!html) { return false; }
+    els.glance.innerHTML = html;
+    R.show(els.glance, true);
+    return true;
+  }
+
+  /* ========================================================================
+     VIEW 1: Visual overview
+     ======================================================================== */
+
+  function renderOverview(overview, sections, hasGeneModel) {
+    if (!overview) { return false; }
+    var out = body('gene-record-overview');
+    out.innerHTML = '';
+    var kind = overview.kind || (payload.data.attributes || {}).kind;
+    var position = '';
+    if (overview.chromosome && overview.start != null) {
+      position = R.escape(overview.chromosome) + ':' + R.number(overview.start) + '–' + R.number(overview.end);
+    }
+    var pan = (sections.pan_gene || {}).pan_gene;
+    var loci = state.loci;
+
+    var factsHtml = R.facts([
+      ['Record', kind ? R.escape(KIND_LABELS[kind] || kind) : ''],
+      ['Full name', overview.full_name && overview.full_name !== overview.symbol ? R.escape(overview.full_name) : ''],
+      ['Species', overview.species ? '<em>' + R.escape(overview.species) + '</em>' : ''],
+      ['Line', overview.line ? R.escape(overview.line) : ''],
+      ['Position', position, overview.span_bp ? R.number(overview.span_bp) + ' bp on the genome' : ''],
+      ['Strand', overview.strand ? (overview.strand === '-' ? 'Minus (−)' : 'Plus (+)') : '', overview.strand_note || ''],
+      ['Model type', overview.model_type ? R.escape(String(overview.model_type).replace(/_/g, ' ')) : ''],
+      ['Transcripts', overview.transcript_count == null ? '' : String(overview.transcript_count),
+        overview.canonical_transcript ? 'canonical ' + overview.canonical_transcript : ''],
+      ['Classical genes', loci.length
+        ? loci.map(function (l) { return '<a href="#" class="v2-locus-link" data-locus="' + l.id + '">' + R.escape(l.name) + '</a>'; }).join(', ')
+        : (hasGeneModel ? '<span class="mgdb-muted">None linked</span>' : ''),
+        loci.length > 1 ? 'each has its own Genetic information section' : (loci.length === 1 && loci[0].full_name ? loci[0].full_name : '')],
+      ['Pan-gene', pan && pan.name ? '<button class="v2-jump" type="button" data-jump="pg-overview">' + R.escape(pan.name) + '</button>' : (hasGeneModel ? '<span class="mgdb-muted">Not placed in a pan-gene</span>' : ''),
+        pan && pan.member_count ? R.number(pan.member_count) + ' gene models across ' + R.number((sections.pan_gene || {}).assembly_count || 0) + ' assemblies' : '']
+    ]);
+    if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); }
+
+    if (!hasGeneModel) {
+      out.insertAdjacentHTML('beforeend', '<div class="mgdb-message mgdb-message-info" role="note"><div><strong>No gene model.</strong>' +
+        '<span> This classical gene has not been linked to a gene model in any assembly, so there is no structure, expression, ' +
+        'pan-gene or sequence to show. Its genetic information is in the view of that name.</span></div></div>');
+    }
+
+    var browser = overview.browser;
+    if (browser && browser.url) {
+      out.insertAdjacentHTML('beforeend', blockHtml('Genome browser', null,
+        '<p class="mgdb-rec-block-status">' + R.escape(browser.location) + ', the gene model with 1,500 bp either side.</p>' +
+        (browser.embed_url
+          ? '<iframe class="gene-record-browser" src="' + R.escape(browser.embed_url) + '" title="' +
+            R.escape(browser.label + ' view of ' + (overview.name || 'this gene')) + '" loading="lazy"></iframe>'
+          : '<p class="mgdb-rec-empty">This assembly is served by GBrowse, which cannot be embedded. Use the link above.</p>'),
+        '<a class="mgdb-rec-tsv" href="' + R.escape(browser.url) + '" target="_blank" rel="noopener">Open in ' + R.escape(browser.label) + '</a>'));
+    }
+
+    qsa('.v2-locus-link', out).forEach(function (a) {
+      a.addEventListener('click', function (event) {
+        event.preventDefault();
+        state.locus = Number(a.getAttribute('data-locus'));
+        jumpTo('locus-' + state.locus + '-overview');
+      });
+    });
+    return !!factsHtml;
+  }
+
+  function domainTrack(domains, protein) {
+    if (!protein || !protein.length_aa) { return ''; }
+    var length = protein.length_aa;
+    var canonical = domains.filter(function (d) { return d.is_canonical && d.start && d.end; });
+    if (!canonical.length) { return ''; }
+    var bars = canonical.map(function (domain, index) {
+      var left = ((domain.start - 1) / length) * 100;
+      var width = Math.max(((domain.end - domain.start + 1) / length) * 100, 0.6);
+      return '<span class="gene-record-domain gene-record-domain-' + (index % 5) + '" style="left:' + left.toFixed(2) +
+        '%;width:' + width.toFixed(2) + '%" title="' + R.escape(domain.name + ' ' + domain.start + '–' + domain.end) + '">' +
+        '<span class="mgdb-visually-hidden">' + R.escape(domain.name + ', residues ' + domain.start + ' to ' + domain.end) + '</span></span>';
+    }).join('');
+    var legend = canonical.map(function (domain, index) {
+      return '<li><span class="gene-record-swatch gene-record-domain-' + (index % 5) + '"></span>' +
+        (domain.url ? R.link(domain.url, domain.name, true) : R.escape(domain.name)) +
+        ' <span class="gene-record-muted">' + domain.start + '–' + domain.end + '</span></li>';
+    }).join('');
+    return '<figure class="gene-record-track"><div class="gene-record-track-bar" role="img" aria-label="Protein domain positions">' + bars +
+      '</div><div class="gene-record-track-scale"><span>1</span><span>' + R.number(length) + ' aa</span></div>' +
+      '<ul class="gene-record-track-legend">' + legend + '</ul></figure>';
+  }
+
+  function renderStructure(structure) {
+    if (!structure) { return false; }
+    var out = body('gene-record-structure');
+    out.innerHTML = '';
+    var protein = structure.protein || {};
+    var rendered = false;
+    var figureDrawn = false;
+
+    if (structure.gene_model && MGDB.geneStructure) {
+      var attrs = payload.data.attributes || {};
+      var figureBlock = document.createElement('div');
+      figureBlock.className = 'mgdb-rec-block gene-record-structure-block';
+      figureBlock.innerHTML = '<div class="mgdb-rec-block-head"><h3>Gene model and protein</h3>' +
+        (structure.gene_model.release ? '<span class="mgdb-rec-block-count">' + R.escape(structure.gene_model.release) + '</span>' : '') +
+        '</div><div class="gene-record-structure-figure"></div>';
+      out.appendChild(figureBlock);
+      figureDrawn = MGDB.geneStructure(qs('.gene-record-structure-figure', figureBlock), {
+        gene: { name: attrs.name || structure.gene_model.canonical_transcript, symbol: attrs.symbol,
+                chromosome: structure.gene_model.chromosome, strand: structure.gene_model.strand,
+                start: structure.gene_model.start, end: structure.gene_model.end },
+        geneModel: structure.gene_model, domains: structure.domains || null, model: structure.model || null, base: ''
+      });
+      if (!figureDrawn) { figureBlock.parentNode.removeChild(figureBlock); } else { rendered = true; }
+    }
+
+    var factsHtml = R.facts([
+      ['Canonical transcript', protein.transcript ? R.escape(protein.transcript) : ''],
+      ['Protein', protein.name ? R.escape(protein.name) : ''],
+      ['Protein length', protein.length_aa ? R.number(protein.length_aa) + ' aa' : '', protein.length_note || ''],
+      ['Transcripts', (structure.transcripts || []).length ? String(structure.transcripts.length) : ''],
+      ['Protein domains', (structure.protein_domains || []).length ? String(structure.protein_domains.length) : '',
+        structure.domains && structure.domains.architecture ? structure.domains.architecture : '']
+    ]);
+    if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); rendered = true; }
+
+    var trackHtml = figureDrawn ? '' : domainTrack(structure.protein_domains || [], protein);
+    if (trackHtml) {
+      out.insertAdjacentHTML('beforeend', blockHtml('Protein domains, to scale', null, trackHtml));
+      rendered = true;
+    }
+    if (rendered && state.views.indexOf('gene_model') !== -1) {
+      crosslink(out, 'Transcripts, exon coordinates and every domain match are listed in the Gene model view.',
+        'gm-overview', 'Open the tables');
+    }
+    if (structure.exon_structure_note) { out.insertAdjacentHTML('beforeend', statusLine(structure.exon_structure_note)); }
+    return rendered;
+  }
+
+  function renderFunction(fn) {
+    if (!fn) { return false; }
+    var out = body('gene-record-function');
+    out.innerHTML = '';
+    var rendered = false;
+    var figureDrawn = false;
+
+    if (MGDB.geneFunction && (fn.go || fn.classes || fn.pathways)) {
+      var attrs = payload.data.attributes || {};
+      var figureBlock = document.createElement('div');
+      figureBlock.className = 'mgdb-rec-block gene-record-function-block';
+      figureBlock.innerHTML = '<div class="mgdb-rec-block-head"><h3>Function at a glance</h3>' +
+        (fn.go && fn.go.available && fn.go.release
+          ? '<span class="mgdb-rec-block-count">GO ' + R.escape(String(fn.go.release).replace(/^releases\//, '')) + '</span>' : '') +
+        '</div><div class="gene-record-function-figure"></div>';
+      out.appendChild(figureBlock);
+      figureDrawn = MGDB.geneFunction(qs('.gene-record-function-figure', figureBlock), {
+        gene: { name: attrs.name, symbol: attrs.symbol }, fn: fn, base: ''
+      });
+      if (!figureDrawn) { figureBlock.parentNode.removeChild(figureBlock); } else { rendered = true; }
+    }
+
+    /* A record with nothing to draw -- a classical gene with a product and
+       no terms -- still gets its facts here rather than an empty section. */
+    if (!figureDrawn) {
+      rendered = R.collection(out, {
+        title: 'Ontology terms', items: fn.ontology, filename: 'gene-ontology-terms.tsv', pageSize: 25,
+        columns: ontologyColumns()
+      }) || rendered;
+      rendered = R.collection(out, {
+        title: 'Gene products', items: fn.gene_products, filename: 'gene-products.tsv',
+        columns: [
+          { key: 'name', label: 'Gene product', tile: true,
+            html: function (g) { return g.html ? R.link(g.html, g.name) : R.escape(g.name); } },
+          { key: 'type', label: 'Type' }
+        ]
+      }) || rendered;
+    } else {
+      var where = state.views.indexOf('gene_model') !== -1 ? 'gm-annotations' : (state.locus ? 'locus-' + state.locus + '-annotations' : null);
+      if (where) {
+        crosslink(out, 'Every term with its evidence and source, the gene products and the protein accessions are tabled under Annotations.',
+          where, 'Open the tables');
+      }
+    }
+    return rendered;
+  }
+
+  function ontologyColumns() {
+    return [
+      { key: 'term', label: 'Term', tile: true, html: function (t) { return t.url ? R.link(t.url, t.term, true) : R.escape(t.term); } },
+      { key: 'name', label: 'Name' },
+      { key: 'ontology', label: 'Ontology' },
+      { key: 'evidence_label', label: 'Evidence', get: function (t) { return t.evidence_label || t.evidence_code || ''; } },
+      { key: 'source', label: 'Source' },
+      { key: 'scope', label: 'Attached to', get: function (t) { return t.scope === 'locus' ? 'Classical gene' : (t.scope === 'gene_model' ? 'Gene model' : (t.attached_to || t.scope || '')); } }
+    ];
+  }
+
+  /* eFP viewer, as on the live page: one atlas at a time. */
+  var efpState = { atlas: 0, mode: 'Absolute', atlases: [] };
+
+  function efpShow() {
+    var atlas = efpState.atlases[efpState.atlas];
+    if (!atlas) { return; }
+    var stage = R.byId('gene-record-efp-stage');
+    var img = qs('img', stage);
+    var link = R.byId('gene-record-efp-open');
+    stage.classList.remove('is-missing');
+    stage.classList.add('is-loading');
+    img.alt = atlas.label + ' expression pattern, ' + efpState.mode.toLowerCase() + ' scale';
+    img.src = efpState.mode === 'Relative' ? atlas.image_relative : atlas.image;
+    if (link) { link.setAttribute('href', atlas.browser); }
+    qsa('[data-atlas]', R.byId('gene-record-efp-atlases')).forEach(function (button) {
+      button.setAttribute('aria-pressed', String(Number(button.getAttribute('data-atlas')) === efpState.atlas));
+    });
+    qsa('[data-mode]', R.byId('gene-record-efp-toolbar')).forEach(function (button) {
+      button.setAttribute('aria-pressed', String(button.getAttribute('data-mode') === efpState.mode));
+    });
+  }
+
+  function renderEfp(out, efp) {
+    if (!efp || !efp.available || !efp.atlases || !efp.atlases.length) { return false; }
+    efpState.atlases = efp.atlases; efpState.atlas = 0; efpState.mode = 'Absolute';
+    out.insertAdjacentHTML('beforeend',
+      '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>eFP Browser<span class="mgdb-rec-block-count">' + efp.atlases.length + '</span></h3></div>' +
+      '<div class="mgdb-rec-toolbar gene-record-efp-toolbar" id="gene-record-efp-toolbar">' +
+        '<div class="mgdb-view-toggle" role="group" aria-label="Color scale">' +
+          '<button class="mgdb-view-btn" type="button" data-mode="Absolute" aria-pressed="true">Absolute</button>' +
+          '<button class="mgdb-view-btn" type="button" data-mode="Relative" aria-pressed="false">Relative</button>' +
+        '</div>' +
+        '<a class="mgdb-button mgdb-button-secondary gene-record-efp-open" id="gene-record-efp-open" href="' + R.escape(efp.browser) + '" target="_blank" rel="noopener">Open at the BAR</a>' +
+      '</div>' +
+      '<div class="gene-record-efp-atlases" id="gene-record-efp-atlases" role="group" aria-label="Atlas">' +
+        efp.atlases.map(function (atlas, index) {
+          return '<button class="gene-record-efp-atlas" type="button" data-atlas="' + index + '" aria-pressed="' + (index === 0) + '">' + R.escape(atlas.label) + '</button>';
+        }).join('') +
+      '</div>' +
+      '<div class="gene-record-efp-stage is-loading" id="gene-record-efp-stage"><img alt=""></div>' +
+      (efp.note ? statusLine(efp.note) : '') +
+      '<p class="mgdb-rec-block-status">' + R.escape(efp.source) + '. ' + R.link(efp.eplant, 'Explore this gene in ePlant', true) + '.</p>' +
+      '</div>');
+    var stage = R.byId('gene-record-efp-stage');
+    var img = qs('img', stage);
+    img.addEventListener('load', function () { stage.classList.remove('is-loading'); });
+    img.addEventListener('error', function () { stage.classList.remove('is-loading'); stage.classList.add('is-missing'); });
+    qsa('[data-atlas]', R.byId('gene-record-efp-atlases')).forEach(function (button) {
+      button.addEventListener('click', function () { efpState.atlas = Number(button.getAttribute('data-atlas')); efpShow(); });
+    });
+    qsa('[data-mode]', R.byId('gene-record-efp-toolbar')).forEach(function (button) {
+      button.addEventListener('click', function () { efpState.mode = button.getAttribute('data-mode'); efpShow(); });
+    });
+    efpShow();
+    return true;
+  }
+
+  function expressionGaps(expression) {
+    var gaps = [];
+    if (expression.rnaseq_histogram && !expression.rnaseq_histogram.available) { gaps.push(expression.rnaseq_histogram.reason); }
+    if (expression.proteomics && !expression.proteomics.available) { gaps.push(expression.proteomics.reason); }
+    return gaps.filter(Boolean);
+  }
+
+  function renderExpression(expression) {
+    if (!expression) { return false; }
+    var out = body('gene-record-expression');
+    out.innerHTML = '';
+    var rendered = false;
+    var profileDrawn = false;
+
+    if (expression.profile && MGDB.geneExpression) {
+      var attrs = payload.data.attributes || {};
+      var block = document.createElement('div');
+      block.className = 'mgdb-rec-block gene-record-expression-block';
+      block.innerHTML = '<div class="mgdb-rec-block-head"><h3>Expression profile</h3>' +
+        (expression.profile.attributes && expression.profile.attributes.release
+          ? '<span class="mgdb-rec-block-count">' + R.escape(expression.profile.attributes.release) + '</span>' : '') +
+        '</div><div class="gene-record-expression-figure"></div>';
+      out.appendChild(block);
+      profileDrawn = MGDB.geneExpression(qs('.gene-record-expression-figure', block), {
+        gene: { name: attrs.name, symbol: attrs.symbol }, profile: expression.profile,
+        qteller: expression.qteller && expression.qteller.available ? expression.qteller.url : null
+      });
+      if (!profileDrawn) { block.parentNode.removeChild(block); } else { rendered = true; }
+    } else if (expression.profile_note) {
+      out.insertAdjacentHTML('beforeend', statusLine(expression.profile_note));
+    }
+
+    if (!profileDrawn && expression.qteller && expression.qteller.available) {
+      out.insertAdjacentHTML('beforeend', blockHtml('qTeller', null,
+        '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-primary" href="' + R.escape(expression.qteller.url) +
+        '" target="_blank" rel="noopener">Open the expression atlas</a></div>'));
+      rendered = true;
+    }
+
+    rendered = renderEfp(out, expression.efp) || rendered;
+
+    var gaps = expressionGaps(expression);
+    if (gaps.length) {
+      R.notes(out, 'Not available for this gene', gaps.map(function (t) { return { text: t }; }));
+      rendered = true;
+    }
+    if (rendered && profileDrawn && state.views.indexOf('gene_model') !== -1) {
+      crosslink(out, 'Every sample, every study and the atlas links are tabled in the Gene model view.', 'gm-expression', 'Open the tables');
+    }
+    if (expression.note) { out.insertAdjacentHTML('beforeend', statusLine(expression.note)); }
+    return rendered;
+  }
+
+  /* The variation track: the canonical transcript to scale, insertions
+     flagged above it, SNP-trait positions pinned below. */
+  function variationTrack(overview, structure, variation) {
+    if (!overview || overview.start == null || overview.end == null) { return ''; }
+    var gStart = Number(overview.start), gEnd = Number(overview.end);
+    if (gEnd <= gStart) { return ''; }
+    var insertions = (variation.insertions || []).filter(function (i) { return i.start != null; });
+    var snps = (variation.snp_traits || []).filter(function (s) { return s.position != null; });
+    if (!insertions.length && !snps.length) { return ''; }
+
+    var pad = Math.max(500, Math.round((gEnd - gStart) * 0.08));
+    var lo = gStart - pad, hi = gEnd + pad;
+    var outside = 0;
+    function clampPos(p) { if (p < lo) { outside++; return lo; } if (p > hi) { outside++; return hi; } return p; }
+
+    var W = 1000, L = 24, Rm = 24, plotW = W - L - Rm;
+    var yIns = 46, yGene = 108, ySnp = 168, yAxis = 214, H = 236;
+    function x(bp) { return L + ((bp - lo) / (hi - lo)) * plotW; }
+
+    var canonical = (structure && structure.exon_structure || []).filter(function (t) { return t.canonical; })[0] ||
+                    (structure && structure.exon_structure || [])[0];
+    var gene = '';
+    gene += '<line class="v2-intron" x1="' + x(gStart).toFixed(1) + '" y1="' + yGene + '" x2="' + x(gEnd).toFixed(1) + '" y2="' + yGene + '"/>';
+    if (canonical) {
+      (canonical.exons || []).forEach(function (e) {
+        gene += '<rect class="v2-exon" x="' + x(e.start).toFixed(1) + '" y="' + (yGene - 6) + '" width="' + Math.max(1.5, x(e.end) - x(e.start)).toFixed(1) + '" height="12" rx="1.5"><title>Exon ' + e.rank + ', ' + R.number(e.start) + '–' + R.number(e.end) + '</title></rect>';
+      });
+      (canonical.cds || []).forEach(function (c) {
+        gene += '<rect class="v2-cds" x="' + x(c.start).toFixed(1) + '" y="' + (yGene - 10) + '" width="' + Math.max(1.5, x(c.end) - x(c.start)).toFixed(1) + '" height="20" rx="2"><title>CDS, ' + R.number(c.start) + '–' + R.number(c.end) + '</title></rect>';
+      });
+    } else {
+      gene += '<rect class="v2-exon" x="' + x(gStart).toFixed(1) + '" y="' + (yGene - 6) + '" width="' + (x(gEnd) - x(gStart)).toFixed(1) + '" height="12" rx="1.5"><title>Gene span</title></rect>';
+    }
+    var strandText = overview.strand === '-' ? '← transcribed right to left (minus strand)' : (overview.strand === '+' ? 'transcribed left to right (plus strand) →' : '');
+
+    var sources = [];
+    insertions.forEach(function (i) { if (sources.indexOf(i.source || 'Insertion') === -1) { sources.push(i.source || 'Insertion'); } });
+    var insHtml = insertions.map(function (i) {
+      var mid = clampPos((Number(i.start) + Number(i.end == null ? i.start : i.end)) / 2);
+      var cx = x(mid).toFixed(1);
+      var alt = sources.indexOf(i.source || 'Insertion') % 2 === 1;
+      var title = i.name + ' · ' + (i.source || 'insertion') + (i.gene_structures ? ' · ' + i.gene_structures : '') + ' · ' + locationText(i);
+      return '<g><line class="v2-ins-stem" x1="' + cx + '" y1="' + (yIns + 8) + '" x2="' + cx + '" y2="' + (yGene - 12) + '"/>' +
+        '<polygon class="v2-ins' + (alt ? ' is-alt' : '') + '" points="' + (Number(cx) - 7) + ',' + (yIns - 6) + ' ' + (Number(cx) + 7) + ',' + (yIns - 6) + ' ' + cx + ',' + (yIns + 8) + '"><title>' + R.escape(title) + '</title></polygon></g>';
+    }).join('');
+
+    var byPos = {};
+    snps.forEach(function (s) { var k = String(s.position); (byPos[k] = byPos[k] || []).push(s); });
+    var snpHtml = Object.keys(byPos).map(function (k) {
+      var list = byPos[k];
+      var cx = x(clampPos(Number(k))).toFixed(1);
+      var r = 4 + Math.min(5, list.length - 1);
+      var traits = [];
+      list.forEach(function (s) { if (traits.indexOf(s.trait) === -1) { traits.push(s.trait); } });
+      var title = list[0].snp + ' · ' + (list[0].gene_structure || '') + ' · ' + traits.length + ' trait' + (traits.length === 1 ? '' : 's') + ': ' + traits.slice(0, 6).join('; ') + (traits.length > 6 ? '…' : '');
+      return '<g><line class="v2-snp-stem" x1="' + cx + '" y1="' + (yGene + 12) + '" x2="' + cx + '" y2="' + (ySnp - r) + '"/>' +
+        '<circle class="v2-snp" cx="' + cx + '" cy="' + ySnp + '" r="' + r + '"><title>' + R.escape(title) + '</title></circle></g>';
+    }).join('');
+
+    var ticks = '';
+    var n = 5;
+    for (var t = 0; t <= n; t++) {
+      var bp = Math.round(lo + (hi - lo) * t / n);
+      var tx = x(bp).toFixed(1);
+      ticks += '<line class="v2-axis" x1="' + tx + '" y1="' + yAxis + '" x2="' + tx + '" y2="' + (yAxis + 5) + '"/>' +
+        '<text class="v2-axis-text" x="' + tx + '" y="' + (yAxis + 17) + '" text-anchor="' + (t === 0 ? 'start' : (t === n ? 'end' : 'middle')) + '">' + R.number(bp) + '</text>';
+    }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + R.escape(insertions.length + ' insertions and ' + snps.length + ' SNP-trait associations placed along ' + (overview.name || 'the gene')) + '">' +
+      '<text class="v2-lane-label" x="' + L + '" y="' + (yIns - 14) + '">Insertions · ' + insertions.length + '</text>' +
+      '<text class="v2-lane-label" x="' + L + '" y="' + (yGene - 20) + '">' + R.escape(canonical ? canonical.id : (overview.name || 'Gene')) + '</text>' +
+      (strandText ? '<text class="v2-strand" x="' + (W - Rm) + '" y="' + (yGene - 20) + '" text-anchor="end">' + R.escape(strandText) + '</text>' : '') +
+      '<text class="v2-lane-label" x="' + L + '" y="' + (ySnp + 26) + '">SNP–trait associations · ' + snps.length + '</text>' +
+      '<line class="v2-axis" x1="' + L + '" y1="' + yAxis + '" x2="' + (W - Rm) + '" y2="' + yAxis + '"/>' + ticks +
+      gene + insHtml + snpHtml + '</svg>';
+
+    var legend = '<ul class="v2-legend">' +
+      '<li><span class="v2-swatch is-cds"></span>Coding sequence</li><li><span class="v2-swatch is-exon"></span>Untranslated exon</li>' +
+      sources.map(function (s, i) { return '<li><span class="v2-swatch is-ins"' + (i % 2 ? ' style="background:var(--mgdb-orange)"' : '') + '></span>' + R.escape(s) + '</li>'; }).join('') +
+      (snps.length ? '<li><span class="v2-swatch is-snp"></span>SNP with a trait association; a larger pin carries more traits</li>' : '') +
+      '</ul>' +
+      (outside ? statusLine(outside + ' position' + (outside === 1 ? ' lies' : 's lie') + ' beyond the drawn window and ' + (outside === 1 ? 'is' : 'are') + ' pinned at its edge.') : '') +
+      statusLine('Positions are on ' + (overview.chromosome || 'the chromosome') + ' of ' + ((payload.data.attributes || {}).assembly || 'this assembly') + '; hover a mark for its name.');
+    return '<div class="v2-vartrack">' + svg + '</div>' + legend;
+  }
+
+  function renderVariation(variation, overview, structure) {
+    if (!variation) { return false; }
+    var out = body('gene-record-variation');
+    out.innerHTML = '';
+    var insertions = variation.insertions || [];
+    var snps = variation.snp_traits || [];
+    var alleles = variation.alleles || [];
+    if (!insertions.length && !snps.length && !alleles.length) { return false; }
+
+    var sources = {}; insertions.forEach(function (i) { sources[i.source || 'unknown'] = true; });
+    var traits = {}; snps.forEach(function (s) { traits[s.trait] = true; });
+    var studies = {}; snps.forEach(function (s) { if (s.study && s.study.name) { studies[s.study.name] = true; } });
+    var facts = R.facts([
+      ['Insertions', insertions.length ? String(insertions.length) : '', Object.keys(sources).length ? 'from ' + Object.keys(sources).join(', ') : ''],
+      ['SNP–trait associations', snps.length ? String(snps.length) : '',
+        snps.length ? Object.keys(traits).length + ' trait' + (Object.keys(traits).length === 1 ? '' : 's') + (Object.keys(studies).length ? ', ' + Object.keys(studies).length + ' stud' + (Object.keys(studies).length === 1 ? 'y' : 'ies') : '') : ''],
+      ['Alleles and variations', alleles.length ? String(alleles.length) : '', alleles.length ? 'curated on the classical gene' : '']
+    ]);
+    if (facts) { out.insertAdjacentHTML('beforeend', facts); }
+
+    var track = variationTrack(overview, structure, variation);
+    if (track) { out.insertAdjacentHTML('beforeend', blockHtml('Insertions and trait-associated SNPs along the gene', null, track)); }
+
+    var links = [];
+    if (insertions.length && state.views.indexOf('gene_model') !== -1) { links.push(['gm-insertions', 'Insertions table']); }
+    if (snps.length && state.views.indexOf('gene_model') !== -1) { links.push(['gm-snps', 'SNPs and traits table']); }
+    if (alleles.length && state.locus) { links.push(['locus-' + state.locus + '-alleles', 'Alleles table']); }
+    if (links.length) {
+      out.insertAdjacentHTML('beforeend', '<p class="v2-crosslink">Every row is tabled: ' + links.map(function (l) {
+        return '<button class="v2-jump" type="button" data-jump="' + l[0] + '">' + R.escape(l[1]) + '</button>';
+      }).join(' · ') + '</p>');
+    }
+    return true;
+  }
+
+  function renderOrthologs(orthologs) {
+    if (!orthologs) { return false; }
+    var out = body('gene-record-orthologs');
+    out.innerHTML = '';
+    var rendered = false;
+    var list = orthologs.orthologs || [];
+    if (list.length) {
+      var bySpecies = {};
+      var order = [];
+      list.forEach(function (o) {
+        var sp = o.species || 'Unknown species';
+        if (!bySpecies[sp]) { bySpecies[sp] = []; order.push(sp); }
+        bySpecies[sp].push(o);
+      });
+      out.insertAdjacentHTML('beforeend', blockHtml('Orthologs by species', list.length,
+        '<ul class="v2-tally">' + order.map(function (sp) {
+          var items = bySpecies[sp];
+          return '<li class="v2-tally-item"><strong>' + items.length + '</strong><em>' + R.escape(sp) + '</em><ul>' +
+            items.slice(0, 6).map(function (o) {
+              return '<li>' + (o.url ? R.link(o.url, o.identifier, true) : R.escape(o.identifier)) +
+                (o.is_direct ? '' : ' <span class="mgdb-muted">via ' + R.escape(o.via || 'pan-gene') + '</span>') + '</li>';
+            }).join('') + (items.length > 6 ? '<li class="mgdb-muted">and ' + (items.length - 6) + ' more</li>' : '') + '</ul></li>';
+        }).join('') + '</ul>' +
+        statusLine('Calls made on this gene model and on the other members of its pan-gene, from ' +
+          (list[0].analysis || 'the ortholog analysis') + '.')));
+      rendered = true;
+      if (state.views.indexOf('pan_gene') !== -1) {
+        crosslink(out, 'The full ortholog table, with the member each call was made on, is in the Pan-gene view.', 'pg-orthologs', 'Open the table');
+      }
+    }
+    rendered = renderPhylostrata(out, orthologs.phylostrata) || rendered;
+    return rendered;
+  }
+
+  function renderPhylostrata(out, ps) {
+    if (!ps || !ps.image) { return false; }
+    var block = document.createElement('div');
+    block.className = 'mgdb-rec-block gene-record-phylostrata';
+    block.innerHTML = '<div class="mgdb-rec-block-head"><h3>Phylostrata</h3><span class="mgdb-rec-block-count">1&ndash;' + ps.scale.max + '</span></div>' +
+      '<figure class="gene-record-phylostrata-figure"><a href="' + R.escape(ps.image) + '" target="_blank" rel="noopener">' +
+      '<img src="' + R.escape(ps.image) + '" alt="Phylostratigraphy of ' + R.escape(ps.gene_model) + ', showing the level at which each part of the protein is conserved" loading="lazy"></a>' +
+      '<figcaption>' + R.escape(ps.description) + '</figcaption></figure>' +
+      '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-secondary" href="' + R.escape(ps.details_url) + '" target="_blank" rel="noopener">Phylostrata details for ' + R.escape(ps.gene_model) + '</a>' +
+      '<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(ps.about_url) + '" target="_blank" rel="noopener">About the Phylostrata tool</a></div>';
+    out.appendChild(block);
+    qs('img', block).addEventListener('error', function () {
+      if (block.parentNode) { block.parentNode.removeChild(block); }
+      if (!out.children.length) {
+        state.rendered['gene-record-orthologs'] = false;
+        var bar = state.bars.visual;
+        var tab = bar ? qs('a[href="#gene-record-orthologs"]', bar) : null;
+        if (tab) { tab.parentNode.removeChild(tab); }
+        R.show(R.byId('gene-record-orthologs'), false);
+      }
+    });
+    return true;
+  }
+
+  function renderImages(locus) {
+    var items = (locus && locus.images) || [];
+    if (!items.length) { return false; }
+    return R.images(body('gene-record-images'), items.map(function (image) {
+      return { url: image.url, caption: image.caption || '', title: (image.variation && image.variation.name) || 'Image',
+               category: image.variation_type || 'Image', record: (image.variation && image.variation.html) || '' };
+    }), 'gene-record-image-dialog', { title: 'Mutant Phenotype Images', filename: 'gene-mutant-phenotype-images.tsv' });
+  }
+
+  function sequenceColumns() {
+    return [
+      { key: 'name', label: 'Transcript', tile: true,
+        html: function (t) { return R.escape(t.name) + (t.canonical ? ' <span class="mgdb-pill mgdb-pill-ok">Canonical</span>' : ''); } },
+      { key: 'cds', label: 'CDS', sort: false, get: function (t) { return t.cds || ''; }, html: function (t) { return t.cds ? R.link(t.cds, 'CDS', true) : '—'; } },
+      { key: 'cdna', label: 'cDNA', sort: false, get: function (t) { return t.cdna || ''; }, html: function (t) { return t.cdna ? R.link(t.cdna, 'cDNA', true) : '—'; } },
+      { key: 'protein_url', label: 'Protein', sort: false, get: function (t) { return t.protein_url || ''; },
+        html: function (t) { return t.protein_url ? R.link(t.protein_url, t.protein || 'Protein', true) : '—'; } }
+    ];
+  }
+
+  function renderSequences(seq, out) {
+    if (!seq || !seq.set) { return false; }
+    out.innerHTML = '';
+    out.insertAdjacentHTML('beforeend', R.facts([
+      ['Annotation set', R.escape(seq.set)],
+      ['Assembly', seq.assembly ? R.escape(seq.assembly) : ''],
+      ['Whole gene', seq.genomic ? R.link(seq.genomic, 'Genomic FASTA', true) : '', 'the model and its introns']
+    ]));
+    R.collection(out, { title: 'Transcript sequences', items: seq.transcripts, filename: 'gene-sequences.tsv', pageSize: 25, columns: sequenceColumns() });
+    var downloads = (seq.downloads || []).filter(Boolean);
+    if (downloads.length) {
+      out.insertAdjacentHTML('beforeend', blockHtml('Bulk downloads', downloads.length,
+        '<div class="mgdb-rec-linkrow">' + downloads.map(function (url) {
+          return '<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(url) + '" target="_blank" rel="noopener">Every sequence for this assembly</a>';
+        }).join('') + '</div>'));
+    }
+    if (seq.note) { out.insertAdjacentHTML('beforeend', statusLine(seq.note)); }
+    return true;
+  }
+
+  /* Gene model scores: the range view, as on the live page. */
+  function fmtScore(v) {
+    if (v == null || isNaN(v)) { return '—'; }
+    var n = Number(v);
+    if (n === 0 || n === 1 || n === 100) { return String(n); }
+    if (Math.abs(n) >= 10) { return n.toFixed(1); }
+    if (Math.abs(n) >= 1) { return n.toFixed(2); }
+    if (Math.abs(n) < 0.001) { return '<0.001'; }
+    return n.toPrecision(3).replace(/\.?0+$/, '');
+  }
+  function scoreStanding(s) {
+    var r = s.range; if (!r || r.p5 == null) { return null; }
+    var v = s.value;
+    if (v >= r.p95) { return 'above 95% of scored features'; }
+    if (v >= r.p75) { return 'in the top quarter'; }
+    if (v >= r.p50) { return 'above the median'; }
+    if (v >= r.p25) { return 'below the median'; }
+    if (v >= r.p5) { return 'in the bottom quarter'; }
+    return 'below 95% of scored features';
+  }
+  function scoreTone(s) {
+    var r = s.range; if (!s.better || !r || r.p25 == null) { return 'neutral'; }
+    var v = s.value;
+    if (s.better === 'high') { return v >= r.p50 ? 'good' : (v < r.p25 ? 'poor' : 'mid'); }
+    return v <= r.p50 ? 'good' : (v > r.p75 ? 'poor' : 'mid');
+  }
+  function scoreRangeHtml(rows) {
+    var withRange = rows.filter(function (s) { return s.range && s.range.n; });
+    var n = withRange.length ? withRange[0].range.n : 0;
+    return '<div class="gene-score-ranges">' + rows.map(function (s) {
+      var lo = null, hi = null, src = null;
+      if (s.range && s.range.min != null && s.range.max != null && s.range.max > s.range.min) { lo = s.range.min; hi = s.range.max; src = 'range'; }
+      else if (s.scale) { lo = s.scale.min; hi = s.scale.max; src = 'scale'; }
+      function pct(v) { return Math.max(0, Math.min(100, 100 * (v - lo) / (hi - lo))); }
+      var tone = scoreTone(s), standing = scoreStanding(s), track = '';
+      if (lo != null) {
+        var r = s.range || {};
+        var title = (s.label || s.metric) + ': ' + fmtScore(s.value) + ' on a ' + fmtScore(lo) + ' to ' + fmtScore(hi) + ' ' + (src === 'range' ? 'genome-wide range' : 'scale') + (standing ? ', ' + standing : '');
+        track = '<div class="gene-score-track" role="img" aria-label="' + R.escape(title) + '" title="' + R.escape(title) + '">' +
+          (src === 'range' && r.p5 != null ? '<span class="gene-score-band" style="left:' + pct(r.p5).toFixed(1) + '%;width:' + (pct(r.p95) - pct(r.p5)).toFixed(1) + '%" title="5th to 95th percentile"></span>' : '') +
+          (src === 'range' && r.p50 != null ? '<span class="gene-score-median" style="left:' + pct(r.p50).toFixed(1) + '%" title="median ' + fmtScore(r.p50) + '"></span>' : '') +
+          '<span class="gene-score-dot is-' + tone + '" style="left:' + pct(s.value).toFixed(1) + '%"></span></div>' +
+          '<div class="gene-score-ends"><span>' + fmtScore(lo) + (src === 'range' ? ' <small>min</small>' : '') + '</span>' +
+          (src === 'range' && r.p50 != null ? '<span class="gene-score-ends-mid"><small>median</small> ' + fmtScore(r.p50) + '</span>' : '') +
+          '<span>' + fmtScore(hi) + (src === 'range' ? ' <small>max</small>' : '') + '</span></div>';
+      } else {
+        track = '<p class="mgdb-muted gene-score-noscale">No scale on file for this metric.</p>';
+      }
+      return '<div class="gene-score-row"><div class="gene-score-head"><span class="gene-score-label">' + R.escape(s.label || s.metric) + '</span>' +
+        '<span class="gene-score-analysis">' + R.escape(s.analysis || '') + (s.version ? ' ' + R.escape(s.version) : '') + '</span>' +
+        '<span class="gene-score-value is-' + tone + '">' + fmtScore(s.value) + '</span></div>' + track +
+        '<p class="gene-score-note">' + R.escape(s.interpretation || '') + (standing ? ' <span class="gene-score-standing">' + R.escape(standing) + '</span>' : '') + '</p></div>';
+    }).join('') + '</div>' +
+    '<p class="mgdb-rec-block-status">' + (withRange.length
+      ? 'Ranges, band (5th to 95th percentile) and median are over every feature the analysis scored, ' + R.number(n) + ' and up, across the annotations it was run on. A circle is green when the score sits on the better side of the median, gold between the median and the poorer quartile, wine beyond it; blue metrics describe the protein rather than judge the model.'
+      : 'Tracks show each metric\'s own scale; genome-wide ranges are not on this host.') + '</p>';
+  }
+  function scoreColumns() {
+    return [
+      { key: 'label', label: 'Score', tile: true, get: function (s) { return s.label || s.metric; } },
+      { key: 'analysis', label: 'Analysis', get: function (s) { return (s.analysis || '') + (s.version ? ' ' + s.version : ''); } },
+      { key: 'value', label: 'Value', sort: 'number', numeric: true, get: function (s) { return fmtScore(s.value); } },
+      { key: 'range', label: 'Genome-wide', sort: false,
+        get: function (s) { return s.range && s.range.min != null ? fmtScore(s.range.min) + '–' + fmtScore(s.range.max) + ', median ' + fmtScore(s.range.p50) : (s.scale ? 'scale ' + s.scale.min + '–' + s.scale.max : ''); } },
+      { key: 'interpretation', label: 'What it means', get: function (s) { var st = scoreStanding(s); return (s.interpretation || '') + (st ? ' (' + st + ')' : ''); } }
+    ];
+  }
+  function renderProvenance(structure) {
+    var scores = (structure && structure.scores) || [];
+    return R.collection(body('gene-record-provenance'), {
+      title: 'Gene model scores', items: scores, filename: 'gene-model-scores.tsv', pageSize: 'all', view: 'range',
+      views: [{ key: 'range', label: 'Range',
+        icon: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><circle cx="10" cy="8" r="3.5" fill="currentColor"/></svg>',
+        render: scoreRangeHtml }],
+      columns: scoreColumns()
+    });
+  }
+
+  function renderMetrics(counts) {
+    R.metrics(R.byId('gene-record-metrics-body'), [
+      ['Ontology terms', 'Function', counts.ontology, 'GO and other ontology terms attached to this gene.', 'green'],
+      ['Insertions', 'Mutants', counts.insertions, 'Insertion alleles recorded in this gene.', 'amber'],
+      ['SNP associations', 'Traits', counts.snp_traits, 'SNPs in this gene with a recorded trait association.', 'blue'],
+      ['References', 'Literature', counts.references, 'Curated publications associated with this gene.', 'burgundy']
+    ]);
+    var series = [
+      ['Transcripts', counts.transcripts], ['Protein domains', counts.protein_domains],
+      ['Ontology terms', counts.ontology], ['Insertions', counts.insertions],
+      ['SNP associations', counts.snp_traits], ['Alleles', counts.alleles],
+      ['Map positions', counts.map_positions], ['Gene products', counts.gene_products],
+      ['Stocks', counts.stocks], ['Images', counts.images],
+      ['Cross-references', counts.xrefs], ['Pan-gene members', counts.pan_gene_members],
+      ['Gene models of this gene', counts.locus_gene_models],
+      ['Curator notes', counts.comments], ['References', counts.references]
+    ];
+    R.connectionsChart('gene-record-connections-chart', 'gene-record-connections-caption',
+                       'gene-record-connections-figure', series, R.connectionsHeight(series));
+    return true;
+  }
+
+  /* ========================================================================
+     VIEW 2: Gene model, tables and lists only
+     ======================================================================== */
+
+  function transcriptColumns() {
+    return [
+      { key: 'name', label: 'Transcript', tile: true },
+      { key: 'is_canonical', label: 'Canonical', get: function (t) { return t.canonical ? 'Yes' : 'No'; },
+        html: function (t) { return t.canonical ? '<span class="mgdb-pill mgdb-pill-ok">Canonical</span>' : '<span class="mgdb-muted">&mdash;</span>'; } },
+      { key: 'protein', label: 'Protein' },
+      { key: 'model_type', label: 'Type', get: function (t) { return String(t.model_type || '').replace(/_/g, ' '); } },
+      { key: 'position', label: 'Position', get: locationText, html: function (t) { var s = locationText(t); return s ? '<span class="mgdb-sequence">' + R.escape(s) + '</span>' : '—'; } },
+      { key: 'span_bp', label: 'Span (bp)', sort: 'number', numeric: true, get: function (t) { return t.span_bp == null ? '' : R.number(t.span_bp); } },
+      { key: 'exon_count', label: 'Exons', sort: 'number', numeric: true, get: function (t) { return t.exon_count == null ? '' : String(t.exon_count); } },
+      { key: 'cds_length_nt', label: 'CDS (nt)', sort: 'number', numeric: true, get: function (t) { return t.cds_length_nt == null ? '' : R.number(t.cds_length_nt); } },
+      { key: 'protein_length_aa', label: 'Protein (aa)', sort: 'number', numeric: true, get: function (t) { return t.protein_length_aa == null ? '' : R.number(t.protein_length_aa); } }
+    ];
+  }
+
+  function transcriptRows(structure) {
+    var blocks = {};
+    ((structure.gene_model && structure.gene_model.transcripts) || []).forEach(function (t) { blocks[t.id] = t; });
+    return (structure.transcripts || []).map(function (t) {
+      var b = blocks[t.name];
+      return b ? Object.assign({}, t, { exon_count: b.exon_count, cds_length_nt: b.cds_length_nt,
+        protein_length_aa: b.protein ? b.protein.length_aa : null }) : t;
+    });
+  }
+
+  function exonRows(structure) {
+    var rows = [];
+    ((structure.gene_model && structure.gene_model.transcripts) || structure.exon_structure || []).forEach(function (t) {
+      (t.exons || []).forEach(function (e) {
+        var coding = 0;
+        (t.cds || []).forEach(function (c) {
+          var lo = Math.max(e.start, c.start), hi = Math.min(e.end, c.end);
+          if (hi >= lo) { coding += hi - lo + 1; }
+        });
+        rows.push({ transcript: t.id, canonical: !!t.canonical, rank: e.rank, start: e.start, end: e.end,
+                    length: e.end - e.start + 1, coding: coding,
+                    kind: coding === 0 ? 'Untranslated' : (coding === e.end - e.start + 1 ? 'Coding' : 'Part coding') });
+      });
+    });
+    return rows;
+  }
+
+  function gmOverview(overview, structure, sections, counts) {
+    var out = body('gm-overview');
+    out.innerHTML = '';
+    var attrs = payload.data.attributes || {};
+    var asm = overview.assembly || {};
+    var pan = (sections.pan_gene || {}).pan_gene;
+    var protein = (structure && structure.protein) || {};
+    var facts = R.facts([
+      ['Gene model', overview.name ? '<span class="mgdb-record-id">' + R.escape(overview.name) + '</span>' : ''],
+      ['Annotation set', overview.annotation && overview.annotation.name ? R.escape(overview.annotation.name) : (attrs.annotation ? R.escape(attrs.annotation) : '')],
+      ['Assembly', asm.name ? (asm.html ? R.link(asm.html, asm.name) : R.escape(asm.name)) : '',
+        [asm.accession, asm.provider, asm.date, asm.coverage ? asm.coverage + ' coverage' : ''].filter(Boolean).join(' · ')],
+      ['Model type', overview.model_type ? R.escape(String(overview.model_type).replace(/_/g, ' ')) : ''],
+      ['Location', overview.chromosome && overview.start != null ? R.escape(overview.chromosome) + ':' + R.number(overview.start) + '–' + R.number(overview.end) : '',
+        overview.span_bp ? R.number(overview.span_bp) + ' bp' : ''],
+      ['Strand', overview.strand ? (overview.strand === '-' ? 'Minus (−)' : 'Plus (+)') : '', overview.strand_note || ''],
+      ['Transcripts', overview.transcript_count == null ? '' : String(overview.transcript_count), overview.canonical_transcript ? 'canonical ' + overview.canonical_transcript : ''],
+      ['Canonical protein', protein.name ? R.escape(protein.name) : (overview.canonical_protein ? R.escape(overview.canonical_protein) : ''),
+        protein.length_aa ? R.number(protein.length_aa) + ' aa' : ''],
+      ['Current in its annotation', overview.is_current == null ? '' : (overview.is_current ? 'Yes' : 'No')],
+      ['Reference gene model', overview.is_reference_gene_model == null ? '' : (overview.is_reference_gene_model ? 'Yes' : 'No')],
+      ['Species', overview.species ? '<em>' + R.escape(overview.species) + '</em>' : '', overview.line ? 'line ' + overview.line : ''],
+      ['Pan-gene', pan && pan.name ? R.link('/pan_gene_center/pan_gene/' + encodeURIComponent(pan.name), pan.name) : '<span class="mgdb-muted">Not placed in a pan-gene</span>',
+        pan && pan.analysis ? pan.analysis : '']
+    ]);
+    if (facts) { out.insertAdjacentHTML('beforeend', facts); }
+
+    R.collection(out, {
+      title: 'Classical genes on this gene model', items: state.loci, filename: 'gene-classical-genes.tsv',
+      columns: [
+        { key: 'name', label: 'Symbol', tile: true, html: function (l) { return '<button class="v2-jump" type="button" data-jump="locus-' + l.id + '-overview">' + R.escape(l.name) + '</button>'; } },
+        { key: 'full_name', label: 'Full name' },
+        { key: 'type', label: 'Type' },
+        { key: 'id', label: 'MaizeGDB ID', sort: 'number', numeric: true, get: function (l) { return String(l.id); } },
+        R.urlColumn(function (l) { return l.html; })
+      ]
+    });
+
+    if (structure) {
+      R.collection(out, { title: 'Transcripts', items: transcriptRows(structure), filename: 'gene-transcripts.tsv', pageSize: 25, columns: transcriptColumns() });
+      R.collection(out, {
+        title: 'Exon coordinates', items: exonRows(structure), filename: 'gene-exons.tsv', pageSize: 25,
+        columns: [
+          { key: 'transcript', label: 'Transcript', tile: true, html: function (e) { return R.escape(e.transcript) + (e.canonical ? ' <span class="mgdb-pill mgdb-pill-ok">Canonical</span>' : ''); } },
+          { key: 'rank', label: 'Exon', sort: 'number', numeric: true, get: function (e) { return String(e.rank); } },
+          { key: 'start', label: 'Start', sort: 'number', numeric: true, get: function (e) { return R.number(e.start); } },
+          { key: 'end', label: 'End', sort: 'number', numeric: true, get: function (e) { return R.number(e.end); } },
+          { key: 'length', label: 'Length (bp)', sort: 'number', numeric: true, get: function (e) { return R.number(e.length); } },
+          { key: 'coding', label: 'Coding (bp)', sort: 'number', numeric: true, get: function (e) { return R.number(e.coding); } },
+          { key: 'kind', label: 'Kind' }
+        ]
+      });
+    }
+
+    var browser = overview.browser;
+    var links = [];
+    if (browser && browser.url) { links.push('<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(browser.url) + '" target="_blank" rel="noopener">Open in ' + R.escape(browser.label) + '</a>'); }
+    if (structure && structure.gene_model && structure.gene_model.links) {
+      var gl = structure.gene_model.links;
+      if (gl.gff3) { links.push('<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(gl.gff3) + '" target="_blank" rel="noopener">GFF3</a>'); }
+      if (gl.bed) { links.push('<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(gl.bed) + '" target="_blank" rel="noopener">BED</a>'); }
+    }
+    if (links.length) { out.insertAdjacentHTML('beforeend', blockHtml('Genome browser and model files', null, '<div class="mgdb-rec-linkrow">' + links.join('') + '</div>')); }
+    return true;
+  }
+
+  function gmAnnotations(fn, structure) {
+    var out = body('gm-annotations');
+    out.innerHTML = '';
+    var rendered = false;
+    fn = fn || {};
+    structure = structure || {};
+
+    rendered = R.collection(out, { title: 'Ontology terms', items: fn.ontology, filename: 'gene-ontology-terms.tsv', pageSize: 25, columns: ontologyColumns() }) || rendered;
+
+    rendered = R.collection(out, {
+      title: 'Protein domains', items: structure.protein_domains, filename: 'gene-protein-domains.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Domain', tile: true, html: function (d) { return d.url ? R.link(d.url, d.name, true) : R.escape(d.name); } },
+        { key: 'accession', label: 'Accession' },
+        { key: 'start', label: 'Start', sort: 'number', numeric: true, get: function (d) { return d.start == null ? '' : String(d.start); } },
+        { key: 'end', label: 'End', sort: 'number', numeric: true, get: function (d) { return d.end == null ? '' : String(d.end); } },
+        { key: 'analysis', label: 'Analysis' },
+        { key: 'evalue', label: 'E-value', sort: 'number', numeric: true, get: function (d) { return d.evalue == null ? '' : String(d.evalue); } },
+        { key: 'entry', label: 'InterPro', html: function (d) { return d.entry ? R.link('https://www.ebi.ac.uk/interpro/entry/InterPro/' + encodeURIComponent(d.entry) + '/', d.entry, true) : '<span class="mgdb-muted">&mdash;</span>'; } },
+        { key: 'transcript', label: 'Transcript' }
+      ]
+    }) || rendered;
+
+    var dom = structure.domains || {};
+    if (dom.sites && dom.sites.length) {
+      rendered = R.collection(out, {
+        title: 'Residue-level sites on ' + (dom.id || 'the canonical protein'), items: dom.sites, filename: 'gene-protein-sites.tsv', pageSize: 25,
+        columns: [
+          { key: 'description', label: 'Site', tile: true },
+          { key: 'residue', label: 'Residue' },
+          { key: 'start', label: 'Position', sort: 'number', numeric: true, get: function (s) { return s.start === s.end ? String(s.start) : s.start + '–' + s.end; } },
+          { key: 'analysis', label: 'Analysis' },
+          { key: 'accession', label: 'Signature' },
+          { key: 'signature_start', label: 'Signature span', get: function (s) { return s.signature_start + '–' + s.signature_end; } }
+        ]
+      }) || rendered;
+    }
+
+    rendered = R.collection(out, {
+      title: 'Protein accessions', items: fn.protein_accessions, filename: 'gene-protein-accessions.tsv',
+      columns: [
+        { key: 'accession', label: 'Accession', tile: true, html: function (a) { return a.url ? R.link(a.url, a.accession, true) : R.escape(a.accession); } },
+        { key: 'database', label: 'Database' },
+        { key: 'analysis', label: 'Analysis' },
+        { key: 'description', label: 'Description' }
+      ]
+    }) || rendered;
+
+    rendered = R.collection(out, {
+      title: 'Gene products', items: fn.gene_products, filename: 'gene-products.tsv',
+      columns: [
+        { key: 'name', label: 'Gene product', tile: true, html: function (g) { return g.html ? R.link(g.html, g.name) : R.escape(g.name); } },
+        { key: 'type', label: 'Type' },
+        { key: 'evidence', label: 'Evidence' },
+        { key: 'comments', label: 'Comments' }
+      ]
+    }) || rendered;
+
+    rendered = R.collection(out, { title: 'Gene model scores', items: structure.scores, filename: 'gene-model-scores.tsv', pageSize: 'all', columns: scoreColumns() }) || rendered;
+    return rendered;
+  }
+
+  function insertionColumns() {
+    return [
+      { key: 'name', label: 'Insertion', tile: true, html: function (i) { var v = (i.variations || [])[0]; return v && v.html ? R.link(v.html, i.name) : R.escape(i.name); } },
+      { key: 'source', label: 'Source' },
+      { key: 'gene_structures', label: 'Gene structure', get: function (i) { return i.gene_structures || ''; } },
+      { key: 'position', label: 'Position', get: locationText, html: function (i) { var t = locationText(i); return t ? '<span class="mgdb-sequence">' + R.escape(t) + '</span>' : '<span class="mgdb-muted">Not recorded</span>'; } },
+      { key: 'transcripts', label: 'Transcript' },
+      { key: 'stocks', label: 'Stock', get: function (i) { return refNames(i.stocks); }, html: function (i) { return refLinks(i.stocks); } }
+    ];
+  }
+
+  function gmInsertions(variation) {
+    var out = body('gm-insertions');
+    out.innerHTML = '';
+    var ok = R.collection(out, { title: 'Insertions', items: (variation || {}).insertions, filename: 'gene-insertions.tsv', pageSize: 25, columns: insertionColumns() });
+    if (ok) {
+      out.insertAdjacentHTML('beforeend', '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-quiet" href="/insertion">Insertion Data Hub</a>' +
+        '<a class="mgdb-button mgdb-button-quiet" href="/uniformmu">UniformMu resource</a></div>');
+    }
+    return ok;
+  }
+
+  function gmExpression(expression) {
+    var out = body('gm-expression');
+    out.innerHTML = '';
+    if (!expression) { return false; }
+    var rendered = false;
+    var profile = expression.profile;
+    var summary = profile && profile.sections && profile.sections.summary;
+    var rna = summary && summary.rna;
+    if (rna) {
+      var factsHtml = R.facts([
+        ['Release', profile.attributes && profile.attributes.release ? R.escape(profile.attributes.release) : ''],
+        ['RNA samples', rna.samples != null ? R.number(rna.samples) : '', rna.samples_with_value != null ? R.number(rna.samples_with_value) + ' with a value' : ''],
+        ['Detected in', rna.detected != null ? R.number(rna.detected) + ' samples' : '', rna.detected_rule ? rna.detected_rule : ''],
+        ['Mean', rna.mean != null ? fmtScore(rna.mean) : '', rna.median != null ? 'median ' + fmtScore(rna.median) : ''],
+        ['Highest', rna.max != null ? fmtScore(rna.max) : '', rna.max_sample ? rna.max_sample.sample + ' (' + rna.max_sample.source + ')' : ''],
+        ['Tissue specificity', rna.tau != null ? 'tau ' + fmtScore(rna.tau) : '', rna.specificity || ''],
+        ['Studies', profile.attributes && profile.attributes.source_count != null ? R.number(profile.attributes.source_count) : '']
+      ]);
+      if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); rendered = true; }
+    }
+    if (profile && profile.sections) {
+      rendered = R.collection(out, {
+        title: 'Samples', items: profile.sections.samples || [], filename: 'gene-expression.tsv', pageSize: 25,
+        columns: [
+          { key: 'label', label: 'Sample', tile: true },
+          { key: 'source', label: 'Study' },
+          { key: 'tissue', label: 'Tissue reading' },
+          { key: 'condition', label: 'Condition', get: function (s) { return s.condition || ''; } },
+          { key: 'assay', label: 'Assay', get: function (s) { return s.assay === 'rna' ? 'RNA' : s.assay; } },
+          { key: 'value', label: 'Value', sort: 'number', numeric: true, get: function (s) { return s.value == null ? '' : String(s.value); } }
+        ]
+      }) || rendered;
+      rendered = R.collection(out, {
+        title: 'Studies', items: profile.sections.sources || [], filename: 'gene-expression-studies.tsv', pageSize: 25,
+        columns: [
+          { key: 'name', label: 'Study', tile: true, html: function (s) { return s.link ? R.link(s.link, s.name, true) : R.escape(s.name); } },
+          { key: 'assay', label: 'Assay', get: function (s) { return s.assay === 'rna' ? 'RNA' : s.assay; } },
+          { key: 'sample_count', label: 'Samples', sort: 'number', numeric: true, get: function (s) { return s.sample_count == null ? '' : String(s.sample_count); } },
+          { key: 'stress', label: 'Stress study', get: function (s) { return s.stress ? 'Yes' : 'No'; } },
+          { key: 'description', label: 'Notes' }
+        ]
+      }) || rendered;
+    } else if (expression.profile_note) {
+      out.insertAdjacentHTML('beforeend', statusLine(expression.profile_note));
+      rendered = true;
+    }
+    if (expression.efp && expression.efp.available && expression.efp.atlases && expression.efp.atlases.length) {
+      rendered = R.collection(out, {
+        title: 'eFP Browser atlases', items: expression.efp.atlases, filename: 'gene-efp-atlases.tsv', pageSize: 25,
+        columns: [
+          { key: 'label', label: 'Atlas', tile: true },
+          { key: 'key', label: 'Data source' },
+          { key: 'image', label: 'Absolute', sort: false, get: function (a) { return a.image; }, html: function (a) { return R.link(a.image, 'Image', true); } },
+          { key: 'image_relative', label: 'Relative', sort: false, get: function (a) { return a.image_relative; }, html: function (a) { return R.link(a.image_relative, 'Image', true); } },
+          { key: 'browser', label: 'Browser', sort: false, get: function (a) { return a.browser; }, html: function (a) { return R.link(a.browser, 'Open at the BAR', true); } }
+        ]
+      }) || rendered;
+    }
+    var links = [];
+    if (expression.qteller && expression.qteller.available) { links.push('<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(expression.qteller.url) + '" target="_blank" rel="noopener">qTeller expression atlas</a>'); }
+    if (expression.efp && expression.efp.eplant) { links.push('<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(expression.efp.eplant) + '" target="_blank" rel="noopener">ePlant</a>'); }
+    if (links.length) { out.insertAdjacentHTML('beforeend', blockHtml('Expression tools', null, '<div class="mgdb-rec-linkrow">' + links.join('') + '</div>')); rendered = true; }
+    var gaps = expressionGaps(expression);
+    if (gaps.length) { R.notes(out, 'Not available for this gene', gaps.map(function (t) { return { text: t }; })); rendered = true; }
+    return rendered;
+  }
+
+  function snpColumns() {
+    return [
+      { key: 'snp', label: 'SNP', tile: true },
+      { key: 'trait', label: 'Trait', html: function (t) { return '<span title="' + R.escape(t.trait_description || '') + '">' + R.escape(t.trait) + '</span>'; } },
+      { key: 'gene_structure', label: 'Structure', get: function (t) { return t.gene_structure || ''; },
+        html: function (t) { return t.gene_structure ? '<span title="' + R.escape(t.structure_description || '') + '">' + R.escape(t.gene_structure) + '</span>' : '<span class="mgdb-muted">—</span>'; } },
+      { key: 'position', label: 'Position', sort: 'number', numeric: true, get: function (t) { return t.position == null ? '' : R.number(t.position); } },
+      { key: 'transcript', label: 'Transcript' },
+      { key: 'study', label: 'Study', tsvOnly: true, get: function (t) { return t.study && t.study.name ? t.study.name : ''; } }
+    ];
+  }
+
+  function gmSnps(variation) {
+    var out = body('gm-snps');
+    out.innerHTML = '';
+    return R.collection(out, { title: 'SNPs and traits', items: (variation || {}).snp_traits, filename: 'gene-snp-traits.tsv', pageSize: 25, columns: snpColumns() });
+  }
+
+  function gmProteomics(expression) {
+    var out = body('gm-proteomics');
+    out.innerHTML = '';
+    var p = expression && expression.proteomics;
+    if (!p) { return false; }
+    if (p.available) {
+      out.insertAdjacentHTML('beforeend', '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-secondary" href="' + R.escape(p.url || '#') + '">Open the proteomics data</a></div>');
+      return true;
+    }
+    if (!p.reason) { return false; }
+    R.notes(out, 'Proteomics', [{ text: p.reason, meta: ['Protein abundance and phosphorylation from Walley et al. 2016 were mapped to B73 RefGen_v3 gene models; the pan-gene view lists any related model that carries them.'] }]);
+    return true;
+  }
+
+  function gmXrefs(xrefs) {
+    var out = body('gm-xrefs');
+    out.innerHTML = '';
+    return R.collection(out, { title: 'Cross-references', items: xrefs, filename: 'gene-cross-references.tsv', pageSize: 25, columns: xrefColumns() });
+  }
+
+  function xrefColumns() {
+    return [
+      { key: 'key', label: 'Accession', tile: true, html: function (x) { return x.url ? R.link(x.url, x.key || x.accession, true) : R.escape(x.key || x.accession); }, get: function (x) { return x.key || x.accession || ''; } },
+      { key: 'database', label: 'Database' },
+      { key: 'comment', label: 'Comment', get: function (x) { return x.comment || x.description || ''; } },
+      { key: 'url', label: 'URL', sort: false, get: function (x) { return x.url || ''; }, html: function (x) { return x.url ? R.link(x.url, x.url, true) : '—'; } }
+    ];
+  }
+
+  /* ========================================================================
+     VIEW 3: Pan-gene
+     ======================================================================== */
+
+  function pgOverview(pan) {
+    var out = body('pg-overview');
+    out.innerHTML = '';
+    var pg = pan.pan_gene;
+    out.insertAdjacentHTML('beforeend', '<p class="v2-lead">A <strong>pan-gene</strong> is the set of gene models from multiple genomes that appear to represent the same gene: ' +
+      'gene models grouped by sequence similarity and syntenic position across the annotations in the analysis.</p>');
+    out.insertAdjacentHTML('beforeend', R.facts([
+      ['Pan-gene', R.link('/pan_gene_center/pan_gene/' + encodeURIComponent(pg.name), pg.name), 'opens the pan-gene record'],
+      ['Members', num(pg.member_count), 'gene models across all assemblies'],
+      ['Assemblies', num(pan.assembly_count), 'genomes where this gene was found'],
+      ['Zea species', pan.species && pan.species.length ? String(pan.species.length) : '',
+        pan.species ? pan.species.map(function (s) { return s.species; }).join(', ') : ''],
+      ['Exemplar transcript', pg.exemplar ? R.escape(pg.exemplar) : ''],
+      ['Chromosome', pg.chromosome ? R.escape(pg.chromosome) : ''],
+      ['Analysis', pg.analysis ? R.escape(pg.analysis) : '']
+    ]));
+
+    if (pan.species && pan.species.length) {
+      var strip = pan.species.map(function (group) {
+        return '<div class="gene-record-species"><h4><em>' + R.escape(group.species) + '</em> <span class="gene-record-muted">' + group.count + '</span></h4>' +
+          '<ul class="gene-record-presence">' + group.assemblies.map(function (a) {
+            return '<li title="' + R.escape(a) + '"><span class="mgdb-visually-hidden">' + R.escape(a) + '</span></li>';
+          }).join('') + '</ul></div>';
+      }).join('');
+      out.insertAdjacentHTML('beforeend', blockHtml('Present in', num(pan.assembly_count),
+        statusLine('One square per assembly in which this gene was found, grouped by species. Hover a square for the assembly name.') + strip));
+    }
+
+    if (pan.pangenome_image && pan.pangenome_image.url) {
+      var pv = pan.pangenome_image;
+      var pvBlock = document.createElement('div');
+      pvBlock.className = 'mgdb-rec-block gene-record-pangenome';
+      pvBlock.innerHTML = '<div class="mgdb-rec-block-head"><h3>Pangenome view</h3><span class="mgdb-rec-block-count">' + R.escape(pv.gene_model) + '</span></div>' +
+        '<figure class="gene-record-pangenome-figure"><a href="' + R.escape(pv.url) + '" target="_blank" rel="noopener">' +
+        '<img src="' + R.escape(pv.url) + '" loading="lazy" alt="Genomic sequence at ' + R.escape(pv.gene_model) + ' across multiple maize assemblies, drawn as a pangenome subgraph"></a>' +
+        '<figcaption>' + R.escape(pv.description) + ' Produced by the ' + R.link(pv.pipeline_url, pv.pipeline, true) + ' at MaizeGDB in 2026.</figcaption></figure>';
+      out.appendChild(pvBlock);
+      qs('img', pvBlock).addEventListener('error', function () { if (pvBlock.parentNode) { pvBlock.parentNode.removeChild(pvBlock); } });
+    }
+
+    out.insertAdjacentHTML('beforeend', '<div class="mgdb-rec-block" id="pg-analysis-block"><div class="mgdb-rec-block-head"><h3>About the analysis</h3></div>' +
+      '<p class="mgdb-rec-block-status" data-role="analysis-status">Loading the analysis description&hellip;</p><div data-role="analysis"></div></div>');
+
+    var gm = (payload.data.attributes || {}).name || '';
+    out.insertAdjacentHTML('beforeend', blockHtml('Structural variation across the NAM founders', null,
+      '<p class="v2-lead">BRIDGEcereal shows structural variation within and near ' + R.escape(gm) + ' across the NAM founder assemblies. ' +
+      'Type the gene model id into its box, check that it is in the database, choose the flanking region, then submit.</p>' +
+      '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-secondary" href="https://bridgecereal.scinet.usda.gov/Maize" target="_blank" rel="noopener">Open BRIDGEcereal</a>' +
+      '<a class="mgdb-button mgdb-button-quiet" href="https://download.maizegdb.org/Pan-genes/" target="_blank" rel="noopener">Download the pan-gene analyses</a></div>'));
+    return true;
+  }
+
+  function pgMembers(pan) {
+    var out = body('pg-members');
+    out.innerHTML = '';
+    var ok = R.collection(out, {
+      title: 'Gene models in this pan-gene', items: pan.members, filename: 'gene-pan-gene-members.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Gene model', tile: true,
+          html: function (m) { return (m.html ? R.link(m.html.replace('/gene_center/gene/', '/gene_center/gene_v2/'), m.name) : R.escape(m.name)) + (m.is_current_record ? ' <span class="mgdb-pill mgdb-pill-ok">This record</span>' : ''); } },
+        { key: 'transcript', label: 'Transcript' },
+        { key: 'annotation', label: 'Annotation set' },
+        { key: 'chromosome', label: 'Chromosome', get: function (m) { return m.chromosome || 'n/a'; } },
+        { key: 'position', label: 'Position', get: function (m) { return m.start != null ? R.number(m.start) + '–' + R.number(m.end) : ''; },
+          html: function (m) { return m.start != null ? '<span class="mgdb-sequence">' + R.number(m.start) + '–' + R.number(m.end) + '</span>' : '<span class="mgdb-muted">Not in the database</span>'; } },
+        { key: 'assembly', label: 'Assembly', html: function (m) { return m.assembly ? R.link('/genome/genome_assembly/' + encodeURIComponent(m.assembly), m.assembly) : '—'; } }
+      ]
+    });
+    if (ok) { out.insertAdjacentHTML('beforeend', statusLine('A chromosome of n/a means the gene model itself is not in the MaizeGDB database, so its position cannot be found.')); }
+    return ok;
+  }
+
+  function pgOrthologs(orthologs) {
+    var out = body('pg-orthologs');
+    out.innerHTML = '';
+    return R.collection(out, {
+      title: 'Orthologs in other species', items: (orthologs || {}).orthologs, filename: 'gene-orthologs.tsv', pageSize: 25,
+      columns: [
+        { key: 'identifier', label: 'Gene', tile: true, html: function (o) { return o.url ? R.link(o.url, o.identifier, true) : R.escape(o.identifier); } },
+        { key: 'species', label: 'Species', html: function (o) { return o.species ? '<em>' + R.escape(o.species) + '</em>' : '<span class="mgdb-muted">—</span>'; } },
+        { key: 'kind', label: 'Relationship', get: function (o) { return String(o.kind || '').replace(/_/g, ' '); } },
+        { key: 'analysis', label: 'Analysis' },
+        { key: 'via', label: 'Called on', get: function (o) { return o.is_direct ? 'This gene model' : (o.via || ''); },
+          html: function (o) { if (o.is_direct) { return '<span class="mgdb-pill mgdb-pill-ok">This gene model</span>'; }
+            return o.via_html ? R.link(o.via_html.replace('/gene_center/gene/', '/gene_center/gene_v2/'), o.via) + ' <span class="mgdb-muted">(pan-gene)</span>' : R.escape(o.via || ''); } }
+      ]
+    });
+  }
+
+  /* The second request: the pan-gene record's own sections, for the member
+     dataset matrix, the analysis description and the comparative viewers.
+     Made only when the Pan-gene view is opened. */
+  function loadPanExtra() {
+    var pan = payload.data.sections.pan_gene;
+    if (!pan || !pan.pan_gene || !pan.pan_gene.name) { return; }
+    state.panLoaded = 'loading';
+    var ds = body('pg-datasets');
+    ds.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Reading the data attached to the other members&hellip;</span></div>';
+    state.rendered['pg-datasets'] = true;
+    refreshBars();
+    MGDB.request('/api/v1/records/pan_gene/' + encodeURIComponent(pan.pan_gene.name) +
+      '?fields=analysis,expression,insertions,traits,proteins,domains,function,viewers,downloads', { key: 'pan-extra' })
+      .then(function (response) {
+        state.panLoaded = 'done';
+        var s = (response.data || {}).sections || {};
+        renderPgAnalysis(s.analysis);
+        state.rendered['pg-datasets'] = pgDatasets(pan, s);
+        state.rendered['pg-viewers'] = pgViewers(s.viewers, s.downloads);
+        refreshBars();
+        if (state.view === 'pan_gene') { showView('pan_gene', { keepUrl: true }); }
+      })
+      .catch(function (error) {
+        if (error && error.name === 'AbortError') { return; }
+        state.panLoaded = 'failed';
+        ds.innerHTML = '<div class="mgdb-message mgdb-message-warn" role="note"><div><strong>The pan-gene record could not be read.</strong><span> The members and orthologs above come from this gene’s own record; the data attached to the other members needs the pan-gene record, which did not answer.</span></div></div>';
+        var st = qs('[data-role="analysis-status"]', R.byId('pg-analysis-block'));
+        if (st) { st.textContent = 'The analysis description could not be read.'; }
+      });
+  }
+
+  function renderPgAnalysis(analysis) {
+    var block = R.byId('pg-analysis-block');
+    if (!block) { return; }
+    var st = qs('[data-role="analysis-status"]', block);
+    var host = qs('[data-role="analysis"]', block);
+    if (!analysis) { if (st) { st.textContent = 'No analysis description is on file.'; } return; }
+    if (st) { st.remove(); }
+    host.innerHTML = '<dl class="mgdb-rec-facts v2-facts-wide">' +
+      R.fact('Description', analysis.description ? R.escape(analysis.description) : '') + '</dl>' +
+      R.facts([
+        ['Program', analysis.program ? R.escape(analysis.program) + (analysis.program_version ? ' ' + R.escape(analysis.program_version) : '') : '', analysis.source_uri ? analysis.source_uri : ''],
+        ['Run', analysis.executed ? R.escape(analysis.executed) : '', analysis.source ? 'by ' + analysis.source : ''],
+        ['Annotations included', analysis.annotations ? String(analysis.annotations.length) : ''],
+        ['Download', analysis.download_url ? R.link(analysis.download_url, 'Full pan-gene analysis', true) : '']
+      ]);
+  }
+
+  function pgDatasets(pan, s) {
+    var out = body('pg-datasets');
+    out.innerHTML = '';
+    var members = pan.members || [];
+    if (!members.length) { return false; }
+    var expr = {}, ins = {}, traits = {}, prot = {}, structs = {}, domains = {}, fnTerms = {};
+    (s.expression || []).forEach(function (e) { expr[e.gene_model] = e.url; });
+    (s.insertions || []).forEach(function (i) { ins[i.gene_model] = (ins[i.gene_model] || 0) + 1; });
+    (s.traits || []).forEach(function (t) { traits[t.gene_model] = (traits[t.gene_model] || 0) + 1; });
+    (((s.proteins || {}).proteomics) || []).forEach(function (p) { prot[p.gene_model] = p.reference || 'yes'; });
+    (((s.proteins || {}).structures) || []).forEach(function (p) { structs[p.gene_model] = p.html; });
+    (((s.domains || {}).members) || []).forEach(function (d) { domains[d.gene_model] = d.domain_string || ''; });
+    (s.function || []).forEach(function (f) {
+      String(f.gene_models || '').split(/,\s*/).forEach(function (g) { if (g) { fnTerms[g] = (fnTerms[g] || 0) + 1; } });
+    });
+
+    function count(map) { return Object.keys(map).filter(function (k) { return members.some(function (m) { return m.name === k; }); }).length; }
+    var facts = R.facts([
+      ['Expression', count(expr) ? count(expr) + ' members' : '', 'with a qTeller profile'],
+      ['Insertions', (s.insertions || []).length ? String((s.insertions || []).length) : '', count(ins) ? 'on ' + count(ins) + ' members' : ''],
+      ['SNP–trait associations', (s.traits || []).length ? String((s.traits || []).length) : '', count(traits) ? 'on ' + count(traits) + ' members' : ''],
+      ['Proteomics', count(prot) ? count(prot) + ' members' : '', 'Walley et al. 2016, B73 RefGen_v3'],
+      ['Protein structures', count(structs) ? count(structs) + ' members' : ''],
+      ['Ontology terms', (s.function || []).length ? String((s.function || []).length) : '', 'distinct terms across the members']
+    ]);
+    if (facts) { out.insertAdjacentHTML('beforeend', facts); }
+
+    function tick(v, title) {
+      return v ? '<span class="v2-mark" title="' + R.escape(title || '') + '">' + (typeof v === 'number' ? v : '✓') + '</span>' : '<span class="v2-mark is-none" aria-label="none">·</span>';
+    }
+    R.collection(out, {
+      title: 'Which members carry which data', items: members, filename: 'gene-pan-gene-member-datasets.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Gene model', tile: true,
+          html: function (m) { return (m.html ? R.link(m.html.replace('/gene_center/gene/', '/gene_center/gene_v2/'), m.name) : R.escape(m.name)) + (m.is_current_record ? ' <span class="mgdb-pill mgdb-pill-ok">This record</span>' : ''); } },
+        { key: 'assembly', label: 'Assembly' },
+        { key: 'expression', label: 'Expression', get: function (m) { return expr[m.name] ? 'yes' : ''; },
+          html: function (m) { return expr[m.name] ? '<a class="v2-mark" href="' + R.escape(expr[m.name]) + '" target="_blank" rel="noopener" title="Open in qTeller">✓</a>' : tick(false); } },
+        { key: 'insertions', label: 'Insertions', sort: 'number', get: function (m) { return ins[m.name] ? String(ins[m.name]) : ''; }, html: function (m) { return tick(ins[m.name], (ins[m.name] || 0) + ' insertions'); } },
+        { key: 'traits', label: 'SNP–traits', sort: 'number', get: function (m) { return traits[m.name] ? String(traits[m.name]) : ''; }, html: function (m) { return tick(traits[m.name], (traits[m.name] || 0) + ' associations'); } },
+        { key: 'proteomics', label: 'Proteomics', get: function (m) { return prot[m.name] ? 'yes' : ''; }, html: function (m) { return tick(!!prot[m.name], prot[m.name]); } },
+        { key: 'structure', label: 'Structure', get: function (m) { return structs[m.name] ? 'yes' : ''; },
+          html: function (m) { return structs[m.name] ? '<a class="v2-mark" href="' + R.escape(structs[m.name]) + '" title="Protein structure record">✓</a>' : tick(false); } },
+        { key: 'terms', label: 'GO terms', sort: 'number', get: function (m) { return fnTerms[m.name] ? String(fnTerms[m.name]) : ''; }, html: function (m) { return tick(fnTerms[m.name], (fnTerms[m.name] || 0) + ' terms'); } },
+        { key: 'domains', label: 'Domains', get: function (m) { return domains[m.name] || ''; } }
+      ]
+    });
+    out.insertAdjacentHTML('beforeend', statusLine('Read from the pan-gene record. A tick or a count means the member carries that data; the gene model link opens its own record.'));
+    return true;
+  }
+
+  function pgViewers(viewers, downloads) {
+    var out = body('pg-viewers');
+    out.innerHTML = '';
+    var links = [];
+    if (viewers && viewers.gcv_url) { links.push('<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(viewers.gcv_url) + '" target="_blank" rel="noopener">Genome Context Viewer</a>'); }
+    if (viewers && viewers.ncbi) {
+      if (viewers.ncbi.gdv_url) { links.push('<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(viewers.ncbi.gdv_url) + '" target="_blank" rel="noopener">NCBI Genome Data Viewer</a>'); }
+      if (viewers.ncbi.cgv_url) { links.push('<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(viewers.ncbi.cgv_url) + '" target="_blank" rel="noopener">NCBI Comparative Genome Viewer</a>'); }
+    }
+    var rendered = false;
+    if (links.length) {
+      out.insertAdjacentHTML('beforeend', blockHtml('Comparative viewers', null, '<div class="mgdb-rec-linkrow">' + links.join('') + '</div>' +
+        (viewers && viewers.ncbi && viewers.ncbi.gene_accession ? statusLine('NCBI Gene ' + viewers.ncbi.gene_accession + ' on ' + viewers.ncbi.reference_assembly + ' (' + viewers.ncbi.reference_accession + ').') : '')));
+      rendered = true;
+    }
+    /* The per-pan-gene sequence files are assembled on request by the
+       pan-gene record page (record_data/pan_gene_seq.php, driven by its own
+       script), so they are not plain URLs to list here; the record is one
+       click away and the bulk directory is a plain link. */
+    if (downloads && (downloads.pan_gene_name || downloads.bulk_url)) {
+      var files = (downloads.files || []).map(function (f) { return f.label; });
+      out.insertAdjacentHTML('beforeend', blockHtml('Pan-gene downloads', files.length || null,
+        (files.length ? '<ul class="mgdb-list">' + files.map(function (l) { return '<li>' + R.escape(l) + '</li>'; }).join('') + '</ul>' : '') +
+        '<div class="mgdb-rec-linkrow">' +
+          (downloads.pan_gene_name ? '<a class="mgdb-button mgdb-button-secondary" href="/pan_gene_center/pan_gene/' + encodeURIComponent(downloads.pan_gene_name) + '#pg-record-downloads">Download from the pan-gene record</a>' : '') +
+          (downloads.bulk_url ? '<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(downloads.bulk_url) + '" target="_blank" rel="noopener">Bulk pan-gene directory</a>' : '') +
+        '</div>' +
+        statusLine('The files for one pan-gene are built on request and can be slow; the bulk directory holds the whole analysis.')));
+      rendered = true;
+    }
+    return rendered;
+  }
+
+  /* ========================================================================
+     VIEW 4: Genetic information, one section set per classical gene
+     ======================================================================== */
+
+  function locusSectionId(id, key) { return 'locus-' + id + '-' + key; }
+
+  function buildLocusView(locusInfo) {
+    var id = locusInfo.id;
+    var dv = 'locus-' + id;
+    var marker = R.byId('gene-record-locus-marker');
+    var bar = document.createElement('nav');
+    bar.className = 'mgdb-section-tabs mgdb-rec-tabs v2-tabs';
+    bar.id = 'gene-record-tabs-' + dv;
+    bar.setAttribute('data-view', dv);
+    bar.setAttribute('aria-label', 'Sections of the genetic information for ' + locusInfo.name);
+    bar.hidden = true;
+    state.bars.pan_gene.parentNode.insertBefore(bar, state.bars.pan_gene.nextSibling);
+    state.bars[dv] = bar;
+
+    LOCUS_KEYS.forEach(function (key) {
+      var sid = locusSectionId(id, key);
+      var section = document.createElement('section');
+      section.id = sid;
+      section.setAttribute('data-view', dv);
+      section.setAttribute('aria-labelledby', sid + '-title');
+      section.hidden = true;
+      var heading = LOCUS_HEADINGS[key] + (key === 'overview' ? ': ' + locusInfo.name : '');
+      section.innerHTML = '<div class="mgdb-section-heading"><div><h2 id="' + sid + '-title">' + R.escape(heading) + '</h2></div></div><div id="' + sid + '-body"></div>';
+      marker.parentNode.insertBefore(section, marker);
+    });
+  }
+
+  function locusTabCounts(id) {
+    var c = {};
+    c[locusSectionId(id, 'overview')] = ['locus_gene_models', 'comments'];
+    c[locusSectionId(id, 'annotations')] = ['ontology_locus'];
+    c[locusSectionId(id, 'references')] = ['references'];
+    c[locusSectionId(id, 'alleles')] = ['alleles', 'images'];
+    c[locusSectionId(id, 'stocks')] = ['stocks'];
+    c[locusSectionId(id, 'map')] = ['map_positions'];
+    c[locusSectionId(id, 'nearby')] = ['nearby'];
+    c[locusSectionId(id, 'genetic')] = ['genetic'];
+    c[locusSectionId(id, 'external')] = ['xrefs'];
+    return c;
+  }
+
+  function locusLabels(id) {
+    var l = {};
+    LOCUS_KEYS.forEach(function (key) { l[locusSectionId(id, key)] = LOCUS_TAB_LABELS[key]; });
+    return l;
+  }
+
+  /* data = { locus, references, xrefs, ontology, counts } */
+  function renderLocusView(id, data) {
+    var locus = data.locus || {};
+    var sid = function (key) { return locusSectionId(id, key); };
+    var out;
+
+    out = body(sid('overview')); out.innerHTML = '';
+    var products = (data.gene_products || []);
+    out.insertAdjacentHTML('beforeend', R.facts([
+      ['Symbol', locus.name ? R.escape(locus.name) : ''],
+      ['Full name', locus.full_name ? R.escape(locus.full_name) : ''],
+      ['Type', locus.type ? R.escape(locus.type) : ''],
+      ['Chromosome bin', locus.bin ? R.escape(locus.bin) : ''],
+      ['MaizeGDB ID', locus.id ? '<span class="mgdb-record-id">' + locus.id + '</span>' : ''],
+      ['Locus record', locus.locus_html ? R.link(locus.locus_html, 'Open the locus record') : ''],
+      ['Gene products', products.length ? products.map(function (g) { return g.html ? R.link(g.html, g.name) : R.escape(g.name); }).join(', ') : '']
+    ]));
+    R.collection(out, {
+      title: 'Synonyms', items: locus.synonyms, filename: 'gene-synonyms.tsv',
+      columns: [
+        { key: 'name', label: 'Name', tile: true },
+        { key: 'authority', label: 'Authority' },
+        { key: 'reference', label: 'Reference', get: function (s) { return s.reference && s.reference.name ? s.reference.name : ''; },
+          html: function (s) { return s.reference && s.reference.name ? R.refLink(s.reference) : '<span class="mgdb-muted">—</span>'; } }
+      ]
+    });
+    R.notes(out, 'Curator notes', (locus.comments || []).map(function (c) {
+      return { text: c.text, meta: [c.label, c.reference ? 'Source: ' + (R.refLink(c.reference) || R.escape(c.reference.name)) : '', c.authority ? 'Authority: ' + R.escape(c.authority) : ''] };
+    }));
+    var models = locus.associated_gene_models || [];
+    var allB73 = models.length && models.every(function (m) { return (m.assembly || '').indexOf('B73') !== -1; });
+    R.collection(out, {
+      title: (allB73 ? 'B73 gene models' : 'Gene models') + ' for this classical gene', items: models, filename: 'gene-associated-models.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Gene model', tile: true, html: function (m) { return R.link('/gene_center/gene_v2/' + encodeURIComponent(m.name), m.name) + (m.is_current_record ? ' <span class="mgdb-pill mgdb-pill-ok">This record</span>' : ''); } },
+        { key: 'assembly', label: 'Assembly' },
+        { key: 'annotation', label: 'Annotation' },
+        { key: 'position', label: 'Position', get: locationText, html: function (m) { var t = locationText(m); return t ? '<span class="mgdb-sequence">' + R.escape(t) + '</span>' : '—'; } },
+        { key: 'is_current', label: 'Current in its annotation', get: function (m) { return m.is_current ? 'Yes' : 'No'; },
+          html: function (m) { return m.is_current ? '<span class="mgdb-pill mgdb-pill-ok">Current</span>' : '<span class="mgdb-pill mgdb-pill-warn">Superseded</span>'; } }
+      ]
+    });
+    R.collection(out, {
+      title: 'Phenotypes', items: locus.phenotypes, filename: 'gene-phenotypes.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Phenotype', tile: true, html: function (p) { return R.link('/data_center/phenotype?id=' + p.id, p.name); } },
+        { key: 'qualifier', label: 'Qualifier', get: function (p) { return p.qualifier || ''; } },
+        R.urlColumn(function (p) { return '/data_center/phenotype?id=' + p.id; })
+      ]
+    });
+    R.collection(out, {
+      title: 'Related loci', items: locus.related_loci, filename: 'gene-related-loci.tsv',
+      columns: [
+        { key: 'name', label: 'Locus', tile: true, html: function (l) { return R.link('/data_center/locus?id=' + l.id, l.name); } },
+        { key: 'qualifier', label: 'Relationship' }
+      ]
+    });
+    state.rendered[sid('overview')] = !!locus.id;
+
+    out = body(sid('annotations')); out.innerHTML = '';
+    state.rendered[sid('annotations')] = R.collection(out, {
+      title: 'Ontology terms on ' + (locus.name || 'this gene'), items: data.ontology, filename: 'gene-locus-ontology-terms.tsv', pageSize: 25, columns: ontologyColumns()
+    });
+
+    out = body(sid('references')); out.innerHTML = '';
+    state.rendered[sid('references')] = R.references(out, data.references, R.byId(sid('references')), 'locus-' + id + '-ref', {});
+
+    out = body(sid('alleles')); out.innerHTML = '';
+    var allelesOk = R.collection(out, {
+      title: 'Alleles and variations', items: locus.alleles || data.alleles, filename: 'gene-alleles.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Allele', tile: true, html: function (a) { return a.html ? R.link(a.html, a.name) : R.link('/data_center/variation?id=' + a.id, a.name); } },
+        { key: 'type', label: 'Type' },
+        { key: 'id', label: 'MaizeGDB ID', sort: 'number', numeric: true, get: function (a) { return a.id == null ? '' : String(a.id); } }
+      ]
+    });
+    var imagesOk = R.collection(out, {
+      title: 'Images on these alleles', items: locus.images, filename: 'gene-allele-images.tsv', pageSize: 10,
+      columns: [
+        { key: 'thumb', label: 'Image', sort: false, get: function (i) { return i.url; },
+          html: function (i) { return '<a href="' + R.escape(i.url) + '" target="_blank" rel="noopener"><img src="' + R.escape(i.url) + '" alt="' + R.escape(i.caption || '') + '" loading="lazy" style="width:72px;height:54px;object-fit:cover;border-radius:4px;display:block"></a>'; } },
+        { key: 'allele', label: 'Allele', tile: true, get: function (i) { return i.variation && i.variation.name ? i.variation.name : ''; },
+          html: function (i) { return i.variation && i.variation.name ? R.link(i.variation.html, i.variation.name) : '—'; } },
+        { key: 'variation_type', label: 'Type' },
+        { key: 'caption', label: 'Caption' }
+      ]
+    });
+    state.rendered[sid('alleles')] = allelesOk || imagesOk;
+
+    out = body(sid('stocks')); out.innerHTML = '';
+    state.rendered[sid('stocks')] = R.collection(out, {
+      title: 'Stocks', items: locus.stocks, filename: 'gene-stocks.tsv', pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Stock', tile: true, html: function (st) { return R.link(st.html, st.name) + (st.from_stock_center ? ' <span class="mgdb-pill mgdb-pill-ok">Stock Center</span>' : ''); } },
+        { key: 'full_name', label: 'Description' },
+        { key: 'type', label: 'Type' },
+        { key: 'alleles', label: 'Alleles' },
+        { key: 'available_from', label: 'Available from' },
+        R.urlColumn(function (st) { return st.html; })
+      ]
+    });
+
+    out = body(sid('map')); out.innerHTML = '';
+    state.rendered[sid('map')] = R.collection(out, {
+      title: 'Map coordinates', items: locus.map_positions, filename: 'gene-map-positions.tsv', pageSize: 25,
+      columns: [
+        { key: 'map', label: 'Map', tile: true },
+        { key: 'position', label: 'Position', sort: 'number', numeric: true, get: function (m) { return m.position == null ? '' : String(m.position); } },
+        { key: 'bin', label: 'Bin' },
+        { key: 'bin2', label: 'Bin 2' },
+        { key: 'is_backbone', label: 'Backbone', get: function (m) { return m.is_backbone ? 'Yes' : 'No'; },
+          html: function (m) { return m.is_backbone ? '<span class="mgdb-pill mgdb-pill-ok">Backbone</span>' : '<span class="mgdb-muted">—</span>'; } }
+      ]
+    });
+
+    state.rendered[sid('nearby')] = renderNearby(body(sid('nearby')), locus);
+    state.rendered[sid('genetic')] = renderGenetic(body(sid('genetic')), locus);
+
+    out = body(sid('external')); out.innerHTML = '';
+    state.rendered[sid('external')] = R.collection(out, { title: 'Cross-references', items: data.xrefs, filename: 'gene-cross-references.tsv', pageSize: 25, columns: xrefColumns() });
+
+    var counts = Object.assign({}, data.counts || {}, { nearby: (locus.nearby_loci || []).length, genetic: (locus.genetic || []).length });
+    buildBar(state.bars['locus-' + id], LOCUS_KEYS.map(function (k) { return sid(k); }), locusLabels(id), counts, locusTabCounts(id));
+  }
+
+  function renderNearby(out, locus) {
+    var list = (locus && locus.nearby_loci) || [];
+    out.innerHTML = '';
+    if (!list.length) { return false; }
+    var maxWindow = locus.nearby_window_cm || 10;
+    var choices = [1, 2, 5, 10].filter(function (c) { return c <= maxWindow; });
+    out.innerHTML = '<div class="mgdb-rec-toolbar"><div class="mgdb-view-toggle" role="group" aria-label="Window">' +
+      choices.map(function (c) { return '<button class="mgdb-view-btn" type="button" data-window="' + c + '" aria-pressed="' + (c === maxWindow) + '">±' + c + ' cM</button>'; }).join('') +
+      '</div></div><div data-role="nearby-list"></div>';
+    var host = qs('[data-role="nearby-list"]', out);
+    function draw(windowCm) {
+      host.innerHTML = '';
+      R.collection(host, {
+        title: 'Loci within ' + windowCm + ' cM', items: list.filter(function (n) { return n.distance_cm === null || n.distance_cm <= windowCm; }),
+        filename: 'gene-nearby-loci.tsv', pageSize: 25,
+        columns: [
+          { key: 'name', label: 'Locus', tile: true, html: function (n) { return (n.html ? R.link(n.html, n.name) : R.escape(n.name)) + (n.is_self ? ' <span class="mgdb-pill mgdb-pill-ok">This gene</span>' : ''); } },
+          { key: 'map', label: 'Map' },
+          { key: 'position', label: 'Position', sort: 'number', numeric: true, get: function (n) { return n.position == null ? '' : String(n.position); } },
+          { key: 'distance_cm', label: 'Distance (cM)', sort: 'number', numeric: true, get: function (n) { return n.distance_cm == null ? '' : String(n.distance_cm); } }
+        ]
+      });
+    }
+    qsa('[data-window]', out).forEach(function (button) {
+      button.addEventListener('click', function () {
+        qsa('[data-window]', out).forEach(function (b) { b.setAttribute('aria-pressed', String(b === button)); });
+        draw(Number(button.getAttribute('data-window')));
+      });
+    });
+    draw(maxWindow);
+    return true;
+  }
+
+  var GENETIC_KINDS = [
+    ['primer', 'Primers and enzymes', 'Primer'], ['bac', 'Related BACs', 'BAC'],
+    ['gel_pattern', 'Gel patterns', 'Gel pattern'], ['map_score', 'Map scores', 'Map score'],
+    ['recombination', 'Recombination data', 'Recombination']
+  ];
+
+  function renderGenetic(out, locus) {
+    var list = (locus && locus.genetic) || [];
+    out.innerHTML = '';
+    if (!list.length) { return false; }
+    var rendered = false;
+    GENETIC_KINDS.forEach(function (spec) {
+      var items = list.filter(function (g) { return g.kind === spec[0]; });
+      var columns = [{ key: 'name', label: spec[2], tile: true, html: function (g) { return g.html ? R.link(g.html, g.name) : R.escape(g.name); } }];
+      if (spec[0] === 'primer') {
+        columns.push({ key: 'detail', label: 'Sequence', html: function (g) { return g.detail ? '<span class="mgdb-sequence">' + R.escape(g.detail) + '</span>' : '<span class="mgdb-muted">Not recorded</span>'; } });
+      }
+      columns.push({ key: 'id', label: 'MaizeGDB ID', sort: 'number', numeric: true, get: function (g) { return g.id == null ? '' : String(g.id); },
+        html: function (g) { return g.id == null ? '—' : '<span class="mgdb-sequence">' + g.id + '</span>'; } });
+      columns.push(R.urlColumn(function (g) { return g.html; }));
+      rendered = R.collection(out, { title: spec[1], items: items, filename: 'gene-' + spec[0] + '.tsv', pageSize: 25, columns: columns }) || rendered;
+    });
+    return rendered;
+  }
+
+  /* An additional classical gene on the model: its own request, made when
+     its chip is first chosen. */
+  function loadLocus(id) {
+    state.locusLoaded[id] = 'loading';
+    var out = body(locusSectionId(id, 'overview'));
+    out.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the genetic information&hellip;</span></div>';
+    state.rendered[locusSectionId(id, 'overview')] = true;
+    refreshBars();
+    MGDB.request('/api/v1/records/gene/' + encodeURIComponent(id) + '?fields=locus,references,xrefs,function', { key: 'locus-' + id })
+      .then(function (response) {
+        var s = (response.data || {}).sections || {};
+        var fn = s.function || {};
+        state.locusLoaded[id] = 'done';
+        renderLocusView(id, {
+          locus: s.locus || {},
+          references: (s.references || {}).references || [],
+          xrefs: (s.xrefs || {}).xrefs || [],
+          ontology: (fn.ontology || []).filter(function (t) { return t.scope === 'locus' || !t.scope; }),
+          gene_products: fn.gene_products || [],
+          counts: (response.meta || {}).counts || {}
+        });
+        if (state.view === 'genetic' && Number(state.locus) === Number(id)) { showView('genetic', { keepUrl: true }); }
+      })
+      .catch(function (error) {
+        if (error && error.name === 'AbortError') { return; }
+        state.locusLoaded[id] = 'failed';
+        out.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert"><div><strong>This classical gene could not be loaded.</strong><span> Reload to try again.</span></div></div>';
+      });
+  }
+
+  /* ------------------------------------------------------------------------
+     Assembly
+     ------------------------------------------------------------------------ */
+
+  function refreshBars() {
+    var counts = (payload.meta || {}).counts || {};
+    buildBar(state.bars.visual, ORDER.visual, LABELS, counts, TAB_COUNTS);
+    buildBar(state.bars.gene_model, ORDER.gene_model, LABELS, counts, TAB_COUNTS);
+    buildBar(state.bars.pan_gene, ORDER.pan_gene, LABELS, counts, TAB_COUNTS);
+    if (state.view) { spyBind(activeBar()); }
+  }
+
+  function render(response) {
+    payload = response;
+    var data = response.data || {};
+    var sections = data.sections || {};
+    var meta = response.meta || {};
+    var counts = meta.counts || {};
+    counts.orthologs = ((sections.orthologs || {}).orthologs || []).length;
+
+    R.show(els.loading, false);
+    R.show(els.error, false);
+
+    var hasGeneModel = !!(data.attributes && data.attributes.name);
+    var primaryLocus = sections.locus && sections.locus.id ? sections.locus : null;
+    var loci = ((sections.overview || {}).loci || []).slice();
+    if (!loci.length && primaryLocus) {
+      loci = [{ id: primaryLocus.id, name: primaryLocus.name, full_name: primaryLocus.full_name, type: primaryLocus.type, html: primaryLocus.locus_html }];
+    }
+    if (primaryLocus) {
+      loci.sort(function (a, b) { return (a.id === primaryLocus.id ? 0 : 1) - (b.id === primaryLocus.id ? 0 : 1); });
+    }
+    state.loci = loci;
+    state.locus = primaryLocus ? primaryLocus.id : (loci.length ? loci[0].id : null);
+
+    renderHeader(data, sections);
+    renderIdeogram(sections.overview, primaryLocus);
+
+    /* Genetic information first, so the visual view's crosslinks know the
+       primary locus's section ids exist. */
+    loci.forEach(buildLocusView);
+    if (primaryLocus) {
+      var fn = sections.function || {};
+      renderLocusView(primaryLocus.id, {
+        locus: primaryLocus,
+        references: (sections.references || {}).references || [],
+        xrefs: (sections.xrefs || {}).xrefs || [],
+        ontology: (fn.ontology || []).filter(function (t) { return t.scope === 'locus' || !t.scope || !hasGeneModel; }),
+        gene_products: fn.gene_products || [],
+        counts: counts
+      });
+      state.locusLoaded[primaryLocus.id] = 'done';
+    }
+    var geneticHas = loci.some(function (l) { return state.rendered[locusSectionId(l.id, 'overview')] || state.locusLoaded[l.id] !== 'done'; });
+
+    var panHas = hasGeneModel && sections.pan_gene && sections.pan_gene.pan_gene && sections.pan_gene.pan_gene.name;
+    state.views = ['visual'].concat(hasGeneModel ? ['gene_model'] : []).concat(panHas ? ['pan_gene'] : []).concat(geneticHas ? ['genetic'] : []);
+
+    /* Gene model view. */
+    if (hasGeneModel) {
+      mark(gmOverview(sections.overview || {}, sections.structure, sections, counts), 'gm-overview');
+      mark(gmAnnotations(sections.function, sections.structure), 'gm-annotations');
+      mark(gmInsertions(sections.variation), 'gm-insertions');
+      mark(gmExpression(sections.expression), 'gm-expression');
+      mark(gmSnps(sections.variation), 'gm-snps');
+      mark(gmProteomics(sections.expression), 'gm-proteomics');
+      mark(renderSequences(sections.sequences, body('gm-sequence')), 'gm-sequence');
+      if (!primaryLocus) { mark(gmXrefs((sections.xrefs || {}).xrefs), 'gm-xrefs'); }
+    }
+
+    /* Pan-gene view. */
+    if (panHas) {
+      mark(pgOverview(sections.pan_gene), 'pg-overview');
+      mark(pgMembers(sections.pan_gene), 'pg-members');
+      mark(pgOrthologs(sections.orthologs), 'pg-orthologs');
+    }
+
+    /* Visual overview, last, so its crosslinks can see what the others have. */
+    mark(renderOverview(sections.overview, sections, hasGeneModel), 'gene-record-overview');
+    if (hasGeneModel) { mark(renderStructure(sections.structure), 'gene-record-structure'); }
+    mark(renderFunction(sections.function), 'gene-record-function');
+    if (hasGeneModel) { mark(renderExpression(sections.expression), 'gene-record-expression'); }
+    mark(renderVariation(sections.variation, sections.overview, sections.structure), 'gene-record-variation');
+    if (hasGeneModel) { mark(renderOrthologs(sections.orthologs), 'gene-record-orthologs'); }
+    mark(renderImages(primaryLocus), 'gene-record-images');
+    mark(R.references(body('gene-record-references'), (sections.references || {}).references,
+                      R.byId('gene-record-references'), 'gene-ref', { timeline: true }), 'gene-record-references');
+    if (hasGeneModel) { mark(renderSequences(sections.sequences, body('gene-record-sequences')), 'gene-record-sequences'); }
+    if (hasGeneModel) { mark(renderProvenance(sections.structure), 'gene-record-provenance'); }
+
+    /* Plotly sizes to its container, and a hidden container has no width. */
+    var metrics = R.byId('gene-record-metrics');
+    metrics.hidden = false;
+    mark(renderMetrics(counts), 'gene-record-metrics');
+
+    refreshBars();
+    renderGlance(counts, sections, hasGeneModel);
+    buildSwitcher();
+
+    /* Where to start: a section named in the hash wins, then ?view=. */
+    var initial = 'visual';
+    var params = new URL(window.location.href).searchParams;
+    var hashId = (window.location.hash || '').slice(1);
+    var hashSection = hashId ? R.byId(hashId) : null;
+    if (hashSection && hashSection.getAttribute('data-view') && hashSection.getAttribute('data-view') !== '*') {
+      var dv = hashSection.getAttribute('data-view');
+      if (/^locus-/.test(dv)) { state.locus = Number(dv.slice(6)); }
+      initial = viewKeyFor(dv);
+    } else if (params.get('view')) {
+      initial = params.get('view');
+      if (initial === 'genetic' && params.get('locus') && loci.some(function (l) { return String(l.id) === params.get('locus'); })) {
+        state.locus = Number(params.get('locus'));
+      }
+    }
+    showView(initial, { keepUrl: true });
+    if (hashSection) { R.focusHash(spyUpdate); }
+
+    R.notice(els.notice, meta, counts);
+    MGDB.announce('Record loaded, ' + state.views.length + ' views.');
+  }
+
+  function load() {
+    if (main.getAttribute('data-gene-state') === 'withdrawn') { R.show(els.loading, false); return; }
+    var requested = main.getAttribute('data-gene-id') || main.getAttribute('data-requested-id');
+    if (!requested) { return; }
+    R.show(els.error, false);
+    R.show(els.loading, true);
+    MGDB.request('/api/v1/records/gene/' + encodeURIComponent(requested), { key: 'gene-record' })
+      .then(function (response) {
+        if (!response || !response.data) { throw new Error('unexpected payload'); }
+        render(response);
+      })
+      .catch(function (error) {
+        if (error && error.name === 'AbortError') { return; }
+        R.show(els.loading, false);
+        R.show(els.error, true);
+      });
+  }
+
+  function init() {
+    main = R.byId('gene-record-top');
+    if (!main) { return; }
+    els = {
+      functionLine: R.byId('gene-record-function-line'),
+      synonyms: R.byId('gene-record-synonyms'),
+      subtitle: R.byId('gene-record-subtitle'),
+      versionNotice: R.byId('gene-record-version-notice'),
+      report: R.byId('gene-record-report'),
+      loading: R.byId('gene-record-loading'),
+      error: R.byId('gene-record-error'),
+      retry: R.byId('gene-record-retry'),
+      notice: R.byId('gene-record-notice'),
+      ideogram: R.byId('gene-record-ideogram'),
+      glance: R.byId('gene-record-glance'),
+      views: R.byId('gene-record-views'),
+      viewsToggle: R.byId('gene-record-views-toggle'),
+      locusSwitch: R.byId('gene-record-locus-switch')
+    };
+    state.bars = {
+      visual: R.byId('gene-record-tabs-visual'),
+      gene_model: R.byId('gene-record-tabs-gene_model'),
+      pan_gene: R.byId('gene-record-tabs-pan_gene')
+    };
+    if (els.retry) { els.retry.addEventListener('click', load); }
+    R.apiCard('gene-copy-json-btn', 'gene-record-api-link', function () { return payload; });
+
+    /* One listener for every jump button the renderers emit, wherever it is. */
+    main.addEventListener('click', function (event) {
+      var target = event.target.closest ? event.target.closest('[data-jump]') : null;
+      if (target) { event.preventDefault(); jumpTo(target.getAttribute('data-jump')); }
+    });
+
+    window.addEventListener('scroll', MGDB.debounce(spyUpdate, 50), { passive: true });
+    window.addEventListener('resize', MGDB.debounce(function () { syncOffsets(); spyUpdate(); }, 100));
+    load();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})(window, document);

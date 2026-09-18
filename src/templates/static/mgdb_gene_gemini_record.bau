@@ -1,0 +1,332 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gene-gemini-record
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(gene_title) &mdash; MaizeGDB gene record">
+<meta property="og:description" content="$(gene_summary)">
+
+;; Gene record Gemini mockup. Multi-view: Visual overview, Gene model, Pan-gene, Genetic information.
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-record-page mgdb-gene-record-page mgdb-gene-gemini-page" id="gene-record-top" data-requested-id="$(requested_identifier)" data-gene-id="$(gene_api_id)" data-gene-state="$(gene_state)" data-chr="$(chr_name)" data-chr-length="$(chr_length)" data-karyotype="$(karyotype)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Gene and Locus Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(gene_title)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero gemini-hero" aria-labelledby="gene-record-title">
+    <div class="mgdb-hero-body gemini-hero-body">
+      <div class="gemini-hero-grid">
+        <div class="gemini-hero-main">
+          <div class="gemini-badge-row">
+            <span class="mgdb-pill mgdb-pill-info gemini-pill-tag">Modernized Record</span>
+            <span class="mgdb-pill gemini-pill-subtle">Gemini Edition</span>
+          </div>
+          <h1 id="gene-record-title">$(gene_title)$(gene_badge)</h1>
+          <p class="mgdb-rec-subtitle" id="gene-record-subtitle">$(gene_subtitle)</p>
+          <p class="mgdb-rec-synonyms" id="gene-record-function-line" hidden></p>
+          <p class="mgdb-rec-synonyms" id="gene-record-synonyms" hidden></p>
+          <dl class="mgdb-record-facts mgdb-rec-headfacts" id="gene-record-facts">$(gene_facts)</dl>
+        </div>
+        <aside class="gemini-ideogram" id="gene-record-ideogram" aria-label="Where this gene sits in the genome" hidden></aside>
+      </div>
+      <div class="gemini-glance" id="gene-record-glance" role="list" aria-label="This record at a glance" hidden></div>
+    </div>
+  </section>
+
+  ;; Top-level primary view switcher
+  <nav class="gemini-view-nav" id="gemini-views" aria-label="Primary views of this record">
+    <div class="gemini-view-container">
+      <div class="gemini-view-toggle-bar">
+        <div class="mgdb-view-toggle gemini-view-toggle" role="tablist" aria-label="Sections of this gene record" id="gemini-view-tabs">
+          <button class="mgdb-view-btn gemini-tab-btn is-active" id="btn-view-visual" role="tab" aria-selected="true" aria-controls="view-visual" data-view="visual" type="button">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+            <span>Visual overview</span>
+          </button>
+          <button class="mgdb-view-btn gemini-tab-btn" id="btn-view-genemodel" role="tab" aria-selected="false" aria-controls="view-genemodel" data-view="genemodel" type="button">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+            <span>Gene model</span>
+          </button>
+          <button class="mgdb-view-btn gemini-tab-btn" id="btn-view-pangenome" role="tab" aria-selected="false" aria-controls="view-pangenome" data-view="pangenome" type="button">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4 9.236V15a1 1 0 00.553.894l4 2A1 1 0 0010 17V11.236a1 1 0 00-.553-.894l-4-2A1 1 0 004 9.236z"/></svg>
+            <span>Pan-gene</span>
+          </button>
+          ;; Genetic information tabs will be dynamically populated or placed here
+          <button class="mgdb-view-btn gemini-tab-btn" id="btn-view-locus" role="tab" aria-selected="false" aria-controls="view-locus" data-view="locus" type="button">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+            <span id="gemini-locus-tab-label">Genetic information</span>
+          </button>
+        </div>
+        <div class="gemini-locus-pills" id="gemini-multi-locus-switch" hidden></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mgdb-loading" id="gene-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading comprehensive record data&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="gene-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="gene-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="gene-record-notice" role="status" hidden></div>
+
+  $(withdrawn_notice)
+
+  <div class="mgdb-message mgdb-message-warn mgdb-rec-alert" id="gene-record-version-notice" role="note" hidden></div>
+
+  <p class="mgdb-rec-report gemini-report"><a class="mgdb-report-link" id="gene-record-report" href="/curation/GeneModelIssue/edit" target="_blank" rel="noopener">Report a gene model error</a></p>
+
+  ;; Dedicated Sticky Navigation Bars per View
+  <nav class="mgdb-section-tabs mgdb-rec-tabs gemini-sticky-subnav" id="gemini-subnav-visual" data-view="visual" aria-label="Visual overview sections">
+    <a href="#gemini-visual-overview" class="is-current">Overview</a>
+    <a href="#gemini-visual-structure">Gene and Protein Structure</a>
+    <a href="#gemini-visual-function">Function</a>
+    <a href="#gemini-visual-expression">Expression</a>
+    <a href="#gemini-visual-variation">Variation</a>
+    <a href="#gemini-visual-orthologs">Orthologs</a>
+    <a href="#gemini-visual-images">Mutant Phenotype Images</a>
+    <a href="#gemini-visual-references">References</a>
+    <a href="#gemini-visual-sequences">Sequences &amp; Downloads</a>
+    <a href="#gemini-visual-scores">Scores</a>
+    <a href="#gemini-visual-metrics">Metrics</a>
+    <a href="#gemini-shared-resources">Related Resources</a>
+    <a href="#gemini-shared-api">API</a>
+  </nav>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs gemini-sticky-subnav" id="gemini-subnav-genemodel" data-view="genemodel" aria-label="Gene model sections" hidden>
+    <a href="#gemini-gm-overview" class="is-current">Overview</a>
+    <a href="#gemini-gm-annotations">Annotations &amp; Scores</a>
+    <a href="#gemini-gm-insertions">Insertions</a>
+    <a href="#gemini-gm-expression">Expression</a>
+    <a href="#gemini-gm-snps">SNPs and Traits</a>
+    <a href="#gemini-gm-proteomics">Proteomics</a>
+    <a href="#gemini-gm-sequences">Sequence</a>
+    <a href="#gemini-shared-resources">Related Resources</a>
+    <a href="#gemini-shared-api">API</a>
+  </nav>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs gemini-sticky-subnav" id="gemini-subnav-pangenome" data-view="pangenome" aria-label="Pan-gene sections" hidden>
+    <a href="#gemini-pg-overview" class="is-current">Overview</a>
+    <a href="#gemini-pg-members">Related Gene Models in Maize</a>
+    <a href="#gemini-pg-structure">Synteny &amp; Structure</a>
+    <a href="#gemini-pg-orthologs">Orthologs in Other Species</a>
+    <a href="#gemini-shared-resources">Related Resources</a>
+    <a href="#gemini-shared-api">API</a>
+  </nav>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs gemini-sticky-subnav" id="gemini-subnav-locus" data-view="locus" aria-label="Genetic information sections" hidden>
+    ;; Dynamic locus subnav tabs will be injected here
+  </nav>
+
+
+  ;; =========================================================================
+  ;; VIEW 1: VISUAL OVERVIEW
+  ;; =========================================================================
+  <div class="gemini-view-panel" id="view-visual" data-view="visual">
+    <section id="gemini-visual-overview" aria-labelledby="gemini-visual-overview-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-overview-title">Overview</h2></div></div>
+      <div id="gemini-visual-overview-body"></div>
+    </section>
+
+    <section id="gemini-visual-structure" aria-labelledby="gemini-visual-structure-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-structure-title">Gene and Protein Structure</h2></div></div>
+      <div id="gemini-visual-structure-body"></div>
+    </section>
+
+    <section id="gemini-visual-function" aria-labelledby="gemini-visual-function-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-function-title">Function</h2></div></div>
+      <div id="gemini-visual-function-body"></div>
+    </section>
+
+    <section id="gemini-visual-expression" aria-labelledby="gemini-visual-expression-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-expression-title">Expression</h2></div></div>
+      <div id="gemini-visual-expression-body"></div>
+    </section>
+
+    <section id="gemini-visual-variation" aria-labelledby="gemini-visual-variation-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-variation-title">Variation</h2></div></div>
+      <div id="gemini-visual-variation-body"></div>
+    </section>
+
+    <section id="gemini-visual-orthologs" aria-labelledby="gemini-visual-orthologs-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-orthologs-title">Orthologs in other species</h2></div></div>
+      <div id="gemini-visual-orthologs-body"></div>
+    </section>
+
+    <section id="gemini-visual-images" aria-labelledby="gemini-visual-images-title" hidden>
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-images-title">Mutant Phenotype Images</h2></div></div>
+      <div id="gemini-visual-images-body"></div>
+    </section>
+
+    <section id="gemini-visual-references" aria-labelledby="gemini-visual-references-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-references-title">References</h2></div></div>
+      <div id="gemini-visual-references-body"></div>
+    </section>
+
+    <section id="gemini-visual-sequences" aria-labelledby="gemini-visual-sequences-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-sequences-title">Sequences and downloads</h2></div></div>
+      <div id="gemini-visual-sequences-body"></div>
+    </section>
+
+    <section id="gemini-visual-scores" aria-labelledby="gemini-visual-scores-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-scores-title">Gene model scores</h2></div></div>
+      <div id="gemini-visual-scores-body"></div>
+    </section>
+
+    <section id="gemini-visual-metrics" aria-labelledby="gemini-visual-metrics-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-visual-metrics-title">Metrics</h2></div></div>
+      <div class="mgdb-metric-grid" id="gemini-visual-metrics-body"></div>
+      <div class="mgdb-chart-grid mgdb-rec-charts" id="gemini-visual-charts">
+        <figure class="mgdb-figure" id="gemini-visual-connections-figure">
+          <h3>Record connections</h3>
+          <div class="mgdb-chart" id="gemini-visual-connections-chart" role="img" aria-label="Record connections chart">
+            <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+          </div>
+          <figcaption id="gemini-visual-connections-caption"></figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+
+  ;; =========================================================================
+  ;; VIEW 2: GENE MODEL \(Classic order, tables & lists only\)
+  ;; =========================================================================
+  <div class="gemini-view-panel" id="view-genemodel" data-view="genemodel" hidden>
+    <section id="gemini-gm-overview" aria-labelledby="gemini-gm-overview-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-overview-title">Overview</h2></div></div>
+      <div id="gemini-gm-overview-body"></div>
+    </section>
+
+    <section id="gemini-gm-annotations" aria-labelledby="gemini-gm-annotations-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-annotations-title">Annotations &amp; Scores</h2></div></div>
+      <div id="gemini-gm-annotations-body"></div>
+    </section>
+
+    <section id="gemini-gm-insertions" aria-labelledby="gemini-gm-insertions-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-insertions-title">Insertions</h2></div></div>
+      <div id="gemini-gm-insertions-body"></div>
+    </section>
+
+    <section id="gemini-gm-expression" aria-labelledby="gemini-gm-expression-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-expression-title">Expression</h2></div></div>
+      <div id="gemini-gm-expression-body"></div>
+    </section>
+
+    <section id="gemini-gm-snps" aria-labelledby="gemini-gm-snps-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-snps-title">SNPs and traits</h2></div></div>
+      <div id="gemini-gm-snps-body"></div>
+    </section>
+
+    <section id="gemini-gm-proteomics" aria-labelledby="gemini-gm-proteomics-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-proteomics-title">Proteomics</h2></div></div>
+      <div id="gemini-gm-proteomics-body"></div>
+    </section>
+
+    <section id="gemini-gm-sequences" aria-labelledby="gemini-gm-sequences-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-gm-sequences-title">Sequence</h2></div></div>
+      <div id="gemini-gm-sequences-body"></div>
+    </section>
+  </div>
+
+
+  ;; =========================================================================
+  ;; VIEW 3: PAN-GENE
+  ;; =========================================================================
+  <div class="gemini-view-panel" id="view-pangenome" data-view="pangenome" hidden>
+    <section id="gemini-pg-overview" aria-labelledby="gemini-pg-overview-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-pg-overview-title">Overview</h2></div></div>
+      <div id="gemini-pg-overview-body"></div>
+    </section>
+
+    <section id="gemini-pg-members" aria-labelledby="gemini-pg-members-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-pg-members-title">Related gene models in maize</h2></div></div>
+      <div id="gemini-pg-members-body"></div>
+    </section>
+
+    <section id="gemini-pg-structure" aria-labelledby="gemini-pg-structure-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-pg-structure-title">Synteny &amp; Structure</h2></div></div>
+      <div id="gemini-pg-structure-body"></div>
+    </section>
+
+    <section id="gemini-pg-orthologs" aria-labelledby="gemini-pg-orthologs-title">
+      <div class="mgdb-section-heading"><div><h2 id="gemini-pg-orthologs-title">Orthologs in other species</h2></div></div>
+      <div id="gemini-pg-orthologs-body"></div>
+    </section>
+  </div>
+
+
+  ;; =========================================================================
+  ;; VIEW 4: GENETIC INFORMATION \(One panel per locus if multiple\)
+  ;; =========================================================================
+  <div class="gemini-view-panel" id="view-locus" data-view="locus" hidden>
+    <div id="gemini-locus-content-area"></div>
+  </div>
+
+
+  ;; =========================================================================
+  ;; SHARED CLOSING SECTIONS
+  ;; =========================================================================
+  <section class="mgdb-hub-related gemini-shared-section" id="gemini-shared-resources" aria-labelledby="gemini-shared-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="gemini-shared-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Find gene models and classical genes by name, function, or position</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>The same gene across every maize assembly, and its orthologs</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Alleles, insertions, and the phenotypes they produce</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>Genome browser</strong>
+          <span>See this region and its neighbours in JBrowse</span>
+        </a>
+        <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>SNPversity 2.0</strong>
+          <span>Genotype data for this gene across the diversity panels</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue gemini-shared-section" id="gemini-shared-api" aria-labelledby="gemini-shared-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="gemini-shared-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="gene-record-api-endpoint">GET /api/v1/records/gene/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="gene-record-api-link" href="/api/v1/records/gene/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/records/gene/$(requested_identifier_path)?format=jsonld" target="_blank" rel="noopener">JSON-LD</a>
+        <button class="mgdb-button mgdb-button-quiet" id="gene-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every view and table on this page is retrieved in one fast, structured JSON response from the MaizeGDB v1 REST API.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="gene-record-image-dialog" aria-labelledby="gene-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="gene-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record</a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file</a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+*)

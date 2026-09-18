@@ -46,6 +46,7 @@ $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 /* The landmark and stock expanders are driven by the legacy AJAX trio. They
    still answer, and rewriting them is not this conversion's job. */
+$bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/js/search.js');
 $bauplan->includeScript('/js/stock.js');
 $bauplan->includeScript('/js/cytogenetics.js');

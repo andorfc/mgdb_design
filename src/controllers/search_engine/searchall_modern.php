@@ -28,6 +28,7 @@ $category_to_type = array(
     'anything' => '',
     'gene_product' => 'gene',
     'gene_model' => 'gene',
+    'pan_gene' => 'pan_gene',
     'genome' => 'genome',
     'locus' => 'locus',
     'probe' => 'probe',

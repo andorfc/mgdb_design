@@ -621,6 +621,16 @@
       var model = spec.model;
       var protein = state.selected.protein;
       if (!model || !model.pdb || !protein) { return; }
+
+      /* Its own sub-header, in the same .mgdb-rec-block-head style as "Gene
+         model and protein" above it. The two things in this section are drawn
+         from different sources and answer different questions -- one is the
+         annotated gene model, the other is a prediction of what the protein
+         folds into -- and without a heading between them the 3D panel read as
+         a continuation of the figure. Emitted after the guard above, so a gene
+         with no model gets no heading over an empty space. */
+      modelPanel.insertAdjacentHTML('beforeend',
+        '<div class="mgdb-rec-block-head"><h3>Predicted protein structure</h3></div>');
       /* The model may be of another isoform than the one selected: AlphaFill
          models the isoform its transplants landed on, and AlphaFold DB the
          UniProt entry. Say so rather than map domains onto the wrong chain. */
@@ -724,14 +734,26 @@
       var mapped = state.colourBy === 'domains';
       state.viewer.setStyle({ model: 0 }, { cartoon: { colorfunc: function (atom) {
         if (!mapped) { return plddtColor(atom.b); }
-        return map[atom.resi] || '#c9d1cc';
+        /* The residues outside any domain. #c9d1cc was chosen to read against
+           the near-black stage this viewer used to have; on white it is very
+           nearly invisible, which made the model look like disconnected
+           fragments rather than one chain with domains marked on it. Dark
+           enough to follow, still clearly subordinate to the domain colours.
+
+           The pLDDT scale above is left alone: those four are AlphaFold DB's
+           own colours, shown there on white, and a reader who knows them
+           should not have to learn ours. */
+        return map[atom.resi] || '#8d9992';
       } } });
       state.viewer.render();
     }
 
     function openModel(viewport, status, model, canonicalOnly) {
       status.textContent = 'Fetching the model…';
-      state.viewer = window.$3Dmol.createViewer(viewport, { backgroundColor: '#0b1210', antialias: true });
+      /* White, not the near-black this used to be. 3Dmol paints the canvas
+         itself, so the stage's CSS background is never seen and changing only
+         that left the viewer black. */
+      state.viewer = window.$3Dmol.createViewer(viewport, { backgroundColor: '#ffffff', antialias: true });
       return window.fetch(model.pdb, { credentials: 'same-origin', mode: /^https?:/.test(model.pdb) && model.pdb.indexOf(window.location.origin) !== 0 ? 'cors' : 'same-origin' })
         .then(function (r) { if (!r.ok) { throw new Error('HTTP ' + r.status); } return r.text(); })
         .then(function (text) {
@@ -749,6 +771,79 @@
             new window.ResizeObserver(function () { if (state.viewer) { state.viewer.resize(); state.viewer.render(); } }).observe(viewport);
           }
         });
+    }
+
+    /* The hub's viewer, fetched once and mounted under this panel. */
+    function loadFullViewLibrary() {
+      if (window.MGDB && window.MGDB.proteinStructureViewer) { return Promise.resolve(); }
+      return new Promise(function (resolve, reject) {
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = '/css/mgdb-protein-structure.css';
+        document.head.appendChild(css);
+        var sc = document.createElement('script');
+        sc.src = '/js/mgdb-protein-structure.js';
+        sc.async = true;
+        sc.onload = function () {
+          (window.MGDB && window.MGDB.proteinStructureViewer) ? resolve() : reject(new Error('viewer did not initialise'));
+        };
+        sc.onerror = function () { reject(new Error('the full viewer failed to load')); };
+        document.head.appendChild(sc);
+      });
+    }
+
+    function toggleFullView(btn, controls, status) {
+      var panel = controls.parentNode;
+      var open = btn.getAttribute('aria-pressed') !== 'true';
+      var host = panel.querySelector('.gs-fullview');
+
+      if (!open) {
+        btn.setAttribute('aria-pressed', 'false');
+        btn.textContent = 'Full view';
+        if (host) { host.hidden = true; }
+        Array.prototype.forEach.call(panel.querySelectorAll('.gs-model-stage, .gs-plddt-legend'), function (n) {
+          if (n.getAttribute('data-gs-was-hidden') !== 'yes') { n.hidden = false; }
+        });
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Loading the full viewer…';
+      loadFullViewLibrary().then(function () {
+        var model = state.spec.model;
+        var protein = state.selected && state.selected.protein;
+        var record = {
+          id: model.protein || (protein && protein.id) || state.spec.gene.name,
+          pdb: model.pdb,
+          entry: model.entry || null,
+          tool: model.source || null,
+          partners: null
+        };
+        if (!host) {
+          host = html('div', 'gs-fullview');
+          panel.appendChild(host);
+        }
+        host.hidden = false;
+        /* White, to match the page it is sitting in rather than the hub's own
+           dark workspace. */
+        var ok = window.MGDB.proteinStructureViewer(host, record, 'monomer', { background: '#ffffff' });
+        if (!ok) { throw new Error('the full viewer could not start'); }
+
+        /* One model on screen at a time: the compact stage and its legend step
+           aside while the full one is open, and their own hidden state is
+           remembered so closing puts them back as they were. */
+        Array.prototype.forEach.call(panel.querySelectorAll('.gs-model-stage, .gs-plddt-legend'), function (n) {
+          n.setAttribute('data-gs-was-hidden', n.hidden ? 'yes' : 'no');
+          n.hidden = true;
+        });
+        btn.disabled = false;
+        btn.setAttribute('aria-pressed', 'true');
+        btn.textContent = 'Close full view';
+      }).catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'Full view';
+        if (status) { status.textContent = (err && err.message ? err.message : 'The full viewer could not be opened') + '.'; }
+      });
     }
 
     function renderModelControls(controls, plddtLegend, status) {
@@ -782,6 +877,26 @@
         if (state.viewer) { state.viewer.spin(on ? 'y' : false); }
       });
       controls.appendChild(spin);
+
+      /* Full view opens the Protein Structure Data Hub's own viewer here, in
+         the page, rather than sending the reader to the hub to look at the
+         protein they were already looking at.
+
+         It is the same component, exported as MGDB.proteinStructureViewer --
+         representation and thickness, six colour schemes, molecular surface,
+         cartoon outline, PNG and coordinate downloads, and the per-residue
+         pLDDT strip you can click to zoom to a residue. Its script is fetched
+         on demand for the same reason the 3D library is: most readers never
+         open it. */
+      var modelSpec = state.spec.model;
+      if (modelSpec && modelSpec.pdb) {
+        var full = html('button', 'gs-chip', 'Full view');
+        full.type = 'button';
+        full.setAttribute('aria-pressed', 'false');
+        full.addEventListener('click', function () { toggleFullView(full, controls, status); });
+        controls.appendChild(full);
+      }
+
       var hint = html('span', 'gs-muted', 'Click a domain in the figure to zoom the model to it.');
       hint.style.fontSize = 'var(--mgdb-text-xs)';
       controls.appendChild(hint);

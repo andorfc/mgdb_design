@@ -426,9 +426,21 @@
     });
 
     /* Open on the most informative group that has anything in it. A
-       heterodimer says more than a monomer of the same protein. */
-    var first = (data.heterodimers || []).length ? 'heterodimer'
-              : ((data.homodimers || []).length ? 'homodimer' : 'monomer');
+       heterodimer says more than a monomer of the same protein.
+
+       Unless the link asked for a group by name: the gene record's "Full
+       screen" control sends readers here for the monomer they were already
+       looking at, and landing them on a heterodimer instead would be a
+       different structure of a different thing. Honoured only when that group
+       has something in it. */
+    var counts = { monomer: (data.monomers || []).length,
+                   homodimer: (data.homodimers || []).length,
+                   heterodimer: (data.heterodimers || []).length,
+                   esmfold: (data.esmfold || []).length };
+    var asked = new window.URLSearchParams(window.location.search).get('type');
+    var first = (asked && counts[asked]) ? asked
+              : (counts.heterodimer ? 'heterodimer'
+              : (counts.homodimer ? 'homodimer' : 'monomer'));
     renderCandidates(first);
   }
 
@@ -976,7 +988,7 @@
   /* host is the element the viewer markup was written into; the root is the
      .ps-viewer inside it. Everything this viewer touches is found under that
      root, so two viewers can coexist on the page. */
-  function startViewer(host, record, type) {
+  function startViewer(host, record, type, opts) {
     var root = host && host.querySelector('[data-ps-viewer]');
     var state = {
       viewer: null, model: null, record: record, type: type, root: root,
@@ -992,7 +1004,10 @@
     }
     viewer = state;
 
-    state.viewer = $3Dmol.createViewer(viewport, { backgroundColor: '#000000' });
+    /* The hub keeps the black a structure workspace conventionally has. The
+       gene record embeds this same viewer inside a white page and passes its
+       own, which is why this is an argument rather than a constant. */
+    state.viewer = $3Dmol.createViewer(viewport, { backgroundColor: (opts && opts.background) || '#000000' });
 
     /* The file is fetched from the archive that published it — AlphaFold DB or
        images.maizegdb.org — not proxied through MaizeGDB. Both send
@@ -1279,6 +1294,31 @@
       runLookup(initial);
     }
   }
+
+  /* ======================================================================
+     The viewer, for other pages
+
+     The gene record shows the same protein and used to send readers here for
+     the full view. Sending them away to look at the thing they were already
+     looking at is a poor trade, so the whole viewer -- the representation and
+     colour rail, the surface, the per-residue pLDDT strip -- is offered as a
+     function any page can mount.
+
+     record needs { id, pdb } and uses { partners, tool, cif, entry } when they
+     are there. type is 'monomer' | 'homodimer' | 'heterodimer' | 'esmfold'.
+     opts.background sets the canvas colour.
+
+     Returns false when 3Dmol is not on the page; the caller is responsible for
+     loading it, because it is half a megabyte and most readers never open a
+     model.
+     ====================================================================== */
+  MGDB.proteinStructureViewer = function (host, record, type, opts) {
+    if (!host || !record || !record.pdb) { return false; }
+    if (typeof window.$3Dmol === 'undefined') { return false; }
+    host.innerHTML = viewerMarkup(record, type || 'monomer');
+    startViewer(host, record, type || 'monomer', opts || {});
+    return true;
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

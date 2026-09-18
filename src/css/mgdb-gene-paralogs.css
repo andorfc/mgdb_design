@@ -1,0 +1,144 @@
+/* file: css/mgdb-gene-paralogs.css
+ *
+ * purpose: the gene record's "Homeologs and tandem arrays" section, drawn by
+ *          js/mgdb-gene-paralogs.js. Colours follow the Expression figure:
+ *          the condition colours are its own, and this gene / the partner
+ *          are the site's green and wine.
+ */
+
+.mgdb-gene-record-page {
+  --gp-this: var(--mgdb-green-dark, #174634);
+  --gp-partner: #7a2c43;
+  --gp-gold: var(--mgdb-gold, #f2a515);
+  --gp-ink: var(--mgdb-ink, #1f2723);
+  --gp-muted: var(--mgdb-muted, #5b655e);
+  --gp-rule: var(--mgdb-line, #d7ddd8);
+  --gp-band: #e6ece7;
+  --gp-atlas: #4c7038;
+  --gp-control: #8d978f;
+  --gp-abiotic: #0641a5;
+  --gp-biotic: #b03a2e;
+  --gp-member: #2f7f6f;
+}
+
+.gp-lead { max-width: 72ch; margin: 0 0 var(--mgdb-space-3); line-height: 1.55; }
+.gp-id { color: var(--gp-muted); font-family: var(--mgdb-font-mono); font-size: .85em; font-weight: 400; }
+.gp-id-only { font-family: var(--mgdb-font-mono); font-size: .92em; }
+.gp-sub { margin: var(--mgdb-space-4) 0 var(--mgdb-space-2); font-size: var(--mgdb-text-base); }
+.gp-sub small { margin-left: 6px; color: var(--gp-muted); font-size: var(--mgdb-text-xs); font-weight: 400; }
+
+.gp-figure { margin: 0; }
+.gp-figure svg { display: block; width: 100%; height: auto; overflow: visible; }
+.gp-figure figcaption { margin-top: 6px; color: var(--gp-muted); font-size: var(--mgdb-text-xs); line-height: 1.5; }
+.gp-axis-text { fill: var(--gp-muted); font-size: 11px; }
+.gp-axis-title { fill: var(--gp-ink); font-size: 12px; font-weight: 600; }
+.gp-grid { stroke: #edf0ed; stroke-width: 1; }
+.gp-empty { color: var(--gp-muted); font-size: var(--mgdb-text-sm); }
+
+/* The two markers, everywhere in the section. */
+.gp-mark-this circle { fill: var(--gp-this); stroke: #fff; stroke-width: 1.5; }
+.gp-mark-partner path { fill: var(--gp-partner); stroke: #fff; stroke-width: 1.5; }
+.gp-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 var(--mgdb-space-2); font-size: var(--mgdb-text-sm); }
+.gp-key span { display: inline-flex; align-items: center; gap: 7px; }
+.gp-key small { color: var(--gp-muted); }
+.gp-key-this, .gp-key-partner { display: inline-block; width: 11px; height: 11px; flex: none; }
+.gp-key-this { border-radius: 50%; background: var(--gp-this); }
+.gp-key-partner { background: var(--gp-partner); transform: rotate(45deg) scale(.9); }
+
+/* ---- Synteny sketch -------------------------------------------------------- */
+
+.gp-synteny-figure { margin: var(--mgdb-space-3) 0; padding: var(--mgdb-space-3); border: 1px solid var(--gp-rule); border-radius: var(--mgdb-radius-sm, 6px); background: #fbfcfb; }
+.gp-syn-bar { fill: #dfe6e0; stroke: #c3cdc5; }
+.gp-syn-pin { fill: var(--gp-partner); }
+.gp-syn-pin.is-this { fill: var(--gp-this); stroke: var(--gp-gold); stroke-width: 2; }
+.gp-syn-sub { fill: var(--gp-ink); font-size: 13px; font-weight: 700; }
+.gp-syn-chr { fill: var(--gp-muted); font-size: 11px; }
+.gp-syn-gene { fill: var(--gp-partner); font-size: 12.5px; font-weight: 700; }
+.gp-syn-gene.is-this { fill: var(--gp-this); }
+/* SVG links take the page's link underline; these are labels on a figure
+   and only underline under the pointer. */
+.mgdb-page .gp-synteny a, .mgdb-page .gp-tandem a { text-decoration: none; }
+.gp-synteny a:hover .gp-syn-gene, .gp-synteny a:focus .gp-syn-gene { text-decoration: underline; }
+.gp-syn-link { fill: none; stroke: #b9a1a8; stroke-width: 2.5; stroke-dasharray: 5 4; }
+.gp-syn-anchor { fill: #fff; stroke: #c3cdc5; }
+.gp-syn-anchor-text { fill: var(--gp-ink); font-size: 11.5px; font-family: var(--mgdb-font-mono); }
+
+/* ---- Divergence tracks --------------------------------------------------- */
+
+.gp-div-row { position: relative; margin: 0 0 var(--mgdb-space-3); }
+.gp-div-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.gp-div-label { font-weight: 700; }
+.gp-div-vals { display: inline-flex; gap: 14px; font-variant-numeric: tabular-nums; }
+.gp-div-vals b { font-size: var(--mgdb-text-base); }
+.gp-div-vals b.is-this { color: var(--gp-this); }
+.gp-div-vals b.is-partner { color: var(--gp-partner); }
+.gp-div-track { display: block; width: 100%; height: 26px; }
+.gp-div-rail { fill: #e9ede9; }
+.gp-div-band { fill: var(--gp-band); stroke: #cdd6cf; }
+.gp-div-median { fill: #6d7a72; }
+.gp-div-trackwrap { position: relative; height: 26px; }
+.gp-div-dots { position: absolute; inset: 0; pointer-events: none; }
+.gp-dot { position: absolute; top: 13px; width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); }
+.gp-dot-this { border-radius: 50%; background: var(--gp-this); }
+.gp-dot-partner { background: var(--gp-partner); transform: rotate(45deg); }
+.gp-div-ends { display: flex; justify-content: space-between; color: var(--gp-muted); font-size: var(--mgdb-text-xs); font-variant-numeric: tabular-nums; }
+.gp-div-note { margin: 2px 0 0; color: var(--gp-muted); font-size: var(--mgdb-text-xs); }
+.gp-read { max-width: 80ch; margin: var(--mgdb-space-2) 0 0; padding: var(--mgdb-space-2) var(--mgdb-space-3); border-left: 3px solid var(--gp-gold); background: #fdf8ec; font-size: var(--mgdb-text-sm); line-height: 1.55; }
+
+/* ---- Tandem array -------------------------------------------------------- */
+
+.gp-tandem-figure { margin: var(--mgdb-space-3) 0; padding: var(--mgdb-space-3); border: 1px solid var(--gp-rule); border-radius: var(--mgdb-radius-sm, 6px); background: #fbfcfb; }
+.gp-tan-axisline { stroke: #c9d1cb; stroke-width: 1; }
+.gp-tan-gene { fill: #fff; stroke: #9aa59e; stroke-width: 1.2; }
+.gp-tan-gene.is-member { fill: var(--gp-member); stroke: var(--gp-member); }
+.gp-tan-gene.is-this { fill: var(--gp-this); stroke: var(--gp-gold); stroke-width: 2.2; }
+.gp-tandem a:hover .gp-tan-gene, .gp-tandem a:focus .gp-tan-gene { stroke: var(--gp-ink); stroke-width: 2; }
+.gp-tan-tick { stroke: #9aa59e; }
+.gp-tan-label { fill: var(--gp-member); font-size: 11.5px; font-weight: 600; }
+.gp-tan-label.is-this { fill: var(--gp-this); font-weight: 800; }
+.gp-swatch { display: inline-block; width: 16px; height: 9px; margin: 0 4px 0 10px; border: 1.2px solid #9aa59e; border-radius: 2px; background: #fff; vertical-align: -1px; }
+.gp-swatch:first-child { margin-left: 0; }
+.gp-swatch.is-member { border-color: var(--gp-member); background: var(--gp-member); }
+.gp-swatch.is-this { border: 2px solid var(--gp-gold); background: var(--gp-this); }
+
+/* ---- Expression of the pair ---------------------------------------------- */
+
+.gp-pick { margin: 0 0 var(--mgdb-space-2); font-size: var(--mgdb-text-sm); }
+.gp-pick label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 600; }
+.gp-pick select { min-height: 36px; max-width: 100%; padding: 4px 8px; border: 1px solid var(--gp-rule); border-radius: var(--mgdb-radius-sm, 6px); background: #fff; font: inherit; font-weight: 400; }
+.gp-expr-status { max-width: 90ch; margin: 0 0 var(--mgdb-space-3); font-size: var(--mgdb-text-sm); line-height: 1.55; }
+.gp-expr-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--mgdb-space-5); align-items: start; }
+.gp-scatter-figure svg { max-width: 420px; }
+.gp-diagonal { stroke: #9aa59e; stroke-width: 1.2; stroke-dasharray: 4 4; }
+.gp-pt { stroke: #fff; stroke-width: .6; opacity: .82; }
+.gp-pt-atlas { fill: var(--gp-atlas); }
+.gp-pt-control { fill: var(--gp-control); }
+.gp-pt-abiotic { fill: var(--gp-abiotic); }
+.gp-pt-biotic { fill: var(--gp-biotic); }
+.gp-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.gp-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.gp-legend small { color: var(--gp-muted); }
+.gp-pt-key { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.gp-pt-key.gp-pt-atlas { background: var(--gp-atlas); }
+.gp-pt-key.gp-pt-control { background: var(--gp-control); }
+.gp-pt-key.gp-pt-abiotic { background: var(--gp-abiotic); }
+.gp-pt-key.gp-pt-biotic { background: var(--gp-biotic); }
+.gp-diag-key { display: inline-block; width: 16px; border-top: 1.5px dashed #9aa59e; }
+.gp-row-label { fill: var(--gp-ink); font-size: 12.5px; }
+.gp-row-n { fill: var(--gp-muted); font-size: 10.5px; }
+.gp-bell { stroke: #b8c2bb; stroke-width: 3; stroke-linecap: round; }
+.gp-expr-side { display: grid; gap: var(--mgdb-space-4); min-width: 0; }
+
+/* ---- About ---------------------------------------------------------------- */
+
+.gp-about { margin-top: var(--mgdb-space-5); padding-top: var(--mgdb-space-3); border-top: 1px solid var(--gp-rule); color: var(--gp-muted); font-size: var(--mgdb-text-xs); line-height: 1.55; }
+.gp-about .gp-sub { color: var(--gp-ink); }
+.gp-about ul { margin: 0; padding-left: 1.2em; }
+.gp-about li + li { margin-top: 4px; }
+.gp-about strong { color: var(--gp-ink); }
+
+@media (max-width: 760px) {
+  .gp-expr-grid { grid-template-columns: minmax(0, 1fr); }
+  .gp-scatter-figure svg { max-width: none; }
+  .gp-div-head { flex-wrap: wrap; }
+}

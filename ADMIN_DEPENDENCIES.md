@@ -1304,10 +1304,17 @@ record pages. The original entry follows, with the corrections marked.
   link and the Copy DOI button on its references, which is what the Data Hub
   pages already show. It would also let the record pages link out to the
   publisher, which today they cannot.
-- **Also outstanding, and not an administrator's job:** the record pages and
-  `include/api/v1/records/reference.php` still read `r.doi` alone, so they show
-  no DOI for the 8,004 references whose DOI is only in `ext_db_key`. That is a
-  code fix of the same shape as the one the reference hub took.
+- **~~Also outstanding, and not an administrator's job~~ — done 2026-09-18:**
+  the thirteen record APIs that list references read `r.doi` and then the
+  citation text, never `ext_db_key`, so they showed no DOI for the 8,004
+  references whose DOI is only there — wx1 showed 52 of the 97 it has. They now
+  share one definition with the reference hub, `mgdbReferenceDoiSql()` in
+  `include/reference_ids_lib.php` (column, then `ext_db_key`, then the
+  citation text, which is truncated and so read last), and return the PubMed
+  ID beside it. 8,506 curated references have a DOI by that definition, 27 more
+  than the hub's earlier one found. `records/reference.php` already read both
+  stores. What this entry asks curation for is unchanged: nothing in the
+  database holds a DOI for the other ~46,400.
 - **Required administrator:** MaizeGDB curation staff
 - **Status:** proposed
 - **Validation:** `/api/v1/records/variation/bz1` returns a non-null `doi` on

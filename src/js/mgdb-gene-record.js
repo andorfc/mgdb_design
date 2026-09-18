@@ -447,7 +447,7 @@
           '<button class="mgdb-view-btn" type="button" data-mode="Absolute" aria-pressed="true">Absolute</button>' +
           '<button class="mgdb-view-btn" type="button" data-mode="Relative" aria-pressed="false">Relative</button>' +
         '</div>' +
-        '<a class="mgdb-rec-tsv" id="gene-record-efp-open" href="' + R.escape(efp.browser) +
+        '<a class="mgdb-button mgdb-button-secondary gene-record-efp-open" id="gene-record-efp-open" href="' + R.escape(efp.browser) +
           '" target="_blank" rel="noopener">Open at the BAR</a>' +
       '</div>' +
       '<div class="gene-record-efp-atlases" id="gene-record-efp-atlases" role="group" aria-label="Atlas">' +
@@ -1319,12 +1319,8 @@
     ];
     var height = R.connectionsHeight(series);
 
-    var refs = (sections.references && sections.references.references) || [];
-    if (R.yearsChart('gene-record-years-chart', 'gene-record-years-caption',
-                     'gene-record-years-figure', refs, height)) {
-      R.watchChartWidth('gene-record-years-chart');
-    }
-
+    /* Publications by year is drawn at the head of References, where it
+       filters the list, rather than as a second copy here. */
     R.connectionsChart('gene-record-connections-chart', 'gene-record-connections-caption',
                        'gene-record-connections-figure', series, height);
     return true;
@@ -1408,7 +1404,7 @@
     if (renderGenetic(sections.locus)) { rendered.push('gene-record-genetic'); }
 
     if (R.references(els.referencesBody, (sections.references || {}).references,
-                     els.referencesSection, 'gene-ref')) {
+                     els.referencesSection, 'gene-ref', { timeline: true })) {
       rendered.push('gene-record-references');
     }
 

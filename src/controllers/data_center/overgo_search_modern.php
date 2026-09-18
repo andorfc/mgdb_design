@@ -43,6 +43,7 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 /* The archive search still runs through the legacy AJAX helper, and so does
    its pagination: every results page carries a script that calls back into
    getSearchData(). */
+$bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/js/search.js');
 // Plotly must be parsed before mgdb-overgo.js runs initFigure().
 $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');

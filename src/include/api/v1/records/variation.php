@@ -242,7 +242,8 @@ if(isset($want['references'])){
      card renders all three: the publication type for the badge, and the
      abstract the card previews. idx_reference_ab_id keeps the abstract
      subquery at about 0.1 ms per reference. */
-  $sth=make_query($DBConn,"SELECT DISTINCT r.id,r.name,r.title,r.author_desc,r.year,r.doi,
+  $sth=make_query($DBConn,"SELECT DISTINCT r.id,r.name,r.title,r.author_desc,r.year,
+      " . mgdbReferenceDoiSql('r') . " AS doi, " . mgdbReferencePubmedSql('r') . " AS pubmed,
       COALESCE(t.name,'General') relevance, t_type.name AS pub_type,
       (
         SELECT substring(regexp_replace(string_agg(
@@ -256,19 +257,12 @@ if(isset($want['references'])){
     WHERE x.id=:id ORDER BY r.year DESC NULLS LAST,r.id DESC LIMIT :lim",1,array('id'=>$id,'lim'=>$max_items));
   MgdbApi::countQuery();
   while($row=retrieve_row($sth)){
-    /* The doi column is empty on most older records; some carry the DOI
-       inside the citation text instead. Same extraction the stock and gene
-       product resources use. */
+    /* Column, then ext_db_key, then the citation text: see
+       include/reference_ids_lib.php. */
     $doi = MgdbApi::text($row['doi']);
-    if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
-      $doi = $m[1];
-    } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string)$row['name'], $m)) {
-      $doi = $m[1];
-    } else {
-      $doi = null;
-    }
     $items[]=array('id'=>(int)$row['id'],'citation'=>MgdbApi::text($row['name']),'title'=>MgdbApi::text($row['title']),
       'authors'=>MgdbApi::text($row['author_desc']),'year'=>MgdbApi::int($row['year']),'doi'=>$doi,
+      'pubmed'=>MgdbApi::text($row['pubmed']),
       'pub_type'=>MgdbApi::text($row['pub_type']) ?: 'Journal article',
       'relevance'=>MgdbApi::text($row['relevance']),'abstract'=>MgdbApi::text($row['abstract']),
       'html'=>'/data_center/reference?id='.(int)$row['id']);

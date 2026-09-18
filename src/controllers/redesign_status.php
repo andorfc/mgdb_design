@@ -112,22 +112,37 @@
   foreach ($categories as $category) {
       $bucket  = $status['by_category'][$category];
       $retired = isset($bucket['retired']) ? $bucket['retired'] : 0;
-      /* Percent of the pages that still exist. A retired route is finished, so
-         leaving it in the denominator would report a category as less complete
-         the more of it was cleared away. */
-      $live    = $bucket['total'] - $retired;
-      $percent = $live > 0 ? round(100 * $bucket['modern'] / $live) : 0;
+      /* Progress uses the same active scope as the scanner's headline:
+         modern + outstanding + half-converted record routes. Older JSON does
+         not carry the progress_* breakdown, so reconstruct it from the
+         disposition counts without putting orphaned routes back in scope. */
+      $scope_modern = isset($bucket['progress_modern'])
+          ? (int) $bucket['progress_modern'] : (int) $bucket['modern'];
+      $scope_total = isset($bucket['progress_total'])
+          ? (int) $bucket['progress_total']
+          : $scope_modern + (int) $bucket['outstanding'] + (int) $bucket['record-modern'];
+      $scope_partial = isset($bucket['progress_partial'])
+          ? (int) $bucket['progress_partial']
+          : min((int) $bucket['partial'], max(0, $scope_total - $scope_modern));
+      $scope_legacy = isset($bucket['progress_legacy'])
+          ? (int) $bucket['progress_legacy']
+          : max(0, $scope_total - $scope_modern - $scope_partial);
+      $percent = $scope_total > 0 ? round(100 * $scope_modern / $scope_total) : null;
+      $progress_value = $percent === null ? -1 : $percent;
+      $progress_html = $percent === null
+          ? '<span class="status-progress-value"><span class="mgdb-visually-hidden">Not applicable</span>&mdash;</span>'
+          : rs_bar($scope_modern, $scope_partial, $scope_legacy)
+            . '<span class="status-progress-value">' . $percent . '%</span>';
       $category_rows .=
           '<tr>'
         . '<th scope="row">' . rs_esc($category) . '</th>'
         . '<td class="mgdb-numeric" data-value="' . $bucket['modern'] . '">' . $bucket['modern'] . '</td>'
-        . '<td class="mgdb-numeric" data-value="' . $bucket['partial'] . '">' . $bucket['partial'] . '</td>'
-        . '<td class="mgdb-numeric" data-value="' . $bucket['legacy'] . '">' . $bucket['legacy'] . '</td>'
+        . '<td class="mgdb-numeric" data-value="' . $bucket['outstanding'] . '">' . $bucket['outstanding'] . '</td>'
+        . '<td class="mgdb-numeric" data-value="' . $bucket['record-modern'] . '">' . $bucket['record-modern'] . '</td>'
+        . '<td class="mgdb-numeric" data-value="' . $bucket['orphaned'] . '">' . $bucket['orphaned'] . '</td>'
         . '<td class="mgdb-numeric" data-value="' . $retired . '">' . $retired . '</td>'
-        . '<td class="mgdb-numeric" data-value="' . $bucket['total'] . '">' . $bucket['total'] . '</td>'
-        . '<td class="status-progress" data-value="' . $percent . '">'
-        . rs_bar($bucket['modern'], $bucket['partial'], $bucket['legacy'], $retired)
-        . '<span class="status-progress-value">' . $percent . '%</span>'
+        . '<td class="status-progress" data-value="' . $progress_value . '">'
+        . $progress_html
         . '</td>'
         . '</tr>';
   }
@@ -278,12 +293,27 @@
       ? (int) $dispositions['outstanding'] : (int) $counts['legacy'];
   $record_modern = isset($dispositions['record-modern']) ? (int) $dispositions['record-modern'] : 0;
   $orphaned = isset($dispositions['orphaned']) ? (int) $dispositions['orphaned'] : 0;
+  $progress = isset($status['progress']) && is_array($status['progress'])
+      ? $status['progress'] : array();
+  $progress_modern = isset($progress['modern'])
+      ? (int) $progress['modern'] : (int) $counts['modern'];
+  $progress_total = isset($progress['total'])
+      ? (int) $progress['total'] : $progress_modern + $outstanding + $record_modern;
+  $progress_partial = isset($progress['partial'])
+      ? (int) $progress['partial']
+      : min((int) $counts['partial'], max(0, $progress_total - $progress_modern));
+  $progress_legacy = isset($progress['legacy'])
+      ? (int) $progress['legacy']
+      : max(0, $progress_total - $progress_modern - $progress_partial);
+  $progress_percent = $progress_total > 0
+      ? round(100 * $progress_modern / $progress_total, 1) : 0.0;
   $body->get('outstanding-count')->replace(number_format($outstanding));
   $body->get('record-modern-count')->replace(number_format($record_modern));
   $body->get('orphaned-count')->replace(number_format($orphaned));
   $body->get('retired-count')->replace(number_format(isset($counts['retired']) ? $counts['retired'] : 0));
-  $body->get('percent-modern')->replace(number_format($status['percent_modern'], 1));
-  $body->get('overall-bar')->replace(rs_bar($counts['modern'], $counts['partial'], $counts['legacy']));
+  $body->get('percent-modern')->replace(number_format($progress_percent, 1));
+  $body->get('overall-bar')->replace(
+      rs_bar($progress_modern, $progress_partial, $progress_legacy));
   $body->get('evidence-note')->replace(
       $status['probed']
         ? 'Each URL below was fetched from this server and the response was read.'

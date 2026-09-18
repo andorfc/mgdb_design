@@ -97,6 +97,12 @@ PROBE_SKIP = re.compile(
 # percentage: there is no page here to convert.
 ENDPOINT = re.compile(r"^/api(/|$)", re.I)
 
+# Only these dispositions belong in redesign progress. Retired routes have no
+# page left to convert, endpoints are not pages, and orphaned legacy routes need
+# a retirement decision rather than redesign work. Keeping this list in one
+# place makes the headline and per-category calculations use the same scope.
+PROGRESS_DISPOSITIONS = ("modern", "outstanding", "record-modern")
+
 # Categories, in the order they appear in the report.
 CATEGORY_ORDER = [
     "Data hubs",
@@ -164,6 +170,20 @@ def classify_live(body):
     if "design_system" in found or "body_class" in found:
         return "partial", found
     return "legacy", found
+
+
+def progress_counts(rows):
+    """Count interface states in the active redesign scope."""
+    counts = {"modern": 0, "partial": 0, "legacy": 0, "total": 0}
+    for row in rows:
+        if row.get("disposition") not in PROGRESS_DISPOSITIONS:
+            continue
+        state = row.get("status")
+        if state not in ("modern", "partial", "legacy"):
+            continue
+        counts[state] += 1
+        counts["total"] += 1
+    return counts
 
 
 # --------------------------------------------------------------------------
@@ -1001,7 +1021,9 @@ class Scanner(object):
         for row in rows:
             bucket = by_category.setdefault(row["category"], {
                 "modern": 0, "partial": 0, "legacy": 0, "retired": 0, "total": 0,
-                "outstanding": 0, "record-modern": 0, "orphaned": 0})
+                "outstanding": 0, "record-modern": 0, "orphaned": 0,
+                "progress_modern": 0, "progress_partial": 0,
+                "progress_legacy": 0, "progress_total": 0})
             bucket[row["status"]] += 1
             # Only the three legacy dispositions are counted here. "modern" and
             # "retired" are dispositions too, and adding them would increment
@@ -1009,6 +1031,10 @@ class Scanner(object):
             # out of 77 rows.
             if row["disposition"] in ("outstanding", "record-modern", "orphaned"):
                 bucket[row["disposition"]] += 1
+            if (row["disposition"] in PROGRESS_DISPOSITIONS
+                    and row["status"] in ("modern", "partial", "legacy")):
+                bucket["progress_" + row["status"]] += 1
+                bucket["progress_total"] += 1
             bucket["total"] += 1
 
         # What to do next: legacy pages, most exposed first. A page in the mega
@@ -1037,12 +1063,7 @@ class Scanner(object):
             else:
                 third_party.append(entry)
 
-        # An endpoint should never be classified modern -- the markers are HTML
-        # -- but subtract it from both halves rather than assume it.
-        endpoints = [row for row in rows if row["disposition"] == "endpoint"]
-        page_total = len(rows) - counts["retired"] - len(endpoints)
-        modern_pages = counts["modern"] - sum(1 for row in endpoints
-                                              if row["status"] == "modern")
+        progress = progress_counts(rows)
 
         return {
             "generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -1050,13 +1071,16 @@ class Scanner(object):
             "site": self.site,
             "counts": counts,
             "dispositions": dispositions,
+            "progress": progress,
             "total": len(rows),
-            # Retired routes are excluded from the denominator: they are not
-            # pages waiting to be modernized, so counting them drags the
-            # figure down for work that is done. Machine endpoints are excluded
-            # for the opposite reason -- they will never be converted, so
-            # counting them holds the figure below 100 for ever.
-            "percent_modern": round(100.0 * modern_pages / page_total, 1) if page_total else 0.0,
+            # Progress measures pages in the active redesign scope. Retired
+            # routes and machine endpoints are not pages to convert; orphaned
+            # legacy routes need a retirement decision and are not redesign
+            # backlog. Record-modern routes remain in scope because their
+            # search half is unfinished.
+            "percent_modern": round(
+                100.0 * progress["modern"] / progress["total"], 1
+            ) if progress["total"] else 0.0,
             "by_category": by_category,
             "category_order": [c for c in CATEGORY_ORDER if c in by_category],
             "rows": rows,
@@ -1145,6 +1169,11 @@ def write_markdown(data, path):
     add("not the other, which usually means a page borrowing components inside the old")
     add("shell.")
     add("")
+    add("The percentage uses the **active redesign scope**: modern pages, pages still")
+    add("to convert, and routes whose record page is modern but whose search page is")
+    add("not. Retired routes, machine endpoints, and unlinked legacy routes are excluded")
+    add("because none is a page waiting for redesign work.")
+    add("")
     add("**Legacy splits three ways, and only one of them is work.** Counting them")
     add("together is what made the figure look worse than it is:")
     add("")
@@ -1176,20 +1205,22 @@ def write_markdown(data, path):
     # ---- progress by category
     add("## By category")
     add("")
-    add("Progress is measured against the pages that still need converting, so a")
-    add("category whose remaining routes are all orphaned or already half done reads as")
-    add("finished, because it is.")
+    add("Progress uses the same active scope as the headline. Unlinked and retired routes")
+    add("are excluded; a half-converted route remains in the denominator until its search")
+    add("page is modern too.")
     add("")
     add("| Category | Modern | To convert | Record done | Not linked | Retired | Progress |")
     add("| --- | ---: | ---: | ---: | ---: | ---: | --- |")
     for category in data["category_order"]:
         bucket = data["by_category"][category]
         live = bucket["modern"] + bucket.get("outstanding", 0) + bucket.get("record-modern", 0)
-        fraction = bucket["modern"] / float(live or 1)
-        add("| %s | %d | %d | %d | %d | %d | %s %.0f%% |" % (
+        fraction = bucket["modern"] / float(live) if live else None
+        progress_label = ("%s %.0f%%" % (bar(fraction, 14), fraction * 100)
+                          if fraction is not None else "n/a")
+        add("| %s | %d | %d | %d | %d | %d | %s |" % (
             category, bucket["modern"], bucket.get("outstanding", 0),
             bucket.get("record-modern", 0), bucket.get("orphaned", 0),
-            bucket.get("retired", 0), bar(fraction, 14), fraction * 100))
+            bucket.get("retired", 0), progress_label))
     add("")
 
     # ---- what to work on next

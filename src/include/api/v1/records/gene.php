@@ -42,7 +42,7 @@
 if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   $SECTIONS = array('overview', 'structure', 'function', 'expression', 'variation',
-                    'pan_gene', 'orthologs', 'locus', 'references', 'xrefs', 'sequences');
+                    'pan_gene', 'orthologs', 'paralogs', 'locus', 'references', 'xrefs', 'sequences');
   $wanted = MgdbApi::sections($SECTIONS);
   $want = array_flip($wanted);
   $max_items = MgdbApi::maxItems();
@@ -84,6 +84,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   $annotation_version = $record ? MgdbApi::text($record['version']) : null;
   $assembly_version = $record ? MgdbApi::text($record['assembly_version']) : null;
   $gene_feature_id = $record ? MgdbApi::int($record['feature_id']) : null;
+  $transcript_feature_ids = array();
   $canonical_transcript = $record ? MgdbApi::text($record['canonical_transcript_name']) : null;
   $canonical_transcript_id = $record ? MgdbApi::int($record['canonical_transcript_id']) : null;
   $canonical_protein = $record ? MgdbApi::text($record['protein']) : null;
@@ -96,6 +97,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
      that depends on it says so rather than going quiet. */
   include_once('./include/api/v1/lib/mgdb_data.php');
   include_once('./include/api/v1/lib/mgdb_expression.php');
+  include_once('./include/api/v1/lib/mgdb_paralogs.php');
   $gene_release = null;
   $gene_shard = null;
   if ($gene_name !== null && $assembly_version !== null && class_exists('MgdbData')) {
@@ -224,6 +226,103 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     'stocks' => (int) $counts_row['stocks']
   );
 
+/* Plant Reactome reactions and pathways for one gene model.
+
+   chado.feature_dbxref against the two `PlantReactome %` databases; the URL is
+   the db's own urlprefix plus the accession, so a prefix change follows without
+   an edit here. 5,364 reaction rows and 4,085 pathway rows across the corpus,
+   and most gene models have neither -- an empty list is the usual answer. */
+function gene_api_plant_reactome($DBConn, $feature_id) {
+  $out = array('reactions' => array(), 'pathways' => array());
+  if (!$feature_id) { return $out; }
+  $sth = make_query($DBConn, "
+    SELECT db.name AS db, x.accession, db.urlprefix
+    FROM chado.feature_dbxref fx
+      JOIN chado.dbxref x ON x.dbxref_id = fx.dbxref_id
+      JOIN chado.db ON db.db_id = x.db_id
+    WHERE fx.feature_id = :fid AND db.name LIKE 'PlantReactome %'
+    ORDER BY db.name, x.accession", 1, array('fid' => (int) $feature_id));
+  MgdbApi::countQuery();
+  while ($row = retrieve_row($sth)) {
+    $accession = trim((string) $row['accession']);
+    if ($accession === '') { continue; }
+    $key = (strpos((string) $row['db'], 'reactions') !== false) ? 'reactions' : 'pathways';
+    $out[$key][] = array(
+      'accession' => $accession,
+      'url' => trim((string) $row['urlprefix']) . $accession
+    );
+  }
+  return $out;
+}//gene_api_plant_reactome
+
+
+/* The three off-site tools that take this gene model by name.
+
+   Each is gated the way the legacy record page gates it, because each is only
+   built for some of the corpus and a link to a tool that has never heard of
+   this gene is worse than no link:
+
+     PanEffect   B73 v5 and the NAM founders -- the ids matching Zm\d+\wb.
+     MaizeMine   B73 RefGen_v3, GRAMENE-4.0 and NAM-5.0 only, and v3/v4 are on
+                 a different host from v5.
+     Tree browser  the three B73 annotations and the NAM assemblies. Its
+                 urlprefix is read from chado.db rather than written here.
+
+   null for a tool means "not built for this gene", which is a different fact
+   from "the link is missing", and the client says so. */
+function gene_api_tools($DBConn, $gene_name, $assembly_version) {
+  $gene_name = trim((string) $gene_name);
+  $assembly_version = trim((string) $assembly_version);
+  $out = array('paneffect' => null, 'maizemine' => null, 'tree_browser' => null, 'gramene' => null);
+  if ($gene_name === '') { return $out; }
+
+  if (preg_match('/Zm\d+\wb/', $gene_name)) {
+    $out['paneffect'] = 'https://www.maizegdb.org/effect/maize_v2/index.html?id='
+                      . rawurlencode($gene_name) . '&option=both&esm=ESM2';
+  }
+
+  $mine = array(
+    'Zm-B73-REFERENCE-NAM-5.0' => 'https://maizemine.rnet.missouri.edu/maizemine/keywordSearchResults.do?searchSubmit=search&searchTerm=',
+    'Zm-B73-REFERENCE-GRAMENE-4.0' => 'http://maizemine-v13.rnet.missouri.edu:8080/maizemine/keywordSearchResults.do?searchSubmit=search&searchTerm=',
+    'B73 RefGen_v3' => 'http://maizemine-v13.rnet.missouri.edu:8080/maizemine/keywordSearchResults.do?searchSubmit=search&searchTerm='
+  );
+  if (isset($mine[$assembly_version])) {
+    $out['maizemine'] = $mine[$assembly_version] . rawurlencode($gene_name);
+  }
+
+  if (preg_match('/^Zm\d+(eb|d|ab)/', $gene_name) || strpos($gene_name, 'GRMZM') === 0) {
+    $row = retrieve_row(make_query($DBConn, "
+      SELECT urlprefix FROM chado.db WHERE name = 'Gramene Maize Tree Browser'", 1, array()));
+    MgdbApi::countQuery();
+    if ($row && trim((string) $row['urlprefix']) !== '') {
+      $out['tree_browser'] = trim((string) $row['urlprefix']) . rawurlencode($gene_name);
+    }
+  }
+
+  /* Gramene's Ensembl views of this gene model: the summary, its orthologues
+     and paralogues, the gene tree and the variant table. One Ensembl gene id
+     drives all five paths.
+
+     B73 only. Gramene's Zea_mays IS B73 -- checked by title: a v5, v4 or v3 id
+     comes back "Gene: <id> - ... - Zea_mays", while a NAM founder id
+     (Zm00026ab070050) and a nonsense id both come back "Summary - Zea_mays"
+     with no gene named. Every one of these paths answers HTTP 200 whatever you
+     ask for, so the status code proves nothing and the title is the test. */
+  if (preg_match('/^(Zm00001eb|Zm00001d|GRMZM)/', $gene_name)) {
+    $g = 'https://ensembl.gramene.org/Zea_mays/';
+    $q = '?db=core;g=' . rawurlencode($gene_name);
+    $out['gramene'] = array(
+      'gene' => $g . 'Gene/Summary' . $q,
+      'orthologs' => $g . 'Gene/Compara_Ortholog' . $q,
+      'paralogs' => $g . 'Gene/Compara_Paralog' . $q,
+      'tree' => $g . 'Gene/Compara_Tree' . $q,
+      'variation' => $g . 'Gene/Variation_Gene/Table' . $q
+    );
+  }
+  return $out;
+}//gene_api_tools
+
+
   $sections = array();
   $truncated = array();
   $measured = array();   // section.key => true length before capping
@@ -342,6 +441,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
     $sections['overview'] = array(
       'browser' => $browser,
+      'tools' => gene_api_tools($DBConn, $gene_name, $assembly_version),
       'name' => $gene_name,
       'symbol' => $symbol,
       'full_name' => $full_name,
@@ -430,6 +530,11 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         $t_end = MgdbApi::int($row['transcript_end']);
         $t_name = MgdbApi::text($row['transcript_name']);
         $t_model = MgdbApi::text($row['model_type']);
+        /* chado.transcript.transcript_id IS the chado.feature.feature_id, which
+           is what the gene-model-score query joins on. Collected here so the
+           scores can cover every isoform rather than the canonical one. */
+        $tid = MgdbApi::int($row['transcript_id']);
+        if ($tid !== null) { $transcript_feature_ids[] = (int) $tid; }
         $transcripts[] = array(
           'name' => $t_name,
           'protein' => gene_api_transcript_protein($t_name, $t_model,
@@ -493,6 +598,23 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
        so one query covers them and any future one. */
     $scores = array();
     if ($gene_feature_id !== null) {
+      /* Every isoform, not just the canonical one.
+
+         This used to ask for (gene, canonical transcript) and nothing else,
+         which showed 16 rows for ptk5 while the database holds 15 scores for
+         each of its 26 transcripts -- 390. AED, pSAURON, reelGene and the
+         protein-structure scores are all computed per transcript, and a
+         non-canonical isoform scoring badly is exactly what a reader looking
+         at a gene model score wants to know.
+
+         Built as a literal id list because the ids come from the transcript
+         query above; each is cast to int on the way in, so the list cannot
+         carry anything but digits. */
+      $score_fids = array((int) $gene_feature_id);
+      foreach ($transcript_feature_ids as $tid) { $score_fids[] = (int) $tid; }
+      if ($canonical_transcript_id !== null) { $score_fids[] = (int) $canonical_transcript_id; }
+      $score_fids = array_values(array_unique($score_fids));
+      $score_fid_list = implode(',', $score_fids);
       $sth = make_query($DBConn, "
         SELECT analysis, program, programversion, sourcename, feature, metric, rawscore
         FROM (
@@ -503,7 +625,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
             JOIN chado.analysis a ON a.analysis_id = af.analysis_id
             JOIN chado.analysisfeatureprop afp ON afp.analysisfeature_id = af.analysisfeature_id
             JOIN chado.cvterm c ON c.cvterm_id = afp.type_id
-          WHERE f.feature_id IN (:gene_fid, :transcript_fid)
+          WHERE f.feature_id IN (" . $score_fid_list . ")
                 AND c.name = 'gene_model_score'
           UNION ALL
           /* Annotation Edit Distance is a featureprop on the mRNA rather than an
@@ -513,14 +635,10 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           FROM chado.feature f
             JOIN chado.featureprop fp ON fp.feature_id = f.feature_id
             JOIN chado.cvterm c ON c.cvterm_id = fp.type_id AND c.name = 'AED_score'
-          WHERE f.feature_id IN (:gene_fid2, :transcript_fid2)
+          WHERE f.feature_id IN (" . $score_fid_list . ")
                 AND fp.value ~ '^[0-9.]+$'
         ) s
-        ORDER BY analysis, metric", 1,
-        array('gene_fid' => $gene_feature_id,
-              'transcript_fid' => $canonical_transcript_id === null ? $gene_feature_id : $canonical_transcript_id,
-              'gene_fid2' => $gene_feature_id,
-              'transcript_fid2' => $canonical_transcript_id === null ? $gene_feature_id : $canonical_transcript_id));
+        ORDER BY feature, analysis, metric", 1, array());
       MgdbApi::countQuery();
       while ($row = retrieve_row($sth)) {
         // The score's name is the prop value; the number is the rawscore.
@@ -740,7 +858,8 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'protein_accessions' => $accessions,
       'go' => gene_api_function_go($ontology, $fn_protein),
       'classes' => gene_api_function_classes($assembly_version, $fn_protein),
-      'pathways' => gene_api_function_pathways($gene_name)
+      'pathways' => gene_api_function_pathways($gene_name),
+      'plant_reactome' => gene_api_plant_reactome($DBConn, $gene_feature_id)
     );
   }
 
@@ -1540,7 +1659,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
          badge, no author line and no abstract preview to show, and this page's
          references looked nothing like the ones on every other record. */
       $sth = make_query($DBConn, "
-        SELECT r.id AS ref_id, r.name AS ref_name, r.title, r.year, r.doi,
+        SELECT r.id AS ref_id, r.name AS ref_name, r.title, r.year, " . mgdbReferenceDoiSql('r') . " AS doi, " . mgdbReferencePubmedSql('r') . " AS pubmed,
                r.author_desc, t.name AS relevance, t_type.name AS pub_type,
                (
                  SELECT substring(regexp_replace(string_agg(
@@ -1557,17 +1676,10 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         ORDER BY r.year DESC NULLS LAST, lower(r.name)", 1, array('lid' => $locus_id));
       MgdbApi::countQuery();
       while ($row = retrieve_row($sth)) {
-        /* mgdb.reference.doi is filled for 1.0% of rows, so the citation text
-           is the fallback: it often carries the DOI inline. Recorded as
-           AD-036. */
+        /* mgdb.reference.doi is filled for 1% of references; most DOIs are in
+           mgdb.ext_db_key. Column, then ext_db_key, then the citation text: see
+           include/reference_ids_lib.php and AD-036. */
         $doi = MgdbApi::text($row['doi']);
-        if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
-          $doi = $m[1];
-        } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string) $row['ref_name'], $m)) {
-          $doi = $m[1];
-        } else {
-          $doi = null;
-        }
         $refs[] = array(
           'type' => 'reference',
           'id' => MgdbApi::int($row['ref_id']),
@@ -1577,6 +1689,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           'authors' => MgdbApi::text($row['author_desc']),
           'year' => MgdbApi::int($row['year']),
           'doi' => $doi,
+          'pubmed' => MgdbApi::text($row['pubmed']),
           'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
           'relevance' => MgdbApi::text($row['relevance']),
           'abstract' => MgdbApi::prose($row['abstract']),
@@ -1648,6 +1761,20 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     $sections['sequences'] = gene_api_sequences(
       $gene_name, $annotation_version, $assembly_version,
       $transcripts, $canonical_transcript, $canonical_protein, $gene_shard);
+  }
+
+  /////
+  // Paralogs -- the retained homeolog and the tandem array
+  //
+  // Built whatever `fields` asks for, because meta.counts carries its two
+  // counts; it is two indexed SQLite reads.
+  /////
+
+  $paralogs = gene_api_paralogs($gene_name, $assembly_version);
+  $counts['homeologs'] = ($paralogs && $paralogs['homeolog']) ? 1 : 0;
+  $counts['tandem_duplicates'] = ($paralogs && $paralogs['tandem']) ? count($paralogs['tandem']['members']) - 1 : 0;
+  if (isset($want['paralogs'])) {
+    $sections['paralogs'] = $paralogs;
   }
 
   /////
@@ -2667,6 +2794,11 @@ function gene_api_function_classes($assembly, $protein) {
   $dir = MgdbData::dir('domains');
   $ctx = ($dir !== null && is_file($dir . '/atlas_classes.json')) ? MgdbData::readJson($dir . '/atlas_classes.json') : null;
   $short = function ($g) { return preg_replace('/^Zm-(.+?)-REFERENCE-.*$/', '$1', (string) $g); };
+  /* The member lists behind each count, downloadable from the domains route
+     when tools/atlas_classes.py has written them for this genome. */
+  $membersBase = ($dir !== null && is_file($dir . '/atlas_members/' . $assembly . '.json'))
+    ? MgdbApi::baseUrl() . '/api/v1/data/domains/' . $assembly : null;
+  $slug = function ($name) { return trim(preg_replace('/[^a-z0-9]+/', '-', strtolower((string) $name)), '-'); };
 
   $present = array();
   foreach (isset($protein['entries']) ? $protein['entries'] : array() as $e) {
@@ -2694,7 +2826,8 @@ function gene_api_function_classes($assembly, $protein) {
       'entries_in_class' => count($iprs),
       'genes_here' => isset($counts[$assembly]) ? (int) $counts[$assembly] : null,
       'maize' => ($ctx && isset($ctx['stats'][$name])) ? $ctx['stats'][$name] : null,
-      'founders' => $founders
+      'founders' => $founders,
+      'download' => ($membersBase !== null && !empty($counts[$assembly])) ? $membersBase . '/class/' . $slug($name) . '?format=tsv' : null
     );
   }
 
@@ -2717,7 +2850,10 @@ function gene_api_function_classes($assembly, $protein) {
       'genes_here' => isset($counts[$assembly]) ? (int) $counts[$assembly] : null,
       'subclass_genes_here' => isset($subCounts[$assembly]) ? (int) $subCounts[$assembly] : null,
       'founders' => $founders,
-      'detail' => $im
+      'detail' => $im,
+      'download' => ($membersBase !== null && !empty($counts[$assembly])) ? $membersBase . '/immunity/' . rawurlencode($cls) . '?format=tsv' : null,
+      'subclass_download' => ($membersBase !== null && $sub !== null && !empty($subCounts[$assembly]))
+        ? $membersBase . '/immunity/' . rawurlencode($cls) . '?format=tsv&subclass=' . rawurlencode($sub) : null
     );
   }
 
@@ -2757,6 +2893,41 @@ function gene_api_function_classes($assembly, $protein) {
     )
   );
 }//gene_api_function_classes
+
+/* The retained maize1/maize2 homeolog and the tandem array of a gene model,
+   from the paralog release (include/api/v1/lib/mgdb_paralogs.php). Null when
+   the assembly has no release -- today everything but B73 v5 -- so the page
+   can tell "not held for this build" from "none". */
+function gene_api_paralogs($gene_name, $assembly) {
+  if ($gene_name === null || !MgdbParalogs::available($assembly)) { return null; }
+  $m = MgdbParalogs::manifest($assembly);
+  $homeolog = MgdbParalogs::homeolog($assembly, $gene_name);
+  $tandem = MgdbParalogs::tandem($assembly, $gene_name);
+  $base = MgdbApi::baseUrl();
+  return array(
+    'available' => true,
+    'genome' => $assembly,
+    'genome_label' => preg_replace('/^Zm-(.+?)-REFERENCE-.*$/', '$1', (string) $assembly),
+    'homeolog' => $homeolog,
+    'tandem' => $tandem,
+    'chromosomes' => $homeolog && $m && isset($m['chromosomes']) ? $m['chromosomes'] : null,
+    'stats' => $homeolog && $m && isset($m['stats']) ? $m['stats'] : null,
+    'expression_api' => (class_exists('MgdbExpression') && MgdbExpression::available($assembly))
+      ? $base . '/api/v1/data/expression/' . $assembly . '/' : null,
+    'source' => array(
+      'title' => $m ? $m['source_title'] : null,
+      'assembly' => $m ? $m['source_assembly'] : null,
+      'generated' => $m ? $m['generated'] : null,
+      'pairs_in_source' => $m ? $m['counts']['pairs_in_source'] : null,
+      'pairs_placed' => $m ? $m['counts']['pairs_placed'] : null,
+      'pairs_half_placed' => $m ? $m['counts']['pairs_half_placed'] : null,
+      'tandem_arrays' => $m ? $m['counts']['tandem_arrays'] : null,
+      'tandem_genes' => $m ? $m['counts']['tandem_genes'] : null,
+      'notes' => $m ? $m['notes'] : array(),
+      'download' => $base . '/data/paralogs/' . $assembly . '/homeolog_pairs.tsv'
+    )
+  );
+}//gene_api_paralogs
 
 function gene_api_function_pathways($gene_name) {
   if ($gene_name === null || !class_exists('MgdbPathways') || !MgdbPathways::available()) { return null; }

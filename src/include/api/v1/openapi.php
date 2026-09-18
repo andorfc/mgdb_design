@@ -265,6 +265,30 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           $paging_parameters, array($format_param)),
         'responses' => $responses
       ));
+      $members_format = array('name' => 'format', 'in' => 'query', 'required' => false,
+        'description' => 'json (the default) or tsv, a download of the gene models.',
+        'schema' => array('type' => 'string', 'enum' => array('json', 'tsv')));
+      $data_paths['/data/domains/{genome}/class/{name}'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => 'Protein domains: every gene in a functional class', 'operationId' => 'getDomainsClass',
+        'description' => $entry['routes']['{genome}/class/{name}'],
+        'parameters' => array($genome_parameter, array(
+          'name' => 'name', 'in' => 'path', 'required' => true, 'schema' => array('type' => 'string'),
+          'description' => 'A class slug or name, as the class list gives it.',
+          'examples' => array('NLR' => array('value' => 'immunity-nlr-nbs-lrr'), 'MYB' => array('value' => 'tf-myb'))
+        ), $members_format),
+        'responses' => $responses
+      ));
+      $data_paths['/data/domains/{genome}/immunity/{class}'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => 'Protein domains: every gene given an immunity call', 'operationId' => 'getDomainsImmunity',
+        'description' => $entry['routes']['{genome}/immunity/{class}'],
+        'parameters' => array($genome_parameter, array(
+          'name' => 'class', 'in' => 'path', 'required' => true, 'schema' => array('type' => 'string'),
+          'description' => 'An immunity class: NLR, NLR_partial, RLK, RLP, PR, IMMUNE_SIGNALING or IMMUNE_OTHER.',
+          'examples' => array('NLR' => array('value' => 'NLR'))
+        ), array('name' => 'subclass', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                 'description' => 'Only the calls with this subclass (CNL, LRR-RLK, PR-5_thaumatin, ...).'), $members_format),
+        'responses' => $responses
+      ));
     }
   }
 

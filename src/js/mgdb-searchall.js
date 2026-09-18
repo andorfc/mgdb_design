@@ -51,6 +51,7 @@
     map: '#mzg-maps',
     person: '#mzg-people-and-organizations',
     genome: '#mzg-genomes',
+    pan_gene: '#mzg-pan-genes',
     recomb: '#mzg-recombination-data',
     primer: '#mzg-restriction-enzymes-and-primers',
     species: '#mzg-species',
@@ -275,6 +276,24 @@
       body.appendChild(titleLink(row, row.name));
       if (row.project) { body.appendChild(el('p', 'sa-row-sub', row.project)); }
       meta(body, [row.annotation ? 'Annotation ' + row.annotation : '']);
+    },
+
+    /* Titled by the exemplar gene model, as the record page is. "Matched on"
+       is the pan-gene hub's own column: a pan-gene can be reached from a
+       locus, a member gene model or a protein, and without it a card reached
+       through a pathway id gives no hint why it is here. */
+    pan_gene: function (row, body) {
+      body.appendChild(titleLink(row, row.name));
+      body.appendChild(el('p', 'sa-row-sub',
+        plural(row.member_count, 'member gene model', 'member gene models') + ' across ' +
+        count(row.annotation_count) + ' of ' + count(row.annotation_total) + ' annotations'));
+      var loci = row.loci || [];
+      var matched = row.matched_as || [];
+      meta(body, [
+        loci.length ? (loci.length === 1 ? 'Locus ' : 'Loci ') + loci.join(', ') : '',
+        row.analysis,
+        matched.length ? 'Matched on ' + matched.join(', ') : ''
+      ]);
     },
 
     simple: function (row, body) {

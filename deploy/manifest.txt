@@ -169,6 +169,7 @@ src/data/ai/ai_resources.json                    data/ai/ai_resources.json
 # Reference literature search — backend
 src/search/reference/reference_search_api.php    search/reference/reference_search_api.php
 src/search/reference/reference_search_lib.php    search/reference/reference_search_lib.php
+src/include/reference_ids_lib.php                include/reference_ids_lib.php
 src/include/db-api.php                           include/db-api.php
 
 # Dashboard cache: collection-wide figures for the data centres, cached to
@@ -223,6 +224,17 @@ src/images/maize_meeting/beijing.jpg             images/maize_meeting/beijing.jp
 src/images/maize_meeting/portland.jpg            images/maize_meeting/portland.jpg
 src/images/maize_meeting/allerton.jpg            images/maize_meeting/allerton.jpg
 src/images/maize_meeting/geneva.jpg              images/maize_meeting/geneva.jpg
+# Archive-card venue photographs the page's JS names by file. They were on the
+# dev server and in the repo but had no mapping, so a deploy to a fresh server
+# would have left /maize_meeting/ with broken images. Added 2026-09-18.
+src/images/maize_meeting/asilomar.jpg                  images/maize_meeting/asilomar.jpg
+src/images/maize_meeting/chicago.jpg                   images/maize_meeting/chicago.jpg
+src/images/maize_meeting/dc.jpg                        images/maize_meeting/dc.jpg
+src/images/maize_meeting/florida1.jpg                  images/maize_meeting/florida1.jpg
+src/images/maize_meeting/florida2.jpg                  images/maize_meeting/florida2.jpg
+src/images/maize_meeting/idaho.jpg                     images/maize_meeting/idaho.jpg
+src/images/maize_meeting/jacksonville.jpg              images/maize_meeting/jacksonville.jpg
+src/images/maize_meeting/mexico.jpg                    images/maize_meeting/mexico.jpg
 
 # The 2020 virtual meeting's poster and video walls. Not a redesign: these four
 # files are here because their password gate redirected without stopping, so a
@@ -2700,6 +2712,15 @@ src/data/expression/.htaccess                    data/expression/.htaccess
 src/tools/go_index.py                            tools/go_index.py
 src/data/go/.htaccess                            data/go/.htaccess
 src/tools/atlas_classes.py                       tools/atlas_classes.py
+# tools/paralogs_index.py writes data/paralogs/<genome>/ (paralogs.sqlite,
+# manifest.json, homeolog_pairs.tsv) from the sources under data/paralogs/
+# sources/: the maize1/maize2 pair table, the v4-to-v5 crosswalk and chain
+# file, and the v5 tandem file. The sources and the release are server-only.
+src/tools/paralogs_index.py                      tools/paralogs_index.py
+src/include/api/v1/lib/mgdb_paralogs.php         include/api/v1/lib/mgdb_paralogs.php
+src/js/mgdb-gene-paralogs.js                     js/mgdb-gene-paralogs.js
+src/css/mgdb-gene-paralogs.css                   css/mgdb-gene-paralogs.css
+src/data/paralogs/.htaccess                      data/paralogs/.htaccess
 # tools/score_ranges.py writes data/gene_scores/index.json from the database (public aggregates).
 src/tools/score_ranges.py                        tools/score_ranges.py
 # Function section: GO reference library, pathway explorer reader, and the figure.
@@ -2729,6 +2750,7 @@ src/images/maize_history/MaizeGDBv3.png                images/maize_history/Maiz
 src/images/quicklinks/amaizing.png                    images/quicklinks/amaizing.png
 src/images/quicklinks/caas.png                        images/quicklinks/caas.png
 src/images/quicklinks/european_maize.png              images/quicklinks/european_maize.png
+src/images/quicklinks/maize_meeting.png       images/quicklinks/maize_meeting.png
 src/controllers/gene_center/gene_gemini_record_modern.php controllers/gene_center/gene_gemini_record_modern.php
 src/templates/static/mgdb_gene_gemini_record.bau           templates/static/mgdb_gene_gemini_record.bau
 src/css/mgdb-gene-gemini-record.css                        css/mgdb-gene-gemini-record.css

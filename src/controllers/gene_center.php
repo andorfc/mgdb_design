@@ -77,11 +77,34 @@
    * Rollback: delete this block. Pre-redesign originals are archived in the
    * redesign repository under legacy/gene-record/.
    */
+  /* 2026-09-17: /gene_center/gene/{id} is served by the page built as the
+     gene_v5 mockup -- the v4 header, four views, and the full record.
+
+     It answers an unresolved id with the same 404-with-suggestions page as
+     before (geneRecordNotFound, now in include/gene_record_lib.php), carries
+     the same JSON-LD and FAIR signposting, and aliases the #gene-record-overview
+     anchor that /new_genes links to.
+
+     Rollback: change gene_record_v5.php back to gene_record_modern.php on the
+     line below. That controller is unchanged apart from calling the 404 page
+     from the lib, and still works. */
   if (PAGE == 'gene' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
-    if (include('controllers/gene_center/gene_record_modern.php')) {
+    if (include('controllers/gene_center/gene_record_v5.php')) {
       return;
     }
   }
+
+  /* Gene record Gemini mockup route. */
+  if (PAGE == 'gene_gemini' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    if (include('controllers/gene_center/gene_gemini_record_modern.php')) {
+      return;
+    }
+  }
+  if (PAGE == 'gene_gemini' && trim((string) getCGIParam('id', 'G', ID)) === '') {
+    header('Location: /gene_center/gene', true, 302);
+    exit;
+  }
+
 
   /* Gene Data Hub landing page on the modern design system.
    *
@@ -103,6 +126,59 @@
     if (include('controllers/gene_center/gene_search_modern.php')) {
       return;
     }
+  }
+
+  /* Gene record page, version 2 mockup: the same record as /gene_center/gene
+     divided into four views. Lives beside the live page rather than replacing
+     it. Returns false for an identifier it cannot resolve, and the empty-id
+     and unresolved cases both fall through to the not-found handling below,
+     because no controllers/gene_center/gene_v2.php exists.
+
+     Rollback: delete this block. */
+  if (PAGE == 'gene_v2' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    if (include('controllers/gene_center/gene_record_v2.php')) {
+      return;
+    }
+  }
+
+  /* Gene record header mockup: the header alone, two columns and a synonym
+     strip, rendered server-side. Same fall-through as gene_v2.
+
+     Rollback: delete this block. */
+  if (PAGE == 'gene_v3' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    if (include('controllers/gene_center/gene_record_v3.php')) {
+      return;
+    }
+  }
+
+  /* Gene record header mockup, version 4: the same facts as gene_v3 in one
+     green panel, two halves divided by a rule, no synonym table. Same
+     fall-through as gene_v2 and gene_v3.
+
+     Rollback: delete this block. */
+  if (PAGE == 'gene_v4' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    if (include('controllers/gene_center/gene_record_v4.php')) {
+      return;
+    }
+  }
+
+  /* Gene record mockup, version 5: the v4 header with the page's navigation
+     under it -- the four view tabs of the openai mockup, and the bubble bar of
+     v2 beneath them. The sections themselves are placeholders. Same
+     fall-through as gene_v2, gene_v3 and gene_v4.
+
+     Rollback: delete this block. */
+  if (PAGE == 'gene_v5' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    /* The mockup URL now forwards to the page it became, so a link shared
+       during review lands on the live record rather than on a second copy of
+       it. 302 rather than 301 on purpose: a permanent redirect is cached by the
+       browser, and this is the dev instance, where it may yet be undone. */
+    $v5_target = '/gene_center/gene/' . rawurlencode(rawurldecode((string) getCGIParam('id', 'G', ID)));
+    $v5_query = $_GET;
+    unset($v5_query['id']);
+    if (!empty($v5_query)) { $v5_target .= '?' . http_build_query($v5_query); }
+    header('Location: ' . $v5_target, true, 302);
+    exit;
   }
 
   /* "/gene_center" is not a page; the gene search is, so the bare route has

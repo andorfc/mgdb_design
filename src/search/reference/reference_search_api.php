@@ -41,7 +41,8 @@ try {
            referenceFacetsOnlyQuery() returns, so a key watching only the
            string kept serving a payload built before the query learned to
            read both DOI stores -- 490 DOIs and no export list sizes. */
-        $facetsKey = 'reference/facets_' . (int) @filemtime(__DIR__ . '/reference_search_lib.php');
+        $facetsKey = 'reference/facets_' . (int) @filemtime(__DIR__ . '/reference_search_lib.php')
+                   . '_' . (int) @filemtime(__DIR__ . '/../../include/reference_ids_lib.php');
         $payload = dashboardCache($system, $facetsKey, function () use ($DBConn, $filter) {
             $built = referenceFacetsOnlyQuery($filter);
             return retrieve_row(make_query($DBConn, $built['sql'], 1, $built['params']));

@@ -1,0 +1,590 @@
+/* ==========================================================================
+   Gene record header mockup, version 4 — /gene_center/gene_v4/{id}
+   --------------------------------------------------------------------------
+   The same facts as the v3 header, laid out the way v2 reads: one green panel
+   instead of two white cards, inline label/value pairs instead of a tabbed
+   definition list, and the two identifiers — the gene's symbol and its gene
+   model's name — set at the same size, because the two halves are peers.
+
+   Left: the gene and its genetic map. Right: the gene model and its physical
+   map. A single vertical rule between them, running the height of the panel.
+   ========================================================================== */
+
+/* The panel keeps the hero's own green. No inner cards, no white grounds: the
+   division between the halves is the rule and nothing else. */
+.mgdb-gene-record-v4-page .v4-hero-body { padding-block: var(--mgdb-space-5); }
+
+.mgdb-gene-record-v4-page .v4-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4px minmax(0, 1fr);
+  gap: 0 var(--mgdb-space-6);
+  align-items: stretch;
+}
+
+/* The rule. It is drawn as the grid's middle track rather than as a border on
+   either side, so it belongs to neither half and can run past the shorter one:
+   a border would stop at whichever column ended first. Faded at both ends so
+   it reads as a divider rather than as the edge of a box. */
+.mgdb-gene-record-v4-page .v4-split::before {
+  content: "";
+  grid-column: 2;
+  grid-row: 1;
+  width: 4px;
+  border-radius: 2px;
+  background: linear-gradient(180deg,
+    rgba(133, 168, 144, 0) 0,
+    rgba(133, 168, 144, .9) 10%,
+    rgba(133, 168, 144, .9) 90%,
+    rgba(133, 168, 144, 0) 100%);
+}
+
+/* A flex column so the map glyph can be pushed to the foot with `margin-top:
+   auto` — the two glyphs then share a baseline whichever half has more facts,
+   which is the whole reason for showing them side by side. */
+.mgdb-gene-record-v4-page .v4-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mgdb-gene-record-v4-page .v4-side-gene { grid-column: 1; grid-row: 1; }
+.mgdb-gene-record-v4-page .v4-side-model { grid-column: 3; grid-row: 1; }
+
+/* --------------------------------------------------------------------------
+   The two names
+
+   Same size, same family, same weight on both sides. The gene model's name is
+   a <p>, not a heading — there is one h1 on the page and it is the gene — and
+   it is deliberately not a link.
+   -------------------------------------------------------------------------- */
+
+/* The v2 header's h1 -- weight 700, no negative tracking, the same system
+   stack -- but set at 30px rather than its 36px.
+
+   At 36px the gene model name shouted, and measurement says why. It is not
+   height: the painted box of "adh1" is 36px tall against "Zm00001eb056510" at
+   37px, because adh1's d and h ascenders reach nearly as high as the digits'
+   lining figures. It is LENGTH. Fifteen characters against four is 328px of
+   ink against 67px -- about five times the area -- and area is what reads as
+   loud. Dropping both to 30px lowers the volume proportionally; the 5:1 ratio
+   between them is inherent to the two strings and no size will change it. */
+.mgdb-hub-page > section.v4-hero .v4-name {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: var(--mgdb-leading-tight);
+  letter-spacing: normal;
+}
+
+/* The model name is long — Zm00001eb056510 — so it is allowed to break rather
+   than push the column wider than its half. */
+.mgdb-hub-page > section.v4-hero .v4-name-model {
+  overflow-wrap: anywhere;
+}
+
+/* Both of these carry the shell's own classes now -- .mgdb-rec-subtitle and
+   .mgdb-rec-synonyms, the pair the v2 header uses -- so the family, size,
+   weight and leading come from one place and cannot drift from v2's. The
+   bespoke versions that stood here set system-ui at 19.6px leading against
+   v2's Verdana at 22.4px, which is the difference that read as less smooth.
+   All that is left here is the spacing between them. */
+.mgdb-gene-record-v4-page .v4-fullname { margin: var(--mgdb-space-1) 0 0; }
+/* Same family and size as the Species and NCBI Gene pairs below it, so the
+   three read as one block. The names are regular weight -- bolding fifteen of
+   them in a row made the synonym list the loudest thing in the panel -- and the
+   lead-in takes the label colour the way a `dt` does, which is what separates
+   it from the names now that nothing is bold.
+
+   `font-family: inherit` is the load-bearing line. The legacy `css/index.css`,
+   which every modern page still loads, carries a bare `p { font-family:
+   Verdana … }` at line 9 -- so EVERY <p> on the site is Verdana unless it says
+   otherwise, whatever its parents are set to. That is the whole reason this
+   line looked like a different face from the fact pairs beside it: dt and dd
+   are not paragraphs, so they inherit the page's system stack, and this one did
+   not. Nothing to do with .mgdb-rec-synonyms, which never set a family at all.
+
+   Any new <p> in page content that has to match its surroundings needs this
+   declaration. */
+.mgdb-gene-record-v4-page .v4-aka {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+  line-height: 22.4px;
+}
+
+.mgdb-gene-record-v4-page .v4-aka-label {
+  color: var(--mgdb-muted);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Where the names came from
+
+   Every synonym is credited to a person, to a data source held as one, or to
+   the paper that used the name -- never to two of those, and for about a third
+   of them to none. The compact line answers "what else is it called"; this
+   answers "who says so", which is a different and much rarer question, so it
+   is behind a disclosure.
+
+   The disclosure SWAPS the line rather than adding to it: :has() hides the
+   compact line while the list is open, so the names are never on screen twice.
+   A browser without :has() shows both, which is untidy but says the same
+   thing -- the reason no other behaviour here depends on it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .v4-aka-block:has(.v4-aka-src[open]) > .v4-aka { display: none; }
+
+.mgdb-gene-record-v4-page .v4-aka-src {
+  margin-top: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-record-v4-page .v4-aka-src > summary {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-gene-record-v4-page .v4-aka-src > summary:hover { text-decoration: underline; }
+
+/* Name and source on one row, the names in a column of their own so the eye
+   can run down either side. max-content on the first track, capped, so the
+   column is as wide as the longest name rather than a guess -- these run from
+   "tak1" to "ZmWAKL40/41/42/44/45/46". */
+.mgdb-gene-record-v4-page .v4-aka-list {
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-gene-record-v4-page .v4-aka-list li {
+  display: grid;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  padding: 3px 0;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-record-v4-page .v4-aka-name { font-weight: 600; }
+
+.mgdb-gene-record-v4-page .v4-aka-per { color: var(--mgdb-ink-soft); }
+.mgdb-gene-record-v4-page .v4-aka-nosource { color: var(--mgdb-muted); font-style: italic; }
+
+/* Under 620px the two columns would leave the citations about 12 characters
+   wide, so the source drops under its name instead. */
+@media (max-width: 620px) {
+  .mgdb-gene-record-v4-page .v4-aka-list li { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-gene-record-v4-page .v4-aka-per { padding-left: var(--mgdb-space-3); }
+}
+
+.mgdb-gene-record-v4-page .v4-empty {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   A half with nothing in it
+
+   Half of all current B73 models have no gene or locus (21,662 of 44,497), and
+   about a tenth of curated genes have no model in any assembly (2,596 of
+   26,115). Neither is a fault and neither is rare, so neither is highlighted:
+   a coloured box that fires on half the gene pages on the site stops meaning
+   anything, and on a record that also carries the wine sibling-loci callout
+   the two would compete for the same glance.
+
+   What makes it read as deliberate instead of as content that failed to arrive
+   is the centring. .v4-side is already a flex column, so flex:1 gives this the
+   whole height the other half sets, and the sentence sits in the middle of it
+   rather than stranded at the top with a column of nothing underneath. The
+   corner badge stays, so the empty half still says which half it is.
+
+   font-family: inherit on the <p>: the legacy css/index.css that every modern
+   page still loads sets a bare `p { font-family: Verdana }`, which any new
+   paragraph in page content has to override.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .v4-none {
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 7rem;
+  padding: var(--mgdb-space-6) var(--mgdb-space-4);
+  place-items: center;
+  text-align: center;
+}
+
+.mgdb-gene-record-v4-page .v4-none p {
+  max-width: 28ch;
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Stacked, the two halves are rows of a single column and the empty one no
+   longer has a tall neighbour to match, so the flex growth has nothing to grow
+   into and the padding is all that separates it. */
+@media (max-width: 860px) {
+  .mgdb-gene-record-v4-page .v4-none {
+    min-height: 0;
+    padding: var(--mgdb-space-4) var(--mgdb-space-4);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Facts
+
+   `.mgdb-record-facts` is the shell's inline pair list — label and value on one
+   line, pairs wrapping across the column. Not the 12.5rem label column v3 uses:
+   with only three or four pairs a side, the tabbed form left a wide empty gutter
+   down the middle of each half.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .v4-facts {
+  margin-top: var(--mgdb-space-4);
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+}
+
+/* A label never wraps. Once a pair takes the whole row its `dt` is free to
+   shrink, and "Transcript length" broke across two lines with the value
+   flowing beside the fragment -- worse than the wrap it was meant to cure. */
+.mgdb-gene-record-v4-page .v4-facts > div > dt { white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+   The map glyphs
+
+   One drawing, two units. Both are a caption, a line to scale with the gene
+   pinned on it, the two ends labelled, and a bar per chromosome or linkage
+   group with this one marked.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .v4-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 32%);
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: end;
+  margin-top: auto;
+  padding-top: var(--mgdb-space-4);
+}
+
+.mgdb-hub-page > section.v4-hero .v4-map-head {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: var(--mgdb-leading-snug);
+  text-transform: uppercase;
+}
+
+.mgdb-gene-record-v4-page .v4-map-line { min-width: 0; }
+
+/* Full section width, above both the line and the bars.
+
+   It used to sit inside .v4-map-line, which is the glyph's first track at
+   about 68% of the half, and both captions wrapped onto a second row there --
+   "chr1 at 281 Mb of 308 Mb · chr1:280,590,357–280,594,023 · 3,667 bp" is
+   around 420px of text in a 374px track. Spanning 1 / -1 gives it the whole
+   550px and it sets on one line. */
+.mgdb-gene-record-v4-page .v4-map-caption {
+  grid-column: 1 / -1;
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-record-v4-page .v4-map-caption strong { color: var(--mgdb-ink); }
+
+/* The top margin went with the caption: the line is the first thing in its
+   track now, and the caption carries the gap below itself. */
+.mgdb-gene-record-v4-page .v4-line {
+  position: relative;
+  height: 10px;
+  margin: 0 0 var(--mgdb-space-1);
+  border-radius: 5px;
+  background: linear-gradient(90deg, #d7e6da, #bfd5c5);
+}
+
+.mgdb-gene-record-v4-page .v4-line-pin {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(0, 0, 0, .25);
+}
+
+.mgdb-gene-record-v4-page .v4-line-ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-gene-record-v4-page .v4-bars {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 3px;
+  align-items: end;
+  height: 58px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-gene-record-v4-page .v4-bars li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+}
+
+.mgdb-gene-record-v4-page .v4-bar {
+  position: relative;
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  background: #cfe0d4;
+}
+
+.mgdb-gene-record-v4-page .v4-bars li.is-here .v4-bar { background: var(--mgdb-green); }
+
+.mgdb-gene-record-v4-page .v4-bar-pin {
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  height: 3px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .9);
+}
+
+.mgdb-gene-record-v4-page .v4-bar-label {
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.mgdb-gene-record-v4-page .v4-bars li.is-here .v4-bar-label {
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+
+.mgdb-gene-record-v4-page .v4-note { margin-top: var(--mgdb-space-4); font-size: var(--mgdb-text-sm); }
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+
+   The rule is horizontal once the halves stack: a vertical divider between two
+   things that are no longer side by side says nothing.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .mgdb-gene-record-v4-page .v4-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--mgdb-space-5) 0;
+  }
+
+  .mgdb-gene-record-v4-page .v4-split::before {
+    grid-column: 1;
+    grid-row: 2;
+    width: auto;
+    height: 4px;
+    background: linear-gradient(90deg,
+      rgba(133, 168, 144, 0) 0,
+      rgba(133, 168, 144, .9) 10%,
+      rgba(133, 168, 144, .9) 90%,
+      rgba(133, 168, 144, 0) 100%);
+  }
+
+  .mgdb-gene-record-v4-page .v4-side-gene { grid-column: 1; grid-row: 1; }
+  .mgdb-gene-record-v4-page .v4-side-model { grid-column: 1; grid-row: 3; }
+  .mgdb-gene-record-v4-page .v4-map { margin-top: var(--mgdb-space-4); }
+}
+
+/* --------------------------------------------------------------------------
+   The other loci on this gene model
+
+   A closed disclosure under the facts. Styled quietly — it is a footnote to the
+   locus above it, not a second section — and it sits above the map glyph, which
+   `margin-top: auto` keeps pinned to the foot either way.
+   -------------------------------------------------------------------------- */
+
+/* A wine callout, not a red one.
+
+   This is worth noticing: the panel is describing one classical gene, and on
+   these records it is one of several the same gene model stands for. Set as
+   plain green text among the other green text it read as a footnote, which is
+   the one thing it is not.
+
+   Wine rather than red because on this site red is not a colour, it is a
+   status. --mgdb-red-soft and --mgdb-status-error-soft are the same #fbeae8,
+   so a pale red box here would be the error box, and six loci on one gene
+   model is a curatorial fact rather than a fault. --mgdb-burgundy-soft is a
+   separate token, and wine and burgundy are already the brand's own accents
+   (page eyebrows, metric spines, .mgdb-note strong) -- so it reads as "look at
+   this" rather than "something is wrong".
+
+   The box holds the whole disclosure, open or closed, so the names stay
+   visibly part of the thing the reader opened. The links inside keep the
+   site's burgundy: 12.3:1 on this tint. */
+
+.mgdb-gene-record-v4-page .v4-loci,
+.mgdb-gene-record-v4-page .v4-anno {
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid rgba(122, 44, 67, .22);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-burgundy-soft);
+  box-shadow: inset 3px 0 0 var(--mgdb-wine);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-record-v4-page .v4-loci > summary,
+.mgdb-gene-record-v4-page .v4-anno > summary {
+  cursor: pointer;
+  color: var(--mgdb-wine);
+  font-weight: 700;
+}
+
+.mgdb-gene-record-v4-page .v4-loci > summary::marker,
+.mgdb-gene-record-v4-page .v4-anno > summary::marker { color: var(--mgdb-wine); }
+.mgdb-gene-record-v4-page .v4-loci > summary:hover,
+.mgdb-gene-record-v4-page .v4-anno > summary:hover { text-decoration: underline; }
+
+/* --------------------------------------------------------------------------
+   The other annotations of this gene
+
+   The same callout as the sibling loci opposite, on the model side. The reader
+   arrived on an identifier that MaizeGDB has annotated several times -- the
+   page is describing the one they asked for, and this is the rest.
+
+   A real table rather than the loci list: two columns with headings, and the
+   assembly is the column that carries the reason each row exists.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .v4-anno-note {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-record-v4-page .v4-anno-table {
+  width: 100%;
+  margin-top: var(--mgdb-space-2);
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-gene-record-v4-page .v4-anno-table th {
+  padding: 0 var(--mgdb-space-3) 4px 0;
+  border-bottom: 1px solid rgba(122, 44, 67, .22);
+  color: var(--mgdb-muted);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mgdb-gene-record-v4-page .v4-anno-table td {
+  padding: 4px var(--mgdb-space-3) 4px 0;
+  border-bottom: 1px solid rgba(122, 44, 67, .12);
+  line-height: var(--mgdb-leading-snug);
+  vertical-align: top;
+}
+
+.mgdb-gene-record-v4-page .v4-anno-table tr:last-child td { border-bottom: 0; }
+.mgdb-gene-record-v4-page .v4-anno-table td:first-child { white-space: nowrap; }
+.mgdb-gene-record-v4-page .v4-anno-table td a { font-weight: 600; }
+.mgdb-gene-record-v4-page .v4-anno-table td:last-child { padding-right: 0; color: var(--mgdb-ink-soft); }
+
+/* Which row is the one MaizeGDB treats as this gene's reference annotation.
+   Green, not wine: inside a wine box a second wine thing is just more box. */
+.mgdb-gene-record-v4-page .v4-anno-mark {
+  display: inline-block;
+  margin-left: var(--mgdb-space-2);
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  vertical-align: 1px;
+}
+
+/* The rule the shell draws under an open disclosure's summary would cut the
+   box in half; the tint already separates the two. */
+.mgdb-gene-record-v4-page .v4-loci-note {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-record-v4-page .v4-loci ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-gene-record-v4-page .v4-loci li {
+  padding: 2px 0;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-record-v4-page .v4-loci li a { font-weight: 600; }
+.mgdb-gene-record-v4-page .v4-loci-full { color: var(--mgdb-ink-soft); }
+
+.mgdb-gene-record-v4-page .v4-loci-ncbi {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* --------------------------------------------------------------------------
+   Section badge
+
+   A small pill in the upper right of each half saying which side you are
+   reading. Absolutely positioned so it does not take a line of its own above
+   the name; the name carries padding on that side so a long identifier wraps
+   before it reaches the badge rather than running under it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .v4-side { position: relative; }
+
+.mgdb-gene-record-v4-page .v4-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2px 10px;
+  border: 1px solid #cfe3d6;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .72);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: var(--mgdb-leading-snug);
+  white-space: nowrap;
+}
+
+/* Room for the badge. 7.5rem clears "Gene/locus" and "Gene model" at this size
+   with space to spare; without it `Zm00001eb056510` at 36px runs under the
+   pill on a narrower half. */
+.mgdb-hub-page > section.v4-hero .v4-name { padding-right: 7rem; }

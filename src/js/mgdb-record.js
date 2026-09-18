@@ -30,7 +30,12 @@
 
   var PAGE_SIZES = [10, 25, 50];
   var DEFAULT_PAGE_SIZE = 10;
-  var REFERENCE_PAGE_SIZE = 5;
+  /* 10, the same as every other table. It was 5, from when this block opened
+     on cards and five cards was a screenful; opening on the table, five rows
+     under a filter, a pager and a year histogram is more chrome than content.
+     The image gallery keeps its own 16: that is a 4-across grid and 10 would
+     leave a ragged half-row. */
+  var REFERENCE_PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   function byId(id) { return document.getElementById(id); }
   function escape(value) { return MGDB.escapeHtml(value == null ? '' : String(value)); }
@@ -143,7 +148,7 @@
             '<button class="mgdb-view-btn" type="button" data-view="table" aria-pressed="' + (state.view === 'table') + '">' +
               '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table</button>' +
             '<button class="mgdb-view-btn" type="button" data-view="grid" aria-pressed="' + (state.view === 'grid') + '">' +
-              '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Grid</button>' +
+              '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards</button>' +
             (spec.views || []).map(function (v) {
               return '<button class="mgdb-view-btn" type="button" data-view="' + escape(v.key) + '" aria-pressed="' + (state.view === v.key) + '">' +
                 (v.icon || '') + escape(v.label) + '</button>';
@@ -538,6 +543,11 @@
      of the same rows is the alternative. Both page five at a time.
      ------------------------------------------------------------------------ */
 
+  /* The API sends the bare PMID; see include/reference_ids_lib.php. */
+  function pubmedUrl(pmid) {
+    return 'https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(String(pmid)) + '/';
+  }
+
   function referenceCard(ref, seq, idPrefix) {
     var title = ref.title || ref.citation || 'Untitled reference';
     var url = ref.doi ? 'https://doi.org/' + ref.doi : '';
@@ -559,6 +569,7 @@
     }
     html += '<div class="mgdb-ref-actions">';
     if (url) { html += '<a class="mgdb-button mgdb-button-primary" href="' + escape(url) + '" target="_blank" rel="noopener">Full text</a>'; }
+    if (ref.pubmed) { html += '<a class="mgdb-button mgdb-button-quiet" href="' + escape(pubmedUrl(ref.pubmed)) + '" target="_blank" rel="noopener">PubMed</a>'; }
     html += '<a class="mgdb-button mgdb-button-quiet" href="' + escape(ref.html) + '">MaizeGDB record</a>';
     html += '<button class="mgdb-ref-copy" type="button" data-copy-target="' + citeId + '">Copy citation</button>';
     if (ref.doi) { html += '<button class="mgdb-ref-copy" type="button" data-copy-value="' + escape(ref.doi) + '">Copy DOI</button>'; }
@@ -568,10 +579,93 @@
     return html;
   }
 
-  function references(target, items, section, idPrefix) {
+  /* ------------------------------------------------------------------------
+     Publications by year
+
+     One column per year from the first to the last, gaps included, at the
+     head of the reference list, and a filter on it: a bar keeps its year,
+     a decade label keeps its decade, the same click again (or the status
+     line's button) lets go. The pointer is never the only way in: every bar
+     carries its year and count as its accessible name, the peak year is
+     labelled outright, the caption names the range, and the table view
+     lists every year.
+     ------------------------------------------------------------------------ */
+  function referenceTimeline(host, items, setRange) {
+    var counts = {};
+    items.forEach(function (r) {
+      var y = parseInt(r.year, 10);
+      if (!isNaN(y) && y > 1000) { counts[y] = (counts[y] || 0) + 1; }
+    });
+    var years = Object.keys(counts).map(Number);
+    if (years.length < 2) { return null; }
+    var first = Math.min.apply(null, years), last = Math.max.apply(null, years);
+    var span = last - first + 1;
+    var max = 0, peak = first, dated = 0;
+    years.sort(function (a, b) { return a - b; }).forEach(function (y) {
+      dated += counts[y];
+      if (counts[y] > max) { max = counts[y]; peak = y; }
+    });
+    var step = span <= 12 ? 1 : 10;
+
+    var bars = '', axis = '';
+    for (var y = first; y <= last; y++) {
+      var n = counts[y] || 0;
+      var col = y - first + 1;
+      var tip = y + ' · ' + n + ' publication' + (n === 1 ? '' : 's');
+      var edge = col <= 4 ? ' is-left' : (col > span - 4 ? ' is-right' : '');
+      bars += '<button class="mgdb-ref-year' + (y === peak ? ' is-peak' : '') + edge + '" type="button" data-year="' + y + '"' +
+        ' style="--h:' + (max ? Math.round(1000 * n / max) / 10 : 0) + '%" aria-pressed="false"' +
+        ' aria-label="' + tip + (n ? ', filter to this year' : '') + '" data-tip="' + tip + '"' + (n ? '' : ' disabled') + '>' +
+        '<i></i>' + (y === peak ? '<span class="mgdb-ref-year-label">' + n + '</span>' : '') + '</button>';
+      if (y % step === 0) {
+        var to = Math.min(last, y + step - 1);
+        var inRange = 0;
+        for (var k = y; k <= to; k++) { inRange += counts[k] || 0; }
+        axis += '<button class="mgdb-ref-decade" type="button" style="grid-column:' + col + '" data-from="' + y + '" data-to="' + to + '" aria-pressed="false"' +
+          ' aria-label="' + (step === 1 ? y : y + ' to ' + to) + ', ' + inRange + ' publication' + (inRange === 1 ? '' : 's') + (inRange ? ', filter to ' + (step === 1 ? 'this year' : 'this decade') : '') + '"' +
+          (inRange ? '' : ' disabled') + '>' + y + '</button>';
+      }
+    }
+    host.innerHTML =
+      '<div class="mgdb-ref-years" role="group" aria-label="Publications by year" style="grid-template-columns:repeat(' + span + ',minmax(0,1fr))">' + bars + '</div>' +
+      '<div class="mgdb-ref-axis" style="grid-template-columns:repeat(' + span + ',minmax(0,1fr))">' + axis + '</div>' +
+      '<p class="mgdb-ref-timeline-caption">' + number(dated) + ' dated publication' + (dated === 1 ? '' : 's') + ', ' + first + ' to ' + last +
+        ' · most in <strong>' + peak + '</strong> (' + max + ')' +
+        (items.length > dated ? ' · ' + number(items.length - dated) + ' without a year' : '') +
+        ' · click a ' + (step === 1 ? 'year' : 'year or a decade') + ' to filter the list</p>';
+
+    var yearsEl = host.querySelector('.mgdb-ref-years');
+    var current = null;
+    function same(a, b) { return !!a && !!b && a[0] === b[0] && a[1] === b[1]; }
+    host.addEventListener('click', function (event) {
+      var bar = event.target.closest('[data-year]');
+      var dec = event.target.closest('[data-from]');
+      var range = bar ? [Number(bar.getAttribute('data-year')), Number(bar.getAttribute('data-year'))]
+                : dec ? [Number(dec.getAttribute('data-from')), Number(dec.getAttribute('data-to'))] : null;
+      if (!range) { return; }
+      setRange(same(range, current) ? null : range);
+    });
+    function sync(range) {
+      current = range;
+      yearsEl.classList.toggle('is-filtered', !!range);
+      Array.prototype.forEach.call(host.querySelectorAll('[data-year]'), function (b) {
+        var y = Number(b.getAttribute('data-year'));
+        b.setAttribute('aria-pressed', range && y >= range[0] && y <= range[1] ? 'true' : 'false');
+      });
+      Array.prototype.forEach.call(host.querySelectorAll('[data-from]'), function (b) {
+        b.setAttribute('aria-pressed', same(range, [Number(b.getAttribute('data-from')), Number(b.getAttribute('data-to'))]) ? 'true' : 'false');
+      });
+    }
+    return { sync: sync };
+  }
+
+  /* opts.timeline: draw the publications-by-year figure above the list and
+     let it filter the list. Off unless a page asks. */
+  function references(target, items, section, idPrefix, opts) {
     if (!items || !items.length) { return false; }
+    opts = opts || {};
     target.innerHTML = '';
-    var state = { view: 'cards', page: 1, size: REFERENCE_PAGE_SIZE, query: '' };
+    var state = { view: 'table', page: 1, size: REFERENCE_PAGE_SIZE, query: '', years: null, sortKey: null, sortDir: 'ascending' };
     var sizeOptions = [5, 10, 25].map(function (n) {
       return '<option value="' + n + '"' + (n === state.size ? ' selected' : '') + '>' + n + '</option>';
     }).join('') + '<option value="all">All</option>';
@@ -581,14 +675,21 @@
         '<h3>Publications<span class="mgdb-rec-block-count">' + number(items.length) + '</span></h3>' +
         '<div class="mgdb-rec-toolbar">' +
           '<label>Filter <input type="search" data-role="filter" placeholder="Title, author, or year" aria-label="Filter references"></label>' +
+          /* Table first and pressed, the same order and the same default as
+             every collection on the page. References opened on Cards because
+             the card is the richer view, but a reader arriving at a list of a
+             hundred publications is scanning, and the toggle reading
+             "Cards | Table" with Table lit was the odd one out of every view
+             control on the record. */
           '<div class="mgdb-view-toggle" role="group" aria-label="References view">' +
-            '<button class="mgdb-view-btn" type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards</button>' +
-            '<button class="mgdb-view-btn" type="button" data-view="table" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table</button>' +
+            '<button class="mgdb-view-btn" type="button" data-view="table" aria-pressed="true"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table</button>' +
+            '<button class="mgdb-view-btn" type="button" data-view="cards" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards</button>' +
           '</div>' +
           '<label>Show <select data-role="size" aria-label="References per page">' + sizeOptions + '</select></label>' +
           '<button class="mgdb-rec-tsv" type="button" data-role="tsv">Download TSV</button>' +
         '</div>' +
       '</div>' +
+      (opts.timeline ? '<div class="mgdb-ref-timeline" data-role="timeline" hidden></div>' : '') +
       '<p class="mgdb-rec-block-status" data-role="status" aria-live="polite"></p>' +
       '<div data-role="body"></div>' +
       '<nav class="mgdb-rec-pagination" data-role="pagination" aria-label="Reference pages" hidden></nav></div>';
@@ -598,21 +699,173 @@
     var status = block.querySelector('[data-role="status"]');
     var pagination = block.querySelector('[data-role="pagination"]');
     var head = block.querySelector('.mgdb-rec-block-head');
+    /* What the table shows.
+
+       Abstract rather than citation: the citation repeats the title, the
+       authors and the year, all of which are already in the first two columns,
+       so the widest column on the table was the one saying the least. The
+       abstract is clamped to four lines -- enough to tell whether the paper is
+       the one you want, not so much that a page of five rows becomes a page of
+       one. 94 of this record's 111 references carry one.
+
+       Actions rather than DOI: a bare DOI string is not something anyone reads,
+       it is something they follow or copy, so the column offers those two,
+       and the PubMed record where there is one. */
     var columns = [
       { key: 'title', label: 'Title', tile: true, get: function (r) { return r.title || r.citation; },
         html: function (r) { return '<a href="' + escape(r.html) + '">' + escape(r.title || r.citation) + '</a>' + (r.authors ? '<small>' + escape(r.authors) + '</small>' : ''); } },
       { key: 'year', label: 'Year', sort: 'number', numeric: true },
+      { key: 'abstract', label: 'Abstract', sort: false,
+        html: function (r) {
+          /* NOT .mgdb-ref-abstract: that class is the card view's abstract
+             block and mgdb-modern.css gives it 12px/16px of padding and a green
+             rule. With border-box sizing that padding came out of the four
+             lines this is meant to show, which is why the preview rendered
+             three and a clipped fourth.
+
+             title carries the whole of what we hold, so hovering the preview
+             reads the rest without leaving the table. The API returns the
+             first 700 characters of an abstract, so that is what "the whole of
+             it" means here. */
+          if (!r.abstract) { return '<span class="mgdb-muted">No abstract on file</span>'; }
+          /* A control, not a tooltip.
+
+             This was a `title` attribute, which was the wrong mechanism twice
+             over: it takes about a second of holding still before anything
+             appears, gives no sign in the meantime that anything is coming, and
+             on a touch screen never appears at all. With `cursor: help` over it
+             the page was promising something the reader could not tell had
+             failed to arrive.
+
+             So the rest of the abstract opens in place. The button stays hidden
+             until the pass after render finds that this particular abstract
+             really does overflow four lines -- a short one has nothing more to
+             show and should not offer to show it. */
+          var absId = idPrefix + '-abs-' + r.id;
+          return '<div class="mgdb-ref-preview-wrap">' +
+            '<div class="mgdb-ref-preview" id="' + escape(absId) + '">' + escape(r.abstract) +
+              (r.abstract.length >= 695 ? '…' : '') + '</div>' +
+            '<button class="mgdb-ref-more" type="button" aria-expanded="false" aria-controls="' +
+              escape(absId) + '" hidden>Show more</button>' +
+            '</div>';
+        } },
+      { key: 'relevance', label: 'Relevance' },
+      { key: 'actions', label: 'Actions', sort: false,
+        html: function (r) {
+          /* One button per line, so the column is one button wide and the
+             title gets the width back. PubMed is its own way to the paper:
+             on wx1, 61 of the 274 references have a PubMed ID and no DOI.
+             With neither there is nothing to follow, and a dead button would
+             be the usual case on older loci, so it says so instead. */
+          var doi = r.doi ? String(r.doi).replace(/\.$/, '') : '';
+          var out = [];
+          if (doi) {
+            out.push('<a class="mgdb-button mgdb-button-quiet mgdb-ref-cta" href="https://doi.org/' + escape(doi) +
+              '" target="_blank" rel="noopener">View paper</a>');
+          }
+          if (r.pubmed) {
+            out.push('<a class="mgdb-button mgdb-button-quiet mgdb-ref-cta" href="' + escape(pubmedUrl(r.pubmed)) +
+              '" target="_blank" rel="noopener">PubMed</a>');
+          }
+          if (doi) {
+            out.push('<button class="mgdb-button mgdb-button-quiet mgdb-ref-cta mgdb-ref-copy" type="button" data-copy-value="' +
+              escape(doi) + '">Copy DOI</button>');
+          }
+          if (!out.length) { return '<span class="mgdb-muted">No DOI or PubMed ID on file</span>'; }
+          return '<div class="mgdb-ref-cellactions">' + out.join('') + '</div>';
+        } }
+    ];
+
+    /* The download keeps what the table gave up, and gains what the cards had:
+       the citation and the DOI are still the fields a reader wants in a
+       spreadsheet, and the authors and the abstract were never in the TSV at
+       all. Actions is not a value and is not in it. */
+    var tsvColumns = [
+      { key: 'title', label: 'Title', get: function (r) { return r.title || r.citation; } },
+      { key: 'authors', label: 'Authors' },
+      { key: 'year', label: 'Year' },
       { key: 'citation', label: 'Citation' },
       { key: 'relevance', label: 'Relevance' },
-      { key: 'doi', label: 'DOI', html: function (r) { return r.doi ? link('https://doi.org/' + r.doi, r.doi, true) : '—'; } }
+      { key: 'doi', label: 'DOI' },
+      { key: 'pubmed', label: 'PubMed ID' },
+      { key: 'abstract', label: 'Abstract' }
     ];
 
     function filtered() {
-      if (!state.query) { return items.slice(); }
-      var needle = state.query.toLowerCase();
-      return items.filter(function (r) {
-        return [r.title, r.authors, r.citation, r.year, r.relevance, r.doi].some(function (v) { return plainText(v).toLowerCase().indexOf(needle) !== -1; });
-      });
+      var rows = items.slice();
+      if (state.years) {
+        rows = rows.filter(function (r) { var y = parseInt(r.year, 10); return y >= state.years[0] && y <= state.years[1]; });
+      }
+      if (state.query) {
+        var needle = state.query.toLowerCase();
+        rows = rows.filter(function (r) {
+          return [r.title, r.authors, r.citation, r.year, r.relevance, r.doi, r.pubmed].some(function (v) { return plainText(v).toLowerCase().indexOf(needle) !== -1; });
+        });
+      }
+      if (state.sortKey) {
+        var col = columns.filter(function (c) { return c.key === state.sortKey; })[0];
+        if (col) {
+          var dir = state.sortDir === 'ascending' ? 1 : -1;
+          var numeric = col.sort === 'number';
+          rows.sort(function (a, b) {
+            var av = plainText(col.get ? col.get(a) : a[col.key]);
+            var bv = plainText(col.get ? col.get(b) : b[col.key]);
+            if (av === '' && bv === '') { return 0; }
+            if (av === '') { return 1; }
+            if (bv === '') { return -1; }
+            if (numeric) {
+              var an = parseFloat(av.replace(/,/g, '')), bn = parseFloat(bv.replace(/,/g, ''));
+              if (!isNaN(an) && !isNaN(bn)) { return (an - bn) * dir; }
+            }
+            return av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' }) * dir;
+          });
+        }
+      }
+      return rows;
+    }
+
+    /* The table this block draws for itself.
+
+       It used to hand the rows to collection() and hide its own head. That
+       traded one set of controls for another: collection() brings its own
+       Table/Grid toggle, so choosing Table replaced the Cards/Table control
+       with a Table/Grid one, and because collection() renders inside the body
+       -- below the year histogram -- the controls moved under the chart as
+       well. Same rows, same columns, drawn here instead, so the filter, the
+       page size, the pager, the TSV button, the histogram and the Cards/Table
+       toggle are the same controls in the same place in both views. */
+    function referencesTable(pageRows) {
+      var headHtml = columns.map(function (col) {
+        /* Abstract and Actions opt out: sorting a table by the first letter of
+           its abstracts is not a thing anyone wants, and Actions has no value
+           to sort on at all. */
+        if (col.sort === false) {
+          return '<th scope="col" class="mgdb-ref-col-' + escape(col.key) + '">' + escape(col.label) + '</th>';
+        }
+        var aria = state.sortKey === col.key ? state.sortDir : 'none';
+        return '<th scope="col"' + (col.numeric ? ' class="mgdb-numeric"' : '') +
+          ' data-sort="' + (col.sort || 'text') + '" aria-sort="' + aria + '">' +
+          '<button type="button" data-sort-key="' + escape(col.key) + '">' + escape(col.label) + '</button></th>';
+      }).join('');
+      var bodyHtml = pageRows.map(function (item) {
+        return '<tr>' + columns.map(function (col, i) {
+          var text = plainText(col.get ? col.get(item) : item[col.key]);
+          var cell = col.html ? col.html(item) : (text === '' ? '<span class="mgdb-muted">&mdash;</span>' : escape(text));
+          var cls = (col.numeric ? ' mgdb-numeric' : '') + ' mgdb-ref-col-' + col.key;
+          return i === 0 ? '<th scope="row" class="mgdb-ref-col-' + col.key + '">' + cell + '</th>'
+                         : '<td class="' + cls.trim() + '">' + cell + '</td>';
+        }).join('') + '</tr>';
+      }).join('');
+      return '<div class="mgdb-table-scroll" tabindex="0" role="region" aria-label="References table">' +
+        '<table class="mgdb-table mgdb-rec-table"><thead><tr>' + headHtml + '</tr></thead><tbody>' + bodyHtml + '</tbody></table></div>';
+    }
+    function scopeText() {
+      if (!state.years) { return ''; }
+      return state.years[0] === state.years[1] ? ' from ' + state.years[0] : ' from ' + state.years[0] + ' to ' + state.years[1];
+    }
+    function emptyText() {
+      if (state.query) { return 'No reference' + scopeText() + ' matches “' + escape(state.query) + '”.'; }
+      return 'No reference' + scopeText() + '.';
     }
 
     function render() {
@@ -623,25 +876,53 @@
       if (state.page > pages) { state.page = pages; }
       var start = (state.page - 1) * size;
       var pageRows = rows.slice(start, start + size);
+      if (timeline) { timeline.sync(state.years); }
 
-      if (state.view === 'table') {
-        body.innerHTML = '';
-        collection(body, { title: 'References', items: rows, filename: 'references.tsv', columns: columns,
-                           pageSize: state.size === 'all' ? 'all' : state.size });
-        // The collection carries its own head, filter and pager; hide this one's.
-        head.hidden = true;
-        status.textContent = '';
-        show(pagination, false);
-        return;
-      }
-
+      /* The head stays put in both views. It carries the only view toggle this
+         block has, and a control that disappears when you use it is not a
+         control. */
       head.hidden = false;
       body.innerHTML = total === 0
-        ? '<p class="mgdb-rec-empty">No reference matches “' + escape(state.query) + '”.</p>'
-        : '<div class="mgdb-ref-list">' + pageRows.map(function (r, i) { return referenceCard(r, start + i, idPrefix); }).join('') + '</div>';
+        ? '<p class="mgdb-rec-empty">' + emptyText() + '</p>'
+        : (state.view === 'table'
+            ? referencesTable(pageRows)
+            : '<div class="mgdb-ref-list">' + pageRows.map(function (r, i) { return referenceCard(r, start + i, idPrefix); }).join('') + '</div>');
       MGDB.initCopyButtons();
-      status.textContent = total === 0 ? '' : 'Showing ' + (start + 1) + '–' + Math.min(start + size, total) + ' of ' +
-        number(total) + (total !== items.length ? ' matching' : '') + ' publications, newest first.';
+
+      Array.prototype.forEach.call(body.querySelectorAll('.mgdb-ref-preview-wrap'), function (wrap) {
+        var pre = wrap.querySelector('.mgdb-ref-preview');
+        var more = wrap.querySelector('.mgdb-ref-more');
+        if (!pre || !more) { return; }
+        more.addEventListener('click', function () {
+          var open = pre.classList.toggle('is-open');
+          more.setAttribute('aria-expanded', String(open));
+          more.textContent = open ? 'Show less' : 'Show more';
+        });
+      });
+      measurePreviews();
+
+      Array.prototype.forEach.call(body.querySelectorAll('button[data-sort-key]'), function (btn) {
+        btn.addEventListener('click', function () {
+          var next = btn.getAttribute('data-sort-key');
+          if (state.sortKey === next) {
+            state.sortDir = state.sortDir === 'ascending' ? 'descending' : 'ascending';
+          } else {
+            state.sortKey = next;
+            state.sortDir = 'ascending';
+          }
+          render();
+          MGDB.announce('References sorted by ' + btn.textContent + ', ' + state.sortDir + '.');
+        });
+      });
+      /* "newest first" is the order the payload arrives in, so it stops being
+         true the moment a column header is used. */
+      var orderText = state.sortKey
+        ? ', by ' + (columns.filter(function (c) { return c.key === state.sortKey; })[0] || {}).label.toLowerCase() +
+          (state.sortDir === 'ascending' ? ', low to high' : ', high to low')
+        : ', newest first';
+      status.innerHTML = (total === 0 ? '' : escape('Showing ' + (start + 1) + '–' + Math.min(start + size, total) + ' of ' +
+        number(total) + (total !== items.length ? ' matching' : '') + ' publications' + scopeText() + orderText + '.')) +
+        (state.years ? ' <button class="mgdb-ref-clear" type="button" data-role="clear-years">Show every year</button>' : '');
 
       if (pages <= 1) { show(pagination, false); pagination.innerHTML = ''; return; }
       var html = '<button class="mgdb-rec-page-btn" type="button" data-page="' + (state.page - 1) + '"' + (state.page === 1 ? ' disabled' : '') + ' aria-label="Previous page">&larr; Prev</button>';
@@ -685,8 +966,43 @@
       });
     });
     block.querySelector('[data-role="tsv"]').addEventListener('click', function () {
-      downloadTsv('references.tsv', columns, filtered());
+      downloadTsv('references.tsv', tsvColumns, filtered());
     });
+    status.addEventListener('click', function (event) {
+      if (event.target.closest('[data-role="clear-years"]')) { state.years = null; state.page = 1; render(); }
+    });
+    var timeline = null;
+    if (opts.timeline) {
+      var timelineHost = block.querySelector('[data-role="timeline"]');
+      timeline = referenceTimeline(timelineHost, items, function (range) { state.years = range; state.page = 1; render(); });
+      show(timelineHost, !!timeline);
+    }
+
+    /* Whether an abstract overflows its four lines can only be known once it
+       has been laid out, so Show more is unhidden by measuring rather than
+       guessed at in the markup. It runs after every render, because filtering,
+       sorting and paging all bring different rows -- and again whenever the
+       list changes width. A list rendered inside a hidden view (the gene
+       record's Genetic information) measures 0 against 0 and would never show
+       the button; the width going from 0 to real is the moment it can. A
+       resize can also move an abstract across its fourth line either way. */
+    function measurePreviews() {
+      Array.prototype.forEach.call(body.querySelectorAll('.mgdb-ref-preview-wrap'), function (wrap) {
+        var pre = wrap.querySelector('.mgdb-ref-preview');
+        var more = wrap.querySelector('.mgdb-ref-more');
+        if (!pre || !more || pre.classList.contains('is-open') || !pre.clientHeight) { return; }
+        more.hidden = pre.scrollHeight <= pre.clientHeight + 1;
+      });
+    }
+    if (window.ResizeObserver) {
+      var measuredWidth = 0;
+      new window.ResizeObserver(function () {
+        var width = body.clientWidth;
+        if (!width || width === measuredWidth) { return; }
+        measuredWidth = width;
+        measurePreviews();
+      }).observe(body);
+    }
 
     render();
     return true;
@@ -1077,7 +1393,11 @@
       notices.push(warning.detail);
     });
     if (!notices.length) { return; }
-    el.innerHTML = '<div><strong>Note</strong><span>' + notices.map(escape).join(' ') + '</span></div>';
+    /* "Note:" with the space outside the <strong>. The label and the text are
+       both inline here -- unlike the warning and error boxes, where they are
+       separate lines -- so without punctuation the two ran together as
+       "NoteOnly the first 500 alleles are shown". */
+    el.innerHTML = '<div><strong>Note:</strong> <span>' + notices.map(escape).join(' ') + '</span></div>';
     show(el, true);
   }
 

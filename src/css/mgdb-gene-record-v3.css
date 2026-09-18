@@ -1,0 +1,385 @@
+/* ==========================================================================
+   Gene record header mockup, version 3 — /gene_center/gene_v3/{id}
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-hub.css and css/mgdb-record.css. The header is one
+   flat green panel from the record shell; this file arranges its inside:
+
+     two columns      the gene locus on the left, its most current gene
+                      model on the right, each a titled list of facts whose
+                      labels share one column so the values line up
+     a genome strip   the chromosome the model sits on, drawn thin under the
+                      model facts, with the gene pinned
+     a synonym strip  a slim table under both columns, quiet on purpose
+
+   Every value is a shared token. Nothing here is sticky and nothing is
+   measured by a script.
+   ========================================================================== */
+
+.mgdb-hub-page > section.mgdb-hub-record-hero .v3-hero-body {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+}
+
+/* --------------------------------------------------------------------------
+   The two columns
+   -------------------------------------------------------------------------- */
+
+/* `align-items: stretch` -- the grid default, set here because it is load
+   bearing rather than incidental. The two columns hold different numbers of
+   facts (a locus has four or five, a gene model seven), and with `start` the
+   shorter one ended well above the other, which read as one panel having
+   failed to load. Equal height also gives the two map glyphs a common
+   baseline, which is what makes them comparable. */
+.v3-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--mgdb-space-5) var(--mgdb-space-6);
+  align-items: stretch;
+}
+
+/* A column is a flex column so its map glyph can be pushed to the foot with
+   `margin-top: auto`. Without that the glyphs sit directly under their last
+   fact row and land at two different heights again, which defeats the point of
+   stretching the panels. */
+.v3-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius);
+  background: rgba(255, 255, 255, .78);
+  box-shadow: var(--hub-shadow);
+}
+
+.v3-col > .v3-map { margin-top: auto; }
+
+.v3-col-locus { border-left: 4px solid var(--mgdb-green); }
+.v3-col-model { border-left: 4px solid var(--mgdb-gold); }
+
+.mgdb-hub-page > section.v3-hero .v3-col-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  margin: 0 0 var(--mgdb-space-3);
+  padding-bottom: var(--mgdb-space-2);
+  border-bottom: 1px solid #dfe9e2;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-hub-page > section.v3-hero .v3-col-title small {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* The facts: label column, value column, one row per fact. Labels share a
+   width inside each column so the values start on one line. */
+.v3-facts {
+  display: grid;
+  grid-template-columns: 12.5rem minmax(0, 1fr);
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+}
+
+.v3-facts > div {
+  display: contents;
+}
+
+.v3-facts dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  padding-top: 2px;
+}
+
+.v3-facts dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 600;
+  line-height: var(--mgdb-leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.v3-facts dd small {
+  display: block;
+  margin-top: 1px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+.v3-facts dd small.is-inline { display: inline; margin-left: var(--mgdb-space-2); }
+
+.v3-facts dd .mgdb-record-id { font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-base); }
+.v3-facts dd .mgdb-pill { vertical-align: middle; margin-left: var(--mgdb-space-2); }
+
+/* The record's name is the first fact of its column and the page's h1. It is
+   sized as a title, not as a fact, and its full name sits beside it. */
+.mgdb-hub-page > section.v3-hero .v3-facts dd h1 {
+  display: inline;
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.v3-facts dd .v3-fullname {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 500;
+}
+
+/* A group of related facts -- the genetic data -- reads as one row with
+   three short values rather than three rows. */
+.v3-facts dd .v3-inline-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v3-facts dd .v3-inline-facts li { display: inline-flex; flex-direction: column; }
+.v3-facts dd .v3-inline-facts li span:first-child {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.v3-empty {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   The genome strip: the ten chromosomes at pocket size and the one this
+   gene sits on drawn long, the gene pinned in gold on both
+   -------------------------------------------------------------------------- */
+
+.v3-genome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 34%);
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: end;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid #dfe9e2;
+}
+
+/* The label sits above both halves of the glyph, spanning the full grid, so
+   "Physical map" and "Genetic map" line up across the two columns.
+
+   Scoped `.mgdb-hub-page > section.v3-hero`, the same way .v3-col-title is, and
+   for the same reason: the hub shell styles a bare `h3` inside a hero section
+   at 22px, which beat a plain `.v3-map-head` and left this sub-label larger
+   than the "Gene locus" panel title above it -- 22px against 13px, exactly
+   inverted hierarchy. It matches the column title now. */
+.mgdb-hub-page > section.v3-hero .v3-map-head {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: var(--mgdb-leading-snug);
+  text-transform: uppercase;
+}
+
+.v3-genome-line { min-width: 0; }
+
+.v3-chrline {
+  position: relative;
+  height: 10px;
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-1);
+  border-radius: 5px;
+  background: linear-gradient(90deg, #d7e6da, #bfd5c5);
+}
+
+.v3-chrline-pin {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(0, 0, 0, .25);
+}
+
+.v3-chrline-ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.v3-genome-caption {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.v3-genome-caption strong { color: var(--mgdb-ink); }
+
+.v3-karyotype {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
+  height: 46px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v3-karyotype li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  height: 100%;
+}
+
+.v3-karyotype .v3-chr-bar {
+  position: relative;
+  width: 6px;
+  border-radius: 3px;
+  background: #cdd6ce;
+}
+
+.v3-karyotype li.is-here .v3-chr-bar { background: var(--mgdb-green); }
+
+.v3-karyotype .v3-chr-pin {
+  position: absolute;
+  right: -3px;
+  left: -3px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.v3-karyotype .v3-chr-label {
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.v3-karyotype li.is-here .v3-chr-label { color: var(--mgdb-green-dark); font-weight: 700; }
+
+/* --------------------------------------------------------------------------
+   Synonyms: a slim table under both columns, deliberately quiet
+   -------------------------------------------------------------------------- */
+
+.v3-synonyms {
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid #cfe3d6;
+}
+
+.mgdb-hub-page > section.v3-hero .v3-synonyms-head {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-hub-page > section.v3-hero .v3-synonyms-head .mgdb-rec-block-count { letter-spacing: 0; text-transform: none; }
+
+.v3-synonyms table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-sm);
+}
+
+.v3-synonyms th,
+.v3-synonyms td {
+  padding: 4px var(--mgdb-space-3) 4px 0;
+  border-bottom: 1px solid #e3ede6;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.v3-synonyms th {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.v3-synonyms tbody tr:last-child td { border-bottom: 0; }
+
+.v3-synonyms td:first-child { font-weight: 700; color: var(--mgdb-ink); }
+
+.v3-synonyms .v3-syn-name { width: 26%; }
+.v3-synonyms .v3-syn-authority { width: 20%; }
+
+.v3-note { margin: 0; font-size: var(--mgdb-text-sm); }
+
+/* --------------------------------------------------------------------------
+   Narrow screens: the columns stack, the label column narrows
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .v3-columns { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .mgdb-hub-page > section.mgdb-hub-record-hero .v3-hero-body { padding: var(--mgdb-space-4); }
+  .v3-col { padding: var(--mgdb-space-3) var(--mgdb-space-4); }
+  .v3-facts { grid-template-columns: 8rem minmax(0, 1fr); gap: var(--mgdb-space-2) var(--mgdb-space-3); }
+  .v3-genome { grid-template-columns: minmax(0, 1fr); }
+  /* Beside the name the kind pill overruns a 375px column; under it, it fits. */
+  .mgdb-hub-page > section.v3-hero .v3-facts dd h1 { display: block; }
+  .v3-facts dd .mgdb-pill {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    margin: 4px 0 0;
+    line-height: 1.35;
+    text-align: left;
+    white-space: normal;
+  }
+  .v3-synonyms .v3-syn-name,
+  .v3-synonyms .v3-syn-authority { width: auto; }
+}
+
+
+/* --------------------------------------------------------------------------
+   Also known as
+
+   Every synonym on one line. The separators are their own spans so they can be
+   dimmed without dimming the names, and `aria-hidden` keeps a screen reader
+   from reading "middle dot" nine times.
+   -------------------------------------------------------------------------- */
+
+.v3-aka { display: inline; }
+
+.v3-aka-sep {
+  margin-inline: .15em;
+  color: var(--mgdb-line);
+}

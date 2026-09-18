@@ -1,0 +1,16 @@
+Options -Indexes
+
+# The paralog release is read by PHP on behalf of the gene record's
+# "Homeologs and tandem arrays" section (include/api/v1/lib/mgdb_paralogs.php).
+# Everything here is denied to the browser -- the SQLite files and the sources
+# above all -- except the public table of placed pairs.
+<FilesMatch ".*">
+  Require all denied
+</FilesMatch>
+
+<Files "homeolog_pairs.tsv">
+  Require all granted
+  Header set Cache-Control "public, max-age=3600"
+  Header set Content-Disposition "attachment; filename=\"B73v5_maize1_maize2_homeolog_pairs.tsv\""
+  ForceType "text/tab-separated-values; charset=utf-8"
+</Files>

@@ -36,6 +36,9 @@
  * makes the index usable, and it is what the header search already does.
  */
 
+/* Pan-genes are matched by the pan-gene hub's own query, not a copy of it. */
+include_once(__DIR__ . '/../pan_gene/pan_gene_search_lib.php');
+
 /* --------------------------------------------------------------------------
    Query text
    -------------------------------------------------------------------------- */
@@ -309,14 +312,27 @@ function saTypeRegistry() {
             'type_name' => null,
             'blurb' => 'Assemblies and annotation sets.',
         ),
+        /* Pan-genes have no MaizeGDB id and no text in all_text_search; they
+           are chado records matched by identifier. The terms are the pan-gene
+           hub's — a locus, gene model, transcript, protein, exemplar or
+           pan-gene name — and the match is the hub's own query, so the count
+           here is the count the hub reports for the same term. */
+        'pan_gene' => array(
+            'label' => 'Pan-genes',
+            'cat' => 'pan_gene',
+            'view' => 'pan_gene',
+            'sources' => array(),          // served by its own handler
+            'type_name' => null,
+            'blurb' => 'Groups of corresponding gene models across maize and Zea genome annotations.',
+        ),
     );
 }
 
 /* The order sections appear in when their counts tie or when no term ranking
    applies. Broadly: what a reader is most often looking for, first. */
 function saTypeOrder() {
-    return array('gene', 'genome', 'locus', 'reference', 'stock', 'probe', 'variation', 'phenotype',
-                 'term', 'qtl_exp', 'gene_product', 'map', 'person', 'recomb',
+    return array('gene', 'pan_gene', 'genome', 'locus', 'reference', 'stock', 'probe', 'variation',
+                 'phenotype', 'term', 'qtl_exp', 'gene_product', 'map', 'person', 'recomb',
                  'primer', 'journal', 'species');
 }
 
@@ -1116,6 +1132,9 @@ function saTypeRows($DBConn, $term, $key, $page, $pageSize, $includeComments, $k
     if ($key === 'genome') {
         return saGenomeRows($DBConn, $term, $page, $pageSize);
     }
+    if ($key === 'pan_gene') {
+        return saPanGeneRows($DBConn, $term, $page, $pageSize);
+    }
 
     $type = $registry[$key];
     $shape = saTypeQuery($key, $type, $term);
@@ -1490,6 +1509,87 @@ function saGenomeRows($DBConn, $term, $page, $pageSize) {
         );
     }
     return array('rows' => $rows, 'total' => count($all));
+}
+
+/* --------------------------------------------------------------------------
+   Pan-genes
+
+   The pan-gene hub's simple search, read a page at a time. Everything that
+   decides which pan-genes match and in what order — panGeneSimpleMatchSql,
+   panGeneSimplePickedSql, panGeneResultSql, panGeneOrderBy — is the hub's own
+   code, so a term finds here exactly the pan-genes the hub lists for it, in
+   the hub's default order, and the section total is the hub's total. The one
+   difference is the case of the term: both now accept lg1, LG1 and Lg1.
+
+   Every arm is an index probe, so a term that is not a pan-gene identifier —
+   most of what anyone types here — costs about 3 ms. The broadest real
+   identifiers are the pathway ids in the protein column: PWY-3781 reaches 548
+   pan-genes in about 100 ms.
+
+   The page is asked for one row more than it shows, and when fewer come back
+   the total is known without counting: most terms match one pan-gene or none.
+   -------------------------------------------------------------------------- */
+
+function saPanGeneRows($DBConn, $term, $page, $pageSize) {
+    /* The hub strips wildcards the same way; a term is a term on both. */
+    $term = trim(str_replace('%', '', (string) $term));
+    if ($term === '') {
+        return array('rows' => array(), 'total' => 0);
+    }
+
+    $params = array();
+    $counter = 0;
+    $picked = panGeneSimplePickedSql(panGeneSimpleMatchSql($term, $params, $counter));
+    $offset = ($page - 1) * $pageSize;
+
+    $rowParams = $params;
+    $rowParams['result_limit'] = $pageSize + 1;
+    $rowParams['result_offset'] = $offset;
+    $sth = $DBConn->prepare(panGeneResultSql($picked, panGeneOrderBy('members')));
+    $sth->execute($rowParams);
+    $found = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($found) > $pageSize) {
+        array_pop($found);
+        $total = null;
+    }
+    elseif ($found || $page === 1) {
+        $total = $offset + count($found);
+    }
+    else {
+        /* An empty page past the first says only that this offset is beyond
+           the end. */
+        $total = null;
+    }
+    if ($total === null) {
+        $sth = $DBConn->prepare(panGeneCountSql($picked));
+        $sth->execute($params);
+        $total = (int) $sth->fetchColumn();
+    }
+
+    $rows = array();
+    foreach ($found as $row) {
+        $exemplar = trim((string) $row['exemplar_gene_model']);
+        $rows[] = array(
+            'id' => null,
+            /* The record page is titled by the exemplar gene model, never the
+               internal pan-gene name, so the card is too. The link keeps the
+               transcript the hub links with; both reach the same record. */
+            'name' => panGeneExemplarGene($exemplar),
+            'exemplar' => $exemplar,
+            'url' => '/pan_gene_center/pan_gene/' . rawurlencode($exemplar),
+            'analysis' => trim((string) $row['pan_gene_analysis']),
+            'member_count' => (int) $row['pan_gene_count'],
+            'annotation_count' => (int) $row['assembly_count'],
+            'annotation_total' => (int) $row['max_annots'],
+            'loci' => panGeneParseArray($row['loci']),
+            'matched_as' => array_values(array_filter(array_map('trim',
+                explode(',', (string) $row['matched_as'])))),
+            /* Every arm is an equality on an identifier. */
+            'exact' => true,
+        );
+    }
+    return array('rows' => $rows, 'total' => (int) $total);
 }
 
 /* --------------------------------------------------------------------------

@@ -4,10 +4,16 @@
   padding-bottom: clamp(3rem, 6vw, 5.5rem);
 }
 
+/* The kernels mark. It was a square SVG network drawing, sized as a 6.5rem
+   square; the kernels are 368x213, so a fixed height would squash them. Width
+   sets the size and the height follows the file.
+
+   mix-blend-mode comes from the shared .mgdb-hero-emblem img rule (multiply),
+   which drops the PNG's edge fringe into the emblem's pale gradient. */
 .mgdb-modern .sitemap-hero-mark {
   display: block;
-  width: 6.5rem;
-  height: 6.5rem;
+  width: min(100%, 7rem);
+  height: auto;
   margin: 0 auto 0.7rem;
 }
 

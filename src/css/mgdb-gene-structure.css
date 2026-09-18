@@ -73,6 +73,27 @@
 }
 
 .gs-chip:hover:not([aria-pressed="true"]) { background: var(--mgdb-surface-alt, #fbf9f5); }
+
+/* A chip that is a link, not a toggle: same shape as the others in the row so
+   the control bar reads as one set, but it goes somewhere rather than changing
+   what is on screen, so it carries no pressed state and keeps link colour. */
+/* `a.gs-chip-link`, not `.gs-chip-link`: the shell's `.mgdb-page a` underlines
+   every link in page content and is one class plus one element, so a bare class
+   selector here has one element fewer and silently loses -- the control kept
+   its chip border and its chip padding and still came out underlined, which is
+   the one thing that made it look like a link rather than a control. */
+a.gs-chip-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--mgdb-burgundy, #501719);
+  text-decoration: none;
+}
+
+a.gs-chip-link:hover {
+  border-color: var(--mgdb-green-dark, #174634);
+  background: var(--mgdb-green-soft, #edf6f1);
+  text-decoration: none;
+}
 .gs-chip[aria-pressed="true"] { border-color: var(--gs-cds); background: var(--gs-cds); color: #fff; }
 .gs-chip:focus-visible { outline: 3px solid var(--mgdb-focus, #f2a515); outline-offset: 2px; }
 .gs-chip-canonical::after { content: " \2605"; font-size: .8em; }
@@ -290,10 +311,41 @@
   overflow: hidden;
   border: 1px solid var(--gs-rule);
   border-radius: var(--mgdb-radius, 8px);
-  background: #0b1210;
+  /* The stage was #0b1210, a near-black panel dropped into the middle of a
+     page that is white everywhere else. The 3D canvas paints its own
+     background over this, so both had to change together -- see
+     createViewer() in js/mgdb-gene-structure.js. */
+  background: var(--mgdb-surface, #fff);
 }
 
 .gs-model-stage[hidden] { display: none; }
+
+/* The hub's viewer, mounted in this panel by the Full view control. Its own
+   stylesheet does all the work; this only gives it room and keeps it from
+   inheriting the compact stage's fixed 460px. */
+.gs-fullview {
+  margin-top: var(--mgdb-space-3);
+}
+
+.gs-fullview[hidden] { display: none; }
+
+/* The hub sizes its viewport for a page that is nothing but the viewer. Inside
+   a record section it gets a height that leaves the rail and the residue strip
+   on screen together.
+
+   The background matters as well as the height: the canvas is painted white by
+   the { background } option passed when this is mounted, but the hub's own
+   .ps-viewport is black underneath it, which shows at any edge the canvas does
+   not cover and during the moment before it draws. */
+/* `.mgdb-modern .gs-fullview`, three classes: the hub's own rule is
+   `.mgdb-modern .ps-viewport` at two, and its stylesheet is injected into
+   <head> when Full view is first opened -- so it arrives AFTER this one and
+   wins every tie. Both of these declarations lost that tie before the scope
+   was added. */
+.mgdb-modern .gs-fullview .ps-viewport {
+  min-height: 460px;
+  background: var(--mgdb-surface, #fff);
+}
 
 .gs-model-viewport { position: absolute; inset: 0; }
 
@@ -304,6 +356,9 @@
   z-index: 2;
   padding: 3px 9px;
   border-radius: 999px;
+  /* A white pill on what used to be a near-black stage. On a white stage it
+     needs an edge, or the status floats with nothing holding it. */
+  border: 1px solid var(--gs-rule);
   background: rgba(255, 255, 255, .88);
   color: var(--gs-ink);
   font-size: var(--mgdb-text-xs);

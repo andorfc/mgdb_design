@@ -1,0 +1,66 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gene-record-v5
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(gene_title) &mdash; MaizeGDB gene record">
+<meta property="og:description" content="$(gene_summary)">
+
+;; The gene record page, /gene_center/gene/{id}: the v4 header, the page's
+;; navigation, and the record itself. Built as the gene_v5 mockup; live from
+;; 2026-09-17.
+;;
+;; Four page classes, each earning its keep:
+;;   .mgdb-record-page        the shell's record chrome
+;;   .mgdb-gene-record-page   everything in mgdb-gene-record.css -- the eFP
+;;                            browser, the structure viewer, the phenotype
+;;                            gallery, the pangenome figure. 45 rules are
+;;                            scoped to it, and without it every one of those
+;;                            components renders as unstyled markup
+;;   .mgdb-gene-record-v4-page  the header panel, styled from v4's stylesheet
+;;                            rather than from a second copy of those rules
+;;   .mgdb-gene-record-v5-page  the navigation and the empty states
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-record-page mgdb-gene-record-page mgdb-gene-record-v4-page mgdb-gene-record-v5-page" id="gene-record-top" data-requested-id="$(requested_identifier)" data-gene-id="$(gene_api_id)" data-gene-state="$(gene_state)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Gene and Locus Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(gene_title)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero v4-hero" aria-labelledby="gene-record-title">
+    <div class="mgdb-hero-body v4-hero-body">
+      $(status_notice)
+      <div class="v4-split">
+        <div class="v4-side v4-side-gene">$(locus_side)</div>
+        <div class="v4-side v4-side-model">$(model_side)</div>
+      </div>
+    </div>
+  </section>
+
+  ;; One sticky block holding both bars: the four views, and the sections of
+  ;; whichever view is open. Two stacked sticky elements -- what v2 does --
+  ;; need each one's height measured against the other's; one does not.
+  <div class="v5-nav" id="v5-nav">
+    <div class="v5-views" role="tablist" aria-label="Views of this record">$(view_tabs)</div>
+    $(view_bars)
+  </div>
+
+  ;; The header above is rendered by the server. Everything below it comes from
+  ;; one /api/v1/records/gene response, rendered by js/mgdb-gene-record-v5.js.
+  <div class="mgdb-loading" id="gene-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+  <div class="mgdb-message mgdb-message-error" id="gene-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The header above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="gene-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+  <div class="mgdb-message mgdb-message-info" id="gene-record-notice" role="status" hidden></div>
+  <div class="mgdb-message mgdb-message-warn mgdb-rec-alert" id="gene-record-version-notice" role="note" hidden></div>
+
+  $(view_panels)
+
+  <p class="v5-report"><a class="mgdb-report-link" id="gene-record-report" href="/curation/GeneModelIssue/edit" target="_blank" rel="noopener">Report a gene model error</a></p>
+
+  ;; The shared image lightbox, used by the phenotype gallery.
+  <dialog class="mgdb-rec-lightbox" id="gene-record-image-dialog" aria-labelledby="gene-lightbox-title"><div class="mgdb-rec-lightbox-content"><button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button><div class="mgdb-rec-lightbox-image"><img alt=""></div><div class="mgdb-rec-lightbox-details"><div class="mgdb-rec-lightbox-meta"><span class="mgdb-rec-image-badge"></span><h3 id="gene-lightbox-title"></h3></div><p class="mgdb-rec-lightbox-caption"></p><div class="mgdb-rec-lightbox-actions"><a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record</a><a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file</a><button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button></div></div></div></dialog>
+
+</main>
+)

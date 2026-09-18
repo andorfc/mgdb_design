@@ -71,8 +71,11 @@
      watching only this file kept serving the old DOI count after the query
      learned to read both DOI stores. */
   $ref_lib = __DIR__ . '/../../search/reference/reference_search_lib.php';
+  /* The DOI definition itself lives in include/reference_ids_lib.php, so its
+     mtime is in the key too. */
+  $ids_lib = __DIR__ . '/../../include/reference_ids_lib.php';
   $page_data = dashboardCache($system, 'reference/page_' . (int) @filemtime(__FILE__)
-      . '_' . (int) @filemtime($ref_lib), function () use ($DBConn) {
+      . '_' . (int) @filemtime($ref_lib) . '_' . (int) @filemtime($ids_lib), function () use ($DBConn) {
       $doiSelect = referenceDoiSql('r');
       $stats_sql = "
         SELECT COUNT(*) AS reference_count,

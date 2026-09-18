@@ -77,12 +77,15 @@ function saRespond($payload, $status = 200) {
    in each. The total is what the sections between them hold, which is the only
    thing it claims to be; making it a count of distinct records instead would
    stop it agreeing with the numbers printed beside it. */
-function saRail($DBConn, $term, $includeComments, $registry, $genes = null, $genomes = null) {
+function saRail($DBConn, $term, $includeComments, $registry, $genes = null, $genomes = null,
+                $panGenes = null) {
     $counts = saCountsByType($DBConn, $term, $includeComments);
-    if ($genes === null)   { $genes = saGeneRows($DBConn, $term, 1, 1); }
-    if ($genomes === null) { $genomes = saGenomeRows($DBConn, $term, 1, 1); }
+    if ($genes === null)    { $genes = saGeneRows($DBConn, $term, 1, 1); }
+    if ($genomes === null)  { $genomes = saGenomeRows($DBConn, $term, 1, 1); }
+    if ($panGenes === null) { $panGenes = saPanGeneRows($DBConn, $term, 1, 1); }
     $counts['gene'] = (int) $genes['total'];
     $counts['genome'] = (int) $genomes['total'];
+    $counts['pan_gene'] = (int) $panGenes['total'];
 
     $types = array();
     foreach (saTypeOrder() as $key) {
@@ -190,7 +193,9 @@ try {
         );
         if ($withRail) {
             $payload['types'] = saRail($DBConn, $term, $includeComments, $registry,
-                                       $key === 'gene' ? $result : null);
+                                       $key === 'gene' ? $result : null,
+                                       $key === 'genome' ? $result : null,
+                                       $key === 'pan_gene' ? $result : null);
             $payload['grand_total'] = 0;
             foreach ($payload['types'] as $type) {
                 $payload['grand_total'] += $type['count'];
@@ -209,20 +214,27 @@ try {
 
     /* Genes carry a second half the resolved table cannot hold — model
        identifiers live in chado.gene_model and have no MaizeGDB id — and
-       genomes are not in all_text_search at all, so both are counted by their
-       own handler. Their first rows are wanted here anyway, so they are
-       fetched once and handed to the rail rather than counted twice. */
+       genomes and pan-genes are not in all_text_search at all, so all three
+       are counted by their own handler. Their first rows are wanted here
+       anyway, so they are fetched once and handed to the rail rather than
+       counted twice. */
     $genes = saGeneRows($DBConn, $term, 1, SUMMARY_ROWS);
     $genomes = saGenomeRows($DBConn, $term, 1, SUMMARY_ROWS);
-    $types = saRail($DBConn, $term, $includeComments, $registry, $genes, $genomes);
+    $panGenes = saPanGeneRows($DBConn, $term, 1, SUMMARY_ROWS);
+    $types = saRail($DBConn, $term, $includeComments, $registry, $genes, $genomes, $panGenes);
     $order = saTypeOrder();
 
     /* Sections lead with the types most likely to be the answer: an exact gene
-       or genome hit first, then whatever has the most records. */
+       or genome hit first, then pan-genes, then whatever has the most
+       records. A pan-gene only ever matches an identifier typed in full, so
+       it outranks the counted types; but it follows the gene, because a
+       symbol such as hb93 names one gene and eight pan-genes, and ranking by
+       count put the eight above the gene the reader typed. */
+    $lead = array('gene' => 0, 'genome' => 0, 'pan_gene' => 1);
     $ranked = $types;
-    usort($ranked, function ($a, $b) use ($order) {
-        $aLead = ($a['key'] === 'gene' || $a['key'] === 'genome') ? 0 : 1;
-        $bLead = ($b['key'] === 'gene' || $b['key'] === 'genome') ? 0 : 1;
+    usort($ranked, function ($a, $b) use ($order, $lead) {
+        $aLead = isset($lead[$a['key']]) ? $lead[$a['key']] : 2;
+        $bLead = isset($lead[$b['key']]) ? $lead[$b['key']] : 2;
         if ($aLead !== $bLead) {
             return $aLead - $bLead;
         }
@@ -238,6 +250,8 @@ try {
             $rows = $genes['rows'];
         } elseif ($type['key'] === 'genome') {
             $rows = $genomes['rows'];
+        } elseif ($type['key'] === 'pan_gene') {
+            $rows = $panGenes['rows'];
         } else {
             /* The count is already in hand from the grouped query above. */
             $result = saTypeRows($DBConn, $term, $type['key'], 1, SUMMARY_ROWS,

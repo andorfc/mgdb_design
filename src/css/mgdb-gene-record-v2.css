@@ -1,0 +1,539 @@
+/* ==========================================================================
+   Gene record, version 2 mockup — /gene_center/gene_v2/{id}
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-hub.css, css/mgdb-record.css and
+   css/mgdb-gene-record.css. Those three settle the ground, the cards, the
+   list blocks, the eFP viewer, the presence strip and the score tracks; this
+   file adds only what the four-view layout needs:
+
+     the hero grid       identity on the left, the karyotype on the right,
+                         the at-a-glance tiles as the hero's lower band
+     the view switcher   sticky at the top, the four views as one segmented
+                         control, the classical-gene chips beside it
+     the section tabs    stuck beneath the switcher rather than at the top
+     the variation track the gene drawn once, insertions and SNP-trait
+                         positions placed along it
+     the ortholog tally  one card per species
+     the dataset matrix  ticks in a table, for the pan-gene members
+
+   Every colour and spacing value is a shared token. The two custom
+   properties written by the script are --v2-switch-h (the switcher's
+   height, which is where the section bar sticks) and --mgdb-tab-offset
+   (the shell's own scroll-offset variable, here the two bars plus 8px).
+   ========================================================================== */
+
+.mgdb-gene-record-v2-page { --v2-switch-h: 0px; }
+
+/* --------------------------------------------------------------------------
+   Hero: identity beside the karyotype, the glance tiles beneath both
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section.mgdb-hub-record-hero .v2-hero-body {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+}
+
+.v2-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 36%);
+  gap: var(--mgdb-space-5) var(--mgdb-space-6);
+  align-items: start;
+}
+
+.v2-hero-main { min-width: 0; }
+
+/* The record's kind and status pills sit beside the name at a size that
+   does not fight it. */
+.mgdb-record-page .v2-hero h1 .mgdb-pill { vertical-align: middle; }
+
+/* The karyotype card: ten chromosomes to scale, this one filled, the gene
+   pinned in gold; under it the chromosome alone, stretched, with the pin
+   placed to the base pair. */
+.v2-ideogram {
+  min-width: 0;
+  padding: var(--mgdb-space-4);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius);
+  background: rgba(255, 255, 255, .78);
+  box-shadow: var(--hub-shadow);
+}
+
+.v2-ideogram h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.v2-karyotype {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px;
+  height: 104px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v2-chr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  height: 100%;
+}
+
+.v2-chr-bar {
+  position: relative;
+  width: 10px;
+  border-radius: 5px;
+  background: #cdd6ce;
+}
+
+.v2-chr.is-here .v2-chr-bar { background: var(--mgdb-green); }
+
+.v2-chr-pin {
+  position: absolute;
+  right: -5px;
+  left: -5px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.v2-chr-label {
+  margin-top: 4px;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.v2-chr.is-here .v2-chr-label {
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+
+.v2-chrline {
+  position: relative;
+  height: 14px;
+  margin: var(--mgdb-space-4) 0 var(--mgdb-space-1);
+  border-radius: 7px;
+  background: linear-gradient(90deg, #d7e6da, #bfd5c5);
+}
+
+.v2-chrline-pin {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 2px #fff, 0 1px 4px rgba(0, 0, 0, .25);
+}
+
+.v2-chrline-ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--mgdb-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-ideogram-caption {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.v2-ideogram-caption strong { color: var(--mgdb-ink); }
+
+/* At a glance: one tile per count, each a button that opens the view the
+   section lives in and scrolls to it. The hero's lower band. */
+.v2-glance {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid #cfe3d6;
+}
+
+.v2-glance-tile {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid #cfe3d6;
+  border-left: 3px solid var(--tone, var(--mgdb-green));
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .88);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+
+.v2-glance-tile:hover,
+.v2-glance-tile:focus-visible {
+  box-shadow: var(--hub-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.v2-glance-tile strong {
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.v2-glance-tile span {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.v2-glance-tile small {
+  color: var(--mgdb-muted);
+  font-size: 11px;
+}
+
+.v2-glance-tile.is-green { --tone: var(--mgdb-green); }
+.v2-glance-tile.is-gold { --tone: var(--mgdb-gold); }
+.v2-glance-tile.is-blue { --tone: var(--mgdb-status-info); }
+.v2-glance-tile.is-burgundy { --tone: var(--mgdb-burgundy); }
+.v2-glance-tile.is-leaf { --tone: var(--mgdb-leaf); }
+.v2-glance-tile.is-orange { --tone: var(--mgdb-orange); }
+.v2-glance-tile.is-wine { --tone: var(--mgdb-wine); }
+
+/* --------------------------------------------------------------------------
+   The view switcher
+
+   Sticky at the top. The shell's section tabs are a row of separate pills;
+   the four views are one control, the same segmented toggle every list
+   block uses to switch between its table and its grid, scaled up to the
+   tap target. The section bar of the active view sticks beneath it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v2-page .v2-switch {
+  position: sticky;
+  z-index: 30;
+  top: 0;
+  margin: 0;
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--hub-line);
+  background: var(--hub-ground);
+}
+
+.v2-switch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+}
+
+.v2-switch-toggle {
+  max-width: 100%;
+  gap: 3px;
+  padding: 3px;
+  border-color: var(--hub-line);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+.v2-switch-toggle .mgdb-view-btn {
+  min-height: var(--mgdb-tap-target);
+  gap: var(--mgdb-space-2);
+  padding: 6px var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.v2-switch-toggle .mgdb-view-btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.v2-switch-toggle .mgdb-view-btn[aria-pressed="true"] {
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.v2-switch-count {
+  display: inline-flex;
+  min-width: 1.4rem;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.v2-switch-toggle .mgdb-view-btn[aria-pressed="true"] .v2-switch-count {
+  background: rgba(255, 255, 255, .22);
+  color: #fff;
+}
+
+/* The classical genes on a multi-locus gene model. Shown only while the
+   Genetic information view is open and there is more than one. */
+.v2-locus-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.v2-locus-switch > span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.v2-locus-switch .mgdb-chip { min-height: 36px; }
+
+/* The section bar of the active view sits under the switcher. The shell
+   gives the bar a top margin to separate it from a hero; here the switcher
+   is above it and the record page's own gap does that job. */
+.mgdb-gene-record-v2-page .mgdb-section-tabs.v2-tabs {
+  z-index: 20;
+  top: var(--v2-switch-h);
+  margin: 0;
+}
+
+/* Where a tab jump lands: under both bars. The shell writes its own
+   --mgdb-tab-offset from whichever bar it found first, and here there are
+   several, so the sections read a variable this page's script measures --
+   the switcher plus the active bar plus 8px. The fallback is one row of each. */
+.mgdb-gene-record-v2-page > section[id] { scroll-margin-top: var(--v2-tab-offset, 134px); }
+
+.v2-report { margin: 0; text-align: right; }
+
+/* A line under a figure that points at the table behind it, in another
+   view. A button styled as a link, because it changes the view. */
+.v2-crosslink {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.v2-jump {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.v2-jump:hover { color: var(--mgdb-green); }
+
+/* --------------------------------------------------------------------------
+   The variation track
+
+   The gene once, to scale: exons as boxes on a line, then insertions as
+   flags above it and SNP-trait positions as pins below. Colour is never the
+   only signal -- every mark carries a title and the tables under the
+   Gene model view keep every row.
+   -------------------------------------------------------------------------- */
+
+.v2-vartrack {
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  overflow-x: auto;
+}
+
+.v2-vartrack svg {
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+  font-family: var(--mgdb-font);
+}
+
+.v2-vartrack .v2-axis { stroke: #9aa39c; stroke-width: 1; }
+.v2-vartrack .v2-axis-text { fill: var(--mgdb-muted); font-size: 11px; }
+.v2-vartrack .v2-intron { stroke: #6f7a72; stroke-width: 2; }
+.v2-vartrack .v2-exon { fill: #b9c9bd; stroke: #6f7a72; stroke-width: 1; }
+.v2-vartrack .v2-cds { fill: var(--mgdb-green); stroke: var(--mgdb-green-dark); stroke-width: 1; }
+.v2-vartrack .v2-ins { fill: var(--mgdb-gold); stroke: var(--mgdb-gold-dark); stroke-width: 1; cursor: default; }
+.v2-vartrack .v2-ins.is-alt { fill: var(--mgdb-orange); }
+.v2-vartrack .v2-ins-stem { stroke: var(--mgdb-gold-dark); stroke-width: 1.5; }
+.v2-vartrack .v2-snp { fill: var(--mgdb-status-info); stroke: #fff; stroke-width: 1.5; cursor: default; }
+.v2-vartrack .v2-snp-stem { stroke: var(--mgdb-status-info); stroke-width: 1.5; }
+.v2-vartrack .v2-lane-label { fill: var(--mgdb-ink-soft); font-size: 12px; font-weight: 700; }
+.v2-vartrack .v2-strand { fill: var(--mgdb-muted); font-size: 11px; }
+
+.v2-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.v2-legend li {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.v2-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.v2-swatch.is-cds { background: var(--mgdb-green); }
+.v2-swatch.is-exon { background: #b9c9bd; }
+.v2-swatch.is-ins { background: var(--mgdb-gold); }
+.v2-swatch.is-snp { background: var(--mgdb-status-info); border-radius: 50%; }
+
+/* --------------------------------------------------------------------------
+   Ortholog tally: one card per species, its identifiers listed
+   -------------------------------------------------------------------------- */
+
+.v2-tally {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v2-tally-item {
+  min-width: 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-top: 3px solid var(--tone, var(--mgdb-green));
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+  box-shadow: var(--hub-shadow);
+}
+
+.v2-tally-item strong {
+  display: block;
+  font-size: var(--mgdb-text-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.v2-tally-item em {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.v2-tally-item ul {
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.v2-tally-item li + li { margin-top: 2px; }
+
+.v2-tally-item:nth-child(6n+1) { --tone: var(--mgdb-green); }
+.v2-tally-item:nth-child(6n+2) { --tone: var(--mgdb-gold); }
+.v2-tally-item:nth-child(6n+3) { --tone: var(--mgdb-status-info); }
+.v2-tally-item:nth-child(6n+4) { --tone: var(--mgdb-burgundy); }
+.v2-tally-item:nth-child(6n+5) { --tone: var(--mgdb-leaf); }
+.v2-tally-item:nth-child(6n+6) { --tone: var(--mgdb-orange); }
+
+/* --------------------------------------------------------------------------
+   Dataset matrix: which pan-gene members carry which data
+   -------------------------------------------------------------------------- */
+
+.v2-mark {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--mgdb-status-ok-soft);
+  color: var(--mgdb-status-ok);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-mark.is-none {
+  background: transparent;
+  color: #c5ccc6;
+}
+
+.mgdb-rec-table td.v2-mark-cell { text-align: center; }
+
+/* A short lead line inside a section, used for one sentence of orientation
+   the group has written -- the pan-gene definition, an availability note. */
+.v2-lead {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+}
+
+.v2-lead + .mgdb-rec-block { margin-top: 0; }
+
+/* Facts with a wide value, for the pan-gene analysis description. */
+.v2-facts-wide > div { grid-column: 1 / -1; }
+.v2-facts-wide dd { font-weight: 400; }
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .v2-hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .v2-ideogram { max-width: 520px; }
+}
+
+@media (max-width: 720px) {
+  .mgdb-hub-page > section.mgdb-hub-record-hero .v2-hero-body {
+    padding: var(--mgdb-space-4);
+  }
+  .v2-glance { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
+  .v2-switch-toggle {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .v2-switch-toggle .mgdb-view-btn {
+    padding: 6px var(--mgdb-space-3);
+    font-size: var(--mgdb-text-sm);
+  }
+  .v2-switch-toggle .mgdb-view-btn svg { display: none; }
+  .v2-vartrack { padding: var(--mgdb-space-2); }
+  .v2-report { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-glance-tile { transition: none; }
+  .v2-glance-tile:hover,
+  .v2-glance-tile:focus-visible { transform: none; }
+}
