@@ -26,6 +26,8 @@
  *            function     GO and other ontology terms on the members
  *            domains      PFam domains in order along each member
  *            expression   qTeller and eFP links per member
+ *            positions    where every member sits in its own assembly, for the
+ *                         chromosome placement map
  *            expression_matrix  the NAM Consortium's ten tissues for every member
  *                         in B73v5 and the 25 NAM founders, for the heatmap
  *            insertions   UniformMu and other insertions in the members
@@ -43,7 +45,7 @@
 if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   $SECTIONS = array('overview', 'members', 'analysis', 'presence', 'function', 'domains',
-                    'expression', 'expression_matrix', 'insertions', 'traits', 'proteins', 'pathways',
+                    'expression', 'expression_matrix', 'positions', 'insertions', 'traits', 'proteins', 'pathways',
                     'sequence', 'tree', 'pangenome', 'downloads', 'viewers');
   $wanted = MgdbApi::sections($SECTIONS);
   $want = array_flip($wanted);
@@ -238,7 +240,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   /* The annotation list is what the analysis section tabulates and what the
      presence section is measured against, so it is read once for either. */
   $annotations = array();
-  if (isset($want['analysis']) || isset($want['presence'])) {
+  if (isset($want['analysis']) || isset($want['presence']) || isset($want['positions'])) {
     /* One row per annotation that went into the analysis. Four of the five
        numbers are analysisprops on the annotation; the fifth, the percentage
        of that annotation's gene models the analysis placed, is the one fact
@@ -867,6 +869,24 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   // touches rather than one per member -- 26 at most, however many members.
   /////
 
+  /////
+  // Positions: where every member sits in its own assembly.
+  //
+  // No database query. chado.gene_model has positions for B73 and the 25 NAM
+  // founders only; the gene-positions releases (tools/gene_positions_index.py)
+  // cover all 66 assemblies of the analysis from their own GFF3 and .fai, so
+  // they are the one source here rather than a mix of the two. One read per
+  // assembly, however many members it holds.
+  /////
+
+  if (isset($want['positions'])) {
+    include_once('./include/api/v1/lib/mgdb_data.php');
+    include_once('./include/api/v1/lib/mgdb_positions.php');
+    $pan_chr = isset($identity['chr']) ? $identity['chr'] : null;
+    $sections['positions'] = mgdbPanGenePositions($annotations, $members, $pan_chr);
+    $counts['positions'] = $sections['positions']['placed'];
+  }
+
   if (isset($want['expression_matrix'])) {
     include_once('./include/api/v1/lib/mgdb_data.php');
     include_once('./include/api/v1/lib/mgdb_expression.php');
@@ -1038,6 +1058,123 @@ function mgdbPanGeneDomainTotals($rows) {
     return strcmp((string) $a['name'], (string) $b['name']);
   });
   return $totals;
+}
+
+/* The placement map's data: every assembly of the analysis with its
+   chromosomes, and every member at its position.
+
+   Chromosome numbers are compared across assemblies, so they have to mean the
+   same thing in each. Checked 2026-09-17 for the eight Zea relatives, whose
+   structure might have differed: each has ten chromosomes named chr1..chr10,
+   and across 18,000-26,000 single-copy pan-genes per relative the relative's
+   copy sits on the same chromosome number as B73v5's in 100.0% of them. Over
+   all members the off-chromosome share is 0.04-0.08% -- so an off-chromosome
+   member is rare in every panel, which is what makes it worth marking.
+
+   The reference chromosome is the pan-gene's own (the record's chr), and the
+   majority chromosome of the placed members is reported beside it: where the
+   two disagree the reader should know. */
+function mgdbPanGenePositions($annotations, $members, $pan_chr) {
+  $pan_num = MgdbPositions::chromNumber(preg_replace('/^chr/i', '', (string) $pan_chr));
+
+  $by_assembly = array();
+  $unplaced = array();
+  foreach ($members as $m) {
+    if ($m['assembly'] === null || $m['name'] === null) {
+      $unplaced[] = array('gene' => $m['name'], 'reason' => 'no assembly recorded');
+      continue;
+    }
+    $by_assembly[$m['assembly']][] = $m;
+  }
+
+  $genomes = array();
+  $placed = array();
+  $seen_assemblies = array();
+  foreach ($annotations as $a) {
+    $asm = $a['assembly'];
+    if (isset($seen_assemblies[$asm])) { continue; }
+    $seen_assemblies[$asm] = true;
+    $panel = mgdbPanGenePanel($asm);
+    $list = isset($by_assembly[$asm]) ? $by_assembly[$asm] : array();
+    $has = MgdbPositions::available($asm);
+    $genomes[] = array(
+      'assembly' => $asm,
+      'label' => mgdbPanGeneShortLabel($asm),
+      'panel' => $panel['label'],
+      'panel_order' => $panel['order'],
+      'species' => mgdbPanGeneSpecies($asm),
+      'member_count' => count($list),
+      'has_positions' => $has,
+      'chromosomes' => $has ? MgdbPositions::chromosomes($asm) : array()
+    );
+    if (!$has) {
+      foreach ($list as $m) { $unplaced[] = array('gene' => $m['name'], 'reason' => 'no positions release'); }
+      continue;
+    }
+    $names = array();
+    foreach ($list as $m) { $names[] = $m['name']; }
+    $pos = MgdbPositions::batch($asm, $names);
+    foreach ($list as $m) {
+      if (!isset($pos[$m['name']])) {
+        $unplaced[] = array('gene' => $m['name'], 'reason' => 'not in its assembly\'s GFF3');
+        continue;
+      }
+      list($seqid, $start, $end, $strand) = $pos[$m['name']];
+      $num = MgdbPositions::chromNumber($seqid);
+      $placed[] = array(
+        'gene' => $m['name'],
+        'transcript' => $m['transcript'],
+        'assembly' => $asm,
+        'seqid' => $seqid,
+        'chr_number' => $num,
+        'start' => $start,
+        'end' => $end,
+        'strand' => $strand,
+        'is_exemplar' => (bool) $m['is_exemplar'],
+        'html' => $m['html'],
+        'off_chromosome' => ($pan_num !== null && $num !== null) ? ($num !== $pan_num) : null
+      );
+    }
+  }
+  /* Members whose assembly is not in the analysis's annotation list at all. */
+  foreach ($by_assembly as $asm => $list) {
+    if (isset($seen_assemblies[$asm])) { continue; }
+    foreach ($list as $m) { $unplaced[] = array('gene' => $m['name'], 'reason' => 'assembly not in the analysis'); }
+  }
+
+  usort($genomes, function ($x, $y) {
+    return $x['panel_order'] === $y['panel_order']
+      ? strnatcasecmp($x['label'], $y['label']) : $x['panel_order'] - $y['panel_order'];
+  });
+  foreach ($genomes as &$g) { unset($g['panel_order']); }
+  unset($g);
+
+  $tally = array();
+  $off = 0;
+  $on_scaffold = 0;
+  foreach ($placed as $p) {
+    if ($p['chr_number'] === null) { $on_scaffold++; continue; }
+    $tally[$p['chr_number']] = (isset($tally[$p['chr_number']]) ? $tally[$p['chr_number']] : 0) + 1;
+    if ($p['off_chromosome']) { $off++; }
+  }
+  arsort($tally);
+  $majority = count($tally) ? (int) key($tally) : null;
+
+  return array(
+    'source' => 'gene-positions releases: each assembly\'s GFF3 and .fai from download.maizegdb.org',
+    'pan_gene_chr' => $pan_chr,
+    'pan_gene_chr_number' => $pan_num,
+    'majority_chr_number' => $majority,
+    'placed' => count($placed),
+    'off_chromosome' => $off,
+    'on_scaffold' => $on_scaffold,
+    'numbering_note' => 'Chromosome numbers are homologous across all 66 assemblies, the Zea relatives ' .
+                        'included: their copy sits on the same chromosome number as B73v5\'s in 100% of ' .
+                        '18,000-26,000 single-copy pan-genes each.',
+    'genomes' => $genomes,
+    'members' => $placed,
+    'unplaced' => $unplaced
+  );
 }
 
 /* The heatmap's data: one row per member gene model in B73v5 or a NAM

@@ -117,6 +117,24 @@
   }
   MGDB.exportSvgToPng = exportSvgToPng;
 
+  /* Run fn once el has a width. Record sections are built while they are
+     still hidden and shown only when the whole record has rendered, so a
+     figure that measures its box at build time gets 0 and draws at its
+     fallback width -- the placement map sat at 898 px in a 1,182 px box. A
+     ResizeObserver is not enough to catch the section appearing: its
+     callbacks run in the rendering step, which a page not being painted (a
+     background tab) does not reach. A timer does, so poll until there is a
+     width, then draw once. */
+  function whenSized(el, fn) {
+    if (el.clientWidth > 0) { fn(); return; }
+    var tries = 0;
+    (function poll() {
+      if (el.clientWidth > 0) { fn(); return; }
+      if (++tries < 300) { setTimeout(poll, 100); }
+    })();
+  }
+  MGDB.whenSized = whenSized;
+
 
   /* Clone an on-page <svg> with its styling written onto the elements.
 
@@ -3026,8 +3044,7 @@
 
     mode = 'genome';
     applyOrder();
-    draw();
-    lastW = scroller.clientWidth;
+    whenSized(scroller, function () { lastW = scroller.clientWidth; draw(); });
     if (spec.treeUrl && MGDB.parseNewick) {
       fetch(spec.treeUrl, { credentials: 'omit' })
         .then(function (r) { return r.ok ? r.text() : null; })
@@ -3058,6 +3075,397 @@
   }
 
   MGDB.panGeneHeatmap = panGeneHeatmap;
+
+  /* ------------------------------------------------------------------------
+     Chromosome placement map
+
+     spec = { positions: sections.positions, filename }
+
+     One row per assembly of the analysis, grouped in the presence strip's
+     panels. Left, the whole genome: ten chromosome slots, the same slot for the
+     same chromosome in every row so the columns line up, each bar drawn to that
+     assembly's own length. Right, a close-up of one chromosome -- the
+     pan-gene's, until the reader picks another -- either end to end on a
+     shared Mb axis, or as a local window centred on each row's own copies,
+     which is where a tandem array such as rp1's shows its copy number.
+
+     A member on a different chromosome number from the pan-gene is orange, as
+     in the presence strip. Numbers are homologous across all 66 assemblies,
+     Zea relatives included -- checked, see sections.positions.numbering_note --
+     so the colour means the same thing in every panel.
+     ------------------------------------------------------------------------ */
+
+  function panGenePlacement(container, spec) {
+    var P = spec && spec.positions;
+    if (!container || !P || !P.genomes || !P.members || !P.members.length) { return null; }
+    var genomes = P.genomes;
+    var members = P.members;
+    var detailChr = P.pan_gene_chr_number || P.majority_chr_number || 1;
+    var zoom = 'chromosome';
+    var selected = {};
+
+    var byAssembly = {};
+    members.forEach(function (m) { (byAssembly[m.assembly] = byAssembly[m.assembly] || []).push(m); });
+
+    /* Slot width per chromosome number: the longest that chromosome is in any
+       assembly, so every bar fits its slot and the columns align. */
+    var slotLen = {};
+    genomes.forEach(function (g) {
+      g.chromosomes.forEach(function (c) {
+        if (c.number != null && (!slotLen[c.number] || c.length > slotLen[c.number])) { slotLen[c.number] = c.length; }
+      });
+    });
+    var numbers = Object.keys(slotLen).map(Number).sort(function (a, b) { return a - b; });
+
+    function chrOf(g, n) {
+      for (var i = 0; i < g.chromosomes.length; i++) { if (g.chromosomes[i].number === n) { return g.chromosomes[i]; } }
+      return null;
+    }
+
+    container.insertAdjacentHTML('afterbegin',
+      '<div class="mgdb-rec-block mgdb-pg-place-block">' +
+        '<div class="mgdb-rec-block-head">' +
+          '<h3>Chromosome placement</h3>' +
+          '<div class="mgdb-pg-place-tools">' +
+            '<label>Close-up <select data-role="place-zoom" aria-label="Close-up view">' +
+              '<option value="chromosome">Whole chromosome</option>' +
+              '<option value="local">Around the copies</option>' +
+            '</select></label>' +
+            '<label>Chromosome <select data-role="place-chr" aria-label="Chromosome for the close-up">' +
+              numbers.map(function (n) {
+                return '<option value="' + n + '"' + (n === detailChr ? ' selected' : '') + '>' + n +
+                  (n === P.pan_gene_chr_number ? ' (pan-gene)' : '') + '</option>';
+              }).join('') +
+            '</select></label>' +
+            '<button class="mgdb-rec-tsv" type="button" data-role="place-png">Export PNG</button>' +
+            '<button class="mgdb-rec-tsv" type="button" data-role="place-tsv">Download TSV</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="mgdb-fig-desc">Chromosome placement map: per-genome ideograms, with every member at its ' +
+          'position and any on another chromosome marked.</p>' +
+        '<p class="mgdb-rec-block-status" data-role="place-status"></p>' +
+        '<div class="mgdb-pg-place-scroll" data-role="place-scroll"></div>' +
+        '<p class="mgdb-pg-place-detail" data-role="place-detail" aria-live="polite"></p>' +
+      '</div>');
+    var block = container.firstElementChild;
+    var scroller = block.querySelector('[data-role="place-scroll"]');
+    var detail = block.querySelector('[data-role="place-detail"]');
+    var idle = 'Hover a mark for its gene model and position; click it to select that gene model in every ' +
+      'figure; click a chromosome number to close in on it.';
+    detail.textContent = idle;
+
+    function statusText() {
+      var off = members.filter(function (m) { return m.off_chromosome; });
+      var withMembers = genomes.filter(function (g) { return g.member_count > 0; }).length;
+      var t = number(members.length) + ' member' + (members.length === 1 ? '' : 's') + ' placed in ' +
+        number(withMembers) + ' of ' + number(genomes.length) + ' assemblies';
+      if (P.pan_gene_chr) {
+        t += ' · pan-gene on chromosome ' + P.pan_gene_chr_number;
+        if (P.majority_chr_number != null && P.majority_chr_number !== P.pan_gene_chr_number) {
+          t += ', though most members are on ' + P.majority_chr_number;
+        }
+      }
+      if (off.length) {
+        var lines = {};
+        off.forEach(function (m) { lines[labelOfAssembly(m.assembly)] = true; });
+        t += ' · <strong>' + number(off.length) + ' on another chromosome</strong> (' +
+          Object.keys(lines).map(esc).join(', ') + ')';
+      } else {
+        t += ' · none on another chromosome';
+      }
+      if (P.on_scaffold) { t += ' · ' + number(P.on_scaffold) + ' on unplaced scaffolds'; }
+      if (P.unplaced && P.unplaced.length) {
+        t += ' · ' + number(P.unplaced.length) + ' with no position (' +
+          P.unplaced.slice(0, 3).map(function (u) { return esc(u.gene); }).join(', ') +
+          (P.unplaced.length > 3 ? ', …' : '') + ')';
+      }
+      return t + '.';
+    }
+
+    function labelOfAssembly(asm) {
+      for (var i = 0; i < genomes.length; i++) { if (genomes[i].assembly === asm) { return genomes[i].label; } }
+      return asm;
+    }
+
+    /* Local window: each row centred on the middle of its own copies on the
+       close-up chromosome, and one half-width for every row so they compare.
+
+       Sized to hold 90% of the rows' clusters, not the widest. Fitting the
+       widest let one far copy set the scale: on rp1 a single Xu178 copy ~2 Mb
+       out forced +/-2 Mb and squeezed every other array into the middle fifth.
+       A copy beyond the window gets a chevron at the edge instead, and is
+       still on the whole-genome ideogram at its true position. */
+    function localWindow() {
+      var spans = [];
+      genomes.forEach(function (g) {
+        var ms = (byAssembly[g.assembly] || []).filter(function (m) { return m.chr_number === detailChr; });
+        if (!ms.length) { return; }
+        var c = centreOf(ms), far = 0;
+        ms.forEach(function (m) { far = Math.max(far, Math.abs(m.start - c), Math.abs(m.end - c)); });
+        spans.push(far);
+      });
+      if (!spans.length) { return 5000; }
+      spans.sort(function (a, b) { return a - b; });
+      var p90 = spans[Math.min(spans.length - 1, Math.floor(spans.length * 0.9))];
+      return Math.min(Math.max(p90 * 1.15, 5000), 2000000);
+    }
+    function centreOf(ms) {
+      var mids = ms.map(function (m) { return (m.start + m.end) / 2; }).sort(function (a, b) { return a - b; });
+      return mids[Math.floor(mids.length / 2)];
+    }
+
+    function niceTicks(max, target) {
+      var raw = max / target, mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+      var step = [1, 2, 5, 10].map(function (k) { return k * mag; }).filter(function (s) { return s >= raw; })[0] || mag * 10;
+      var out = [];
+      for (var v = 0; v <= max + 1e-9; v += step) { out.push(v); }
+      return { step: step, ticks: out };
+    }
+    function mb(bp) { return bp >= 1e6 ? (bp / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' Mb'
+      : (bp / 1e3).toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' kb'; }
+
+    var ROW = 13, PANEL = 20, HEAD = 34, LABEL_W = 118;
+
+    function draw() {
+      var W = Math.max((scroller.clientWidth || 900) - 2, 620);
+      var genomeW = Math.round((W - LABEL_W) * 0.5) - 16;
+      var detailX = LABEL_W + genomeW + 28;
+      var detailW = W - detailX - 8;
+      var GAP = 4;
+      var totalSlot = numbers.reduce(function (s, n) { return s + slotLen[n]; }, 0);
+      var scale = (genomeW - GAP * (numbers.length - 1)) / totalSlot;
+      var slotX = {}, x = LABEL_W;
+      numbers.forEach(function (n) { slotX[n] = x; x += slotLen[n] * scale + GAP; });
+
+      var half = zoom === 'local' ? localWindow() : 0;
+      var detailMax = zoom === 'local' ? 2 * half : (slotLen[detailChr] || 1);
+      function DX(bp) { return detailX + (bp / detailMax) * detailW; }
+
+      var rows = [];
+      var lastPanel = null;
+      genomes.forEach(function (g) {
+        if (g.panel !== lastPanel) { rows.push({ panel: g.panel }); lastPanel = g.panel; }
+        rows.push({ g: g });
+      });
+      var height = HEAD;
+      rows.forEach(function (r) { height += r.panel ? PANEL : ROW; });
+      height += 8;
+
+      var any = Object.keys(selected).length > 0;
+      var out = [];
+      out.push('<svg class="mgdb-pg-place-svg" width="' + W + '" height="' + height + '" viewBox="0 0 ' + W + ' ' +
+        height + '" role="img" aria-label="Chromosome placement of ' + members.length + ' members across ' +
+        genomes.length + ' assemblies">');
+
+      /* The pan-gene's chromosome, as a band down the whole genome panel. */
+      if (P.pan_gene_chr_number && slotX[P.pan_gene_chr_number] != null) {
+        out.push('<rect class="mgdb-pg-place-band" x="' + (slotX[P.pan_gene_chr_number] - 2) + '" y="' + (HEAD - 4) +
+          '" width="' + (slotLen[P.pan_gene_chr_number] * scale + 4) + '" height="' + (height - HEAD) + '" rx="3"></rect>');
+      }
+      /* Headers: chromosome numbers (clickable), and the close-up's axis. */
+      numbers.forEach(function (n) {
+        out.push('<text class="mgdb-pg-place-chrnum' + (n === detailChr ? ' is-current' : '') + '" data-chr="' + n +
+          '" x="' + (slotX[n] + slotLen[n] * scale / 2) + '" y="14" text-anchor="middle">' + n + '</text>');
+      });
+      out.push('<text class="mgdb-pg-place-head" x="' + LABEL_W + '" y="28">Whole genome</text>');
+      out.push('<text class="mgdb-pg-place-head" x="' + detailX + '" y="12">' +
+        (zoom === 'local' ? 'Around the copies on chromosome ' + detailChr : 'Chromosome ' + detailChr) + '</text>');
+      /* In the local window the ticks are counted from the centre, so they
+         are round and symmetric: counted from the left edge they read
+         -655 kb, -155 kb, +345 kb. */
+      var axisTicks = [];
+      if (zoom === 'local') {
+        var st = niceTicks(half, 3).step;
+        for (var k = -Math.floor(half / st); k * st <= half; k++) { axisTicks.push({ at: half + k * st, off: k * st }); }
+      } else {
+        niceTicks(detailMax, 5).ticks.forEach(function (v) { axisTicks.push({ at: v, off: v }); });
+      }
+      axisTicks.forEach(function (t) {
+        var tx = DX(t.at);
+        var lab = zoom === 'local'
+          ? (t.off === 0 ? '0' : (t.off > 0 ? '+' : '\u2212') + mb(Math.abs(t.off)))
+          : (t.off === 0 ? '0' : mb(t.off));
+        out.push('<text class="mgdb-pg-place-tick" x="' + tx + '" y="27" text-anchor="middle">' + lab + '</text>');
+        out.push('<path class="mgdb-pg-place-grid" d="M' + tx + ' ' + (HEAD - 4) + 'V' + (height - 6) + '"></path>');
+      });
+
+      var y = HEAD;
+      rows.forEach(function (r) {
+        if (r.panel) {
+          out.push('<text class="mgdb-pg-place-panel" x="4" y="' + (y + PANEL - 6) + '">' + esc(r.panel.toUpperCase()) + '</text>');
+          y += PANEL; return;
+        }
+        var g = r.g, ms = byAssembly[g.assembly] || [];
+        var absent = ms.length === 0;
+        out.push('<g class="mgdb-pg-place-row' + (absent ? ' is-absent' : '') + '" data-asm="' + esc(g.assembly) + '">');
+        out.push('<text class="mgdb-pg-place-line" x="4" y="' + (y + ROW - 3) + '">' + esc(g.label) + '</text>');
+        out.push('<text class="mgdb-pg-place-count" x="' + (LABEL_W - 8) + '" y="' + (y + ROW - 3) +
+          '" text-anchor="end">' + (absent ? 'absent' : ms.length) + '</text>');
+        var cy = y + ROW / 2;
+        /* Whole genome: every chromosome to this assembly's own length. */
+        numbers.forEach(function (n) {
+          var c = chrOf(g, n);
+          if (!c) { return; }
+          out.push('<rect class="mgdb-pg-place-chr" x="' + slotX[n] + '" y="' + (cy - 2) + '" width="' +
+            Math.max(c.length * scale, 1).toFixed(1) + '" height="4" rx="2"></rect>');
+        });
+        ms.forEach(function (m) {
+          if (m.chr_number == null || slotX[m.chr_number] == null) { return; }
+          var mx = slotX[m.chr_number] + ((m.start + m.end) / 2) * scale;
+          out.push(markHtml(m, mx, cy, 'genome', any));
+        });
+        /* Close-up. */
+        var c = chrOf(g, detailChr);
+        var here = ms.filter(function (m) { return m.chr_number === detailChr; });
+        if (zoom === 'chromosome') {
+          if (c) {
+            out.push('<rect class="mgdb-pg-place-chr" x="' + detailX + '" y="' + (cy - 2) + '" width="' +
+              Math.max(DX(c.length) - detailX, 1).toFixed(1) + '" height="4" rx="2"></rect>');
+          }
+          here.forEach(function (m) { out.push(markHtml(m, DX((m.start + m.end) / 2), cy, 'detail', any)); });
+        } else if (here.length) {
+          var ctr = centreOf(here);
+          out.push('<rect class="mgdb-pg-place-chr" x="' + detailX + '" y="' + (cy - 1.5) + '" width="' + detailW +
+            '" height="3" rx="1.5"></rect>');
+          here.forEach(function (m) {
+            var a = m.start - ctr + half, b = m.end - ctr + half;
+            if (b < 0 || a > detailMax) {
+              out.push('<text class="mgdb-pg-place-more" x="' + (a > detailMax ? detailX + detailW - 4 : detailX + 4) +
+                '" y="' + (cy + 3.5) + '" text-anchor="middle">' + (a > detailMax ? '›' : '‹') + '</text>');
+              return;
+            }
+            out.push(geneBoxHtml(m, Math.max(DX(a), detailX), Math.min(DX(b), detailX + detailW), cy, any));
+          });
+        }
+        out.push('</g>');
+        y += ROW;
+      });
+
+      out.push('</svg>');
+      scroller.innerHTML = out.join('');
+      block.querySelector('[data-role="place-status"]').innerHTML = statusText();
+    }
+
+    function markClass(m, any) {
+      return 'mgdb-pg-place-mark' + (m.off_chromosome ? ' is-off' : '') + (m.is_exemplar ? ' is-exemplar' : '') +
+        (any && selected[m.gene] ? ' is-picked' : '') + (any && !selected[m.gene] ? ' is-dim' : '');
+    }
+    function markHtml(m, mx, cy, where, any) {
+      return '<rect class="' + markClass(m, any) + '" data-gene="' + esc(m.gene) + '" x="' + (mx - 1.25).toFixed(1) +
+        '" y="' + (cy - 5.5) + '" width="2.5" height="11" rx="1"><title>' + esc(markTitle(m)) + '</title></rect>';
+    }
+    /* In the local window a gene is wide enough to draw as itself, pointed at
+       its 3' end so the strand reads. */
+    function geneBoxHtml(m, x0, x1, cy, any) {
+      var w = Math.max(x1 - x0, 3), h = 8, top = cy - h / 2, tip = Math.min(4, w / 2);
+      var d = m.strand === '-'
+        ? 'M' + x0 + ' ' + cy + 'L' + (x0 + tip) + ' ' + top + 'H' + (x0 + w) + 'V' + (top + h) + 'H' + (x0 + tip) + 'Z'
+        : 'M' + x0 + ' ' + top + 'H' + (x0 + w - tip) + 'L' + (x0 + w) + ' ' + cy + 'L' + (x0 + w - tip) + ' ' + (top + h) + 'H' + x0 + 'Z';
+      return '<path class="' + markClass(m, any) + '" data-gene="' + esc(m.gene) + '" d="' + d + '"><title>' +
+        esc(markTitle(m)) + '</title></path>';
+    }
+    function markTitle(m) {
+      return m.gene + '\n' + labelOfAssembly(m.assembly) + '  ' + m.seqid + ':' + m.start.toLocaleString() + '–' +
+        m.end.toLocaleString() + ' (' + m.strand + ')' + (m.off_chromosome ? '\nOn another chromosome from the pan-gene' : '');
+    }
+
+    /* ---- interaction ----------------------------------------------------- */
+
+    function memberByGene(gene) {
+      for (var i = 0; i < members.length; i++) { if (members[i].gene === gene) { return members[i]; } }
+      return null;
+    }
+
+    scroller.addEventListener('mousemove', function (event) {
+      var el = event.target.closest ? event.target.closest('[data-gene]') : null;
+      if (!el) { detail.textContent = idle; return; }
+      var m = memberByGene(el.getAttribute('data-gene'));
+      if (!m) { return; }
+      var bits = [(m.html ? '<a href="' + esc(m.html) + '">' : '') + '<span class="mgdb-sequence">' + esc(m.gene) +
+        '</span>' + (m.html ? '</a>' : ''), '<strong>' + esc(labelOfAssembly(m.assembly)) + '</strong>',
+        '<span class="mgdb-sequence">' + esc(m.seqid) + ':' + m.start.toLocaleString() + '–' +
+        m.end.toLocaleString() + '</span> (' + esc(m.strand) + ')', mb(m.end - m.start + 1)];
+      if (m.off_chromosome) { bits.push('<span class="mgdb-pill mgdb-pill-warn">Chromosome ' + m.chr_number +
+        ', pan-gene on ' + P.pan_gene_chr_number + '</span>'); }
+      if (m.is_exemplar) { bits.push('<span class="mgdb-pill mgdb-pill-ok">Exemplar</span>'); }
+      detail.innerHTML = bits.join(' &middot; ');
+    });
+    scroller.addEventListener('mouseleave', function () { detail.textContent = idle; });
+
+    scroller.addEventListener('click', function (event) {
+      var num = event.target.closest ? event.target.closest('[data-chr]') : null;
+      if (num) {
+        detailChr = +num.getAttribute('data-chr');
+        block.querySelector('[data-role="place-chr"]').value = String(detailChr);
+        draw(); return;
+      }
+      var el = event.target.closest ? event.target.closest('[data-gene]') : null;
+      if (!el) { return; }
+      var gene = el.getAttribute('data-gene');
+      var sel = MGDB.panGeneSelection.get();
+      if (sel && sel.genes.length === 1 && sel.genes[0] === gene) { MGDB.panGeneSelection.clear(); return; }
+      MGDB.panGeneSelection.set({ genes: [gene], label: gene, source: 'placement', filter: gene });
+    });
+
+    MGDB.panGeneSelection.subscribe(function (sel) {
+      selected = {};
+      if (sel) { sel.genes.forEach(function (g) { selected[g] = true; }); }
+      var any = !!sel;
+      Array.prototype.forEach.call(scroller.querySelectorAll('[data-gene]'), function (el) {
+        var hit = any && selected[el.getAttribute('data-gene')];
+        el.classList.toggle('is-dim', any && !hit);
+        el.classList.toggle('is-picked', !!hit);
+      });
+    });
+
+    block.querySelector('[data-role="place-zoom"]').addEventListener('change', function () { zoom = this.value; draw(); });
+    block.querySelector('[data-role="place-chr"]').addEventListener('change', function () { detailChr = +this.value; draw(); });
+
+    block.querySelector('[data-role="place-tsv"]').addEventListener('click', function () {
+      var columns = [
+        { label: 'Gene model', get: function (m) { return m.gene; } },
+        { label: 'Line', get: function (m) { return labelOfAssembly(m.assembly); } },
+        { label: 'Assembly', get: function (m) { return m.assembly; } },
+        { label: 'Sequence', get: function (m) { return m.seqid; } },
+        { label: 'Start', get: function (m) { return m.start; } },
+        { label: 'End', get: function (m) { return m.end; } },
+        { label: 'Strand', get: function (m) { return m.strand; } },
+        { label: 'On another chromosome', get: function (m) { return m.off_chromosome ? 'yes' : (m.off_chromosome === false ? 'no' : ''); } }
+      ];
+      if (window.MGDBRecord && window.MGDBRecord.downloadTsv) {
+        window.MGDBRecord.downloadTsv(spec.filename || 'pan-gene-placement.tsv', columns, members);
+      }
+    });
+
+    block.querySelector('[data-role="place-png"]').addEventListener('click', function () {
+      var svg = scroller.querySelector('svg');
+      if (!svg) { return; }
+      var M = 24, HEADER = 50, w = +svg.getAttribute('width'), h = +svg.getAttribute('height');
+      var clone = inlineSvgStyles(svg);
+      clone.setAttribute('x', M); clone.setAttribute('y', HEADER);
+      var body = xText(M, M + 6, 'Chromosome placement', { size: 17, weight: 700, fill: '#1f2723' });
+      body += xText(M, M + 24, block.querySelector('[data-role="place-status"]').textContent, { size: 10.5, fill: '#5d6b62' });
+      body += new XMLSerializer().serializeToString(clone);
+      body += xText(M, HEADER + h + 16, 'MaizeGDB · orange: on another chromosome from the pan-gene · ' +
+        'positions from each assembly’s own GFF3', { size: 10, fill: '#7c837e' });
+      exportSvgToPng(body, w + 2 * M, HEADER + h + 28, (spec.filename || 'pan-gene-placement.tsv').replace(/\.tsv$/, '') + '.png');
+    });
+
+    var lastW = 0;
+    function onResize() {
+      if (!scroller.clientWidth || Math.abs(scroller.clientWidth - lastW) < 8) { return; }
+      lastW = scroller.clientWidth; draw();
+    }
+    var debounced = MGDB.debounce ? MGDB.debounce(onResize, 150) : onResize;
+    if (window.ResizeObserver) { new window.ResizeObserver(debounced).observe(scroller); }
+    window.addEventListener('resize', debounced);
+
+    whenSized(scroller, function () { lastW = scroller.clientWidth; draw(); });
+    return { element: block };
+  }
+
+  MGDB.panGenePlacement = panGenePlacement;
+
 
 
   MGDB.parseNewick = parseNewick;

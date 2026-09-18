@@ -397,9 +397,15 @@
     return true;
   }
 
-  function renderContext(viewers) {
-    if (!viewers || !viewers.gcv_url) { return false; }
+  function renderContext(viewers, positions) {
     var out = els.contextBody;
+    out.innerHTML = '';
+    var map = null;
+    if (!viewers || !viewers.gcv_url) {
+      map = MGDB.panGenePlacement ? MGDB.panGenePlacement(out, { positions: positions,
+        filename: 'pan-gene-placement.tsv' }) : null;
+      return !!map;
+    }
     out.innerHTML =
       '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>Genomic Context Viewer for the ' +
       R.escape(viewers.gcv_analysis || 'pan-gene analysis') + '</h3></div>' +
@@ -418,6 +424,11 @@
       R.link('https://github.com/legumeinfo/gcv', 'GitHub', true) + ', ' +
       R.link('https://doi.org/10.1093/bioinformatics/btx757', 'Cleary and Farmer, 2017', true) + ', ' +
       R.link('https://doi.org/10.1093/nar/gkad391', 'Cleary and Farmer, 2023', true) + '.</p></div>';
+    /* The placement map above the GCV: where each member is, before the
+       synteny around it. */
+    if (MGDB.panGenePlacement) {
+      MGDB.panGenePlacement(out, { positions: positions, filename: 'pan-gene-placement.tsv' });
+    }
     return true;
   }
 
@@ -865,7 +876,7 @@
     }
     if (renderTree(sections.tree, sections.members, sections.overview)) { rendered.push('pg-record-tree'); }
     if (renderPangenome(sections.pangenome)) { rendered.push('pg-record-pangenome'); }
-    if (renderContext(sections.viewers)) { rendered.push('pg-record-context'); }
+    if (renderContext(sections.viewers, sections.positions)) { rendered.push('pg-record-context'); }
     if (renderAnalysis(sections.analysis)) { rendered.push('pg-record-analysis'); }
     if (renderDownloads(sections.downloads)) { rendered.push('pg-record-downloads'); }
     if (renderViewers(sections.viewers)) { rendered.push('pg-record-viewers'); }

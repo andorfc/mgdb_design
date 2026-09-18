@@ -761,3 +761,63 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
   background-size: 5px 5px;
 }
 .mgdb-pg-heat-tools label.is-disabled { opacity: .45; }
+
+/* ── Chromosome placement map ─────────────────────────────────────────────
+   Real pixel size, scrolled sideways inside its own box on a narrow screen.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mgdb-pg-place-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-pg-place-tools label { display: inline-flex; gap: 6px; align-items: center; }
+.mgdb-pg-place-tools select {
+  height: 32px;
+  padding: 0 var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+}
+
+.mgdb-pg-place-scroll { margin-top: var(--mgdb-space-3); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.mgdb-pg-place-scroll .mgdb-pg-place-svg { display: block; max-width: none; }
+
+.mgdb-pg-place-band { fill: var(--mgdb-surface-sunken); }
+.mgdb-pg-place-chr { fill: #dcd8cf; }
+.mgdb-pg-place-grid { stroke: #efece5; stroke-width: 1; fill: none; }
+.mgdb-pg-place-chrnum { fill: var(--mgdb-ink-soft); font-size: 10.5px; font-weight: 700; cursor: pointer; }
+.mgdb-pg-place-chrnum.is-current { fill: var(--mgdb-focus); text-decoration: underline; }
+.mgdb-pg-place-chrnum:hover { fill: var(--mgdb-ink); }
+.mgdb-pg-place-head { fill: var(--mgdb-muted); font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.mgdb-pg-place-tick { fill: var(--mgdb-muted); font-size: 9.5px; font-variant-numeric: tabular-nums; }
+.mgdb-pg-place-panel { fill: var(--mgdb-ink-soft); font-size: 9.5px; font-weight: 700; letter-spacing: .04em; }
+.mgdb-pg-place-line { fill: var(--mgdb-ink); font-size: 10.5px; font-weight: 600; }
+.mgdb-pg-place-count { fill: var(--mgdb-muted); font-size: 9.5px; font-variant-numeric: tabular-nums; }
+.mgdb-pg-place-row.is-absent .mgdb-pg-place-line { fill: var(--mgdb-muted); font-weight: 400; }
+.mgdb-pg-place-row.is-absent .mgdb-pg-place-chr { fill: #ece9e2; }
+.mgdb-pg-place-more { fill: var(--mgdb-muted); font-size: 12px; font-weight: 700; }
+
+.mgdb-pg-place-mark { fill: var(--mgdb-green); cursor: pointer; }
+.mgdb-pg-place-mark.is-off { fill: var(--mgdb-orange); }
+.mgdb-pg-place-mark.is-exemplar { stroke: var(--mgdb-gold); stroke-width: 1.5; }
+.mgdb-pg-place-mark.is-dim { opacity: .2; }
+.mgdb-pg-place-mark.is-picked { fill: var(--mgdb-focus); }
+.mgdb-pg-place-mark:hover { fill: var(--mgdb-ink); }
+
+.mgdb-pg-place-block .mgdb-pg-place-detail {
+  min-height: calc(2 * var(--mgdb-leading-snug) * 1em);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-pg-place-detail strong { color: var(--mgdb-ink); }

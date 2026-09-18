@@ -19,7 +19,7 @@ chr9 while the pan-gene is chr10).
 | 4 | Conservation profile + working MSA (windowed canvas) | **Live on dev 2026-09-17** |
 | 5 | NAM expression heatmap (26 genomes x 10 NAM Consortium tissues) | **Live on dev 2026-09-17** |
 | 6 | Homeolog / paralog comparison within a genome | planned |
-| 7 | Chromosome placement map | needs gene-model releases for NAM + PanAnd |
+| 7 | Chromosome placement map | **Live on dev 2026-09-17** |
 | 8 | Gene structure stack under the MSA | needs gene-model releases |
 
 ## To deploy figure 1
@@ -312,3 +312,60 @@ views, each with the label steps that belong to what it shows:
   none is disabled. Verified one cell independently: B73v5 Zm00001eb405860 in
   leaf tip, 9.63 FPKM against an average of 5.05, log2 FC 0.812; the page
   prints +0.8.
+
+## Figure 7: chromosome placement map
+
+**New dataset: gene positions.** `tools/gene_positions_index.py` builds
+`data/gene_positions/<assembly>/positions.sqlite` (genes: seqid, start, end,
+strand; seqs: lengths) for all 66 assemblies of the analysis, streamed from each
+assembly's GFF3 and .fai on download.maizegdb.org -- a few MB each, not the
+~151 MB of a full gene-models release. Built on dev 2026-09-17: 66 of 66, no
+failures, about four minutes. Rebuild with
+
+    ssh development-server 'python3 /tmp/gene_positions_index.py \
+        --pairs /tmp/pairs_all.tsv --dest /var/www/claude/html/data/gene_positions'
+
+where pairs_all.tsv is `<assembly>\t<annotation>` for every annotation in the
+analysis (the presence section lists them). Registered in `MgdbData::$dirs` as
+`gene-positions`; read by `lib/mgdb_positions.php`; files denied to the browser
+by the directory's .htaccess, like the expression releases.
+
+Why: chado.gene_model has positions for B73 and the 25 NAM founders only. The
+Zea relatives, European flint, CAAS FIL and HiLo had none at all.
+
+Three assemblies do not use the standard file names -- Mo17 CAU-2.0 (GFF3 drops
+the ".1"), CML530 HiLo (no genome .fai; lengths from the GFF3's
+##sequence-region), B73 RefGen_v3 (Ensembl files, `gene:` IDs). B73 v3's .fai
+says Chr1..Chr10 and its GFF3 chr1..chr10, which at first listed every
+chromosome twice and flagged 110,211 of 110,467 genes; names are now matched
+case-insensitively and by number.
+
+**Zea relatives share the grid.** Checked because their structure might differ:
+all eight have ten chromosomes named chr1..chr10, and the relative's copy sits
+on the same chromosome number as B73v5's in 100.0% of 18,000-26,000 single-copy
+pan-genes each. Over all members the off-chromosome share is 0.04-0.08%, so an
+orange mark is rare in every panel. The 100% is cleaner than biology alone would
+give, which suggests the analysis pairs genes only across expected chromosomes
+and adds the rare exceptions in a later pass; either way the numbering is
+homologous and the flag is meaningful. None of the relatives' ~23,000
+scaffold-only genes appears in these pan-genes.
+
+API: `positions` section, one read per assembly, no DB query: 153 ms for rp1,
+83 ms for lg1. rp1: 298 of 301 placed (the three AC152495.1 BAC models have no
+assembly), exactly one off-chromosome -- **Oh7B Zm00038ab381310,
+chr9:3,547,029-3,551,697 (-)**, pan-gene on chr10.
+
+Figure: one row per assembly in the presence strip's panels. Left, the whole
+genome -- ten aligned chromosome slots, each bar to the assembly's own length,
+the pan-gene's chromosome banded. Right, a close-up of one chromosome (click a
+chromosome number): whole chromosome on a Mb axis, or "around the copies", each
+row centred on its own copies, which shows rp1's tandem arrays -- copy number
+from 1 to 14 and spacing that differs line to line. The local window holds 90%
+of the rows' clusters; a copy beyond it gets an edge chevron. Worth a look in
+the data: K0326Y's single rp1 copy is a ~250 kb gene model, far longer than any
+other copy -- probably a merged model in that annotation.
+
+The figure draws once its box has a width. Record sections are built hidden, so
+measuring at build time gave 0 and the map sat at its 898 px fallback in a
+1,182 px box; a ResizeObserver does not fire for a page that is not being
+painted. `MGDB.whenSized()` polls on a timer instead; the heatmap uses it too.
