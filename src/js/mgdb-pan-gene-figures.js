@@ -2487,16 +2487,18 @@
     return active[0] || null;
   }
 
-  /* Log2 fold change, blue for below the pan-gene's average in a tissue and
-     red for above, through the reference palette's neutral midpoint. The blue
+  /* Log2 fold change, blue for above the pan-gene's average in a tissue and
+     red for below (Carson's choice, 2026-09-17; the reverse of the common
+     red-for-up convention, so the legend always says which is which), through
+     the reference palette's neutral midpoint. The blue
      arm is the reference blue ramp; the red arm was derived from it step for
      step in OKLab, same lightness and chroma at every step (L 0.857/0.717/
      0.575/0.386), so +2 reads exactly as strong as -2. Saturates at +/-4, a
      16-fold difference. */
   var DIV_STOPS = [
-    [-4, [16, 66, 129]], [-3, [42, 120, 214]], [-2, [109, 167, 236]], [-1, [183, 211, 246]],
+    [-4, [118, 36, 20]], [-3, [198, 75, 51]], [-2, [228, 135, 115]], [-1, [244, 195, 184]],
     [0, [240, 239, 236]],
-    [1, [244, 195, 184]], [2, [228, 135, 115]], [3, [198, 75, 51]], [4, [118, 36, 20]]
+    [1, [183, 211, 246]], [2, [109, 167, 236]], [3, [42, 120, 214]], [4, [16, 66, 129]]
   ];
   var FC_MAX = 4;
 
@@ -2868,7 +2870,7 @@
           '<span class="mgdb-pg-heat-ramp" style="background:linear-gradient(to right,' + stops.join(',') +
           ')" aria-hidden="true"></span>' +
           '<span class="mgdb-pg-heat-rampcap">+' + FC_MAX + ' log2 fold change against the pan-gene’s average ' +
-          'in that tissue (blue below, red above; ±' + FC_MAX + ' is 16×)</span>' +
+          'in that tissue (red below, blue above; ±' + FC_MAX + ' is 16×)</span>' +
           '<span class="mgdb-pg-heat-dotkey" aria-hidden="true"></span><span>both under 1 ' + esc(units) + '</span>' +
           '<span class="mgdb-pg-heat-hatchkey" aria-hidden="true"></span><span>not measured</span>' +
           (labelMode === 'none' ? '' : '<span class="mgdb-pg-heat-labelkey">Numbers are log2 fold change' +
@@ -3022,7 +3024,7 @@
         var f = view === 'fold' ? divColour(-FC_MAX + i * (2 * FC_MAX / 39)) : heatColour(i / 39);
         body += '<rect x="' + (lx + i * 4) + '" y="' + ly + '" width="4" height="10" fill="' + f + '"></rect>';
       }
-      body += xText(lx + 168, ly + 9, view === 'fold' ? '−' + FC_MAX + ' → +' + FC_MAX + ' (blue below, red above)'
+      body += xText(lx + 168, ly + 9, view === 'fold' ? '−' + FC_MAX + ' → +' + FC_MAX + ' (red below, blue above)'
         : (scale === 'row' ? '0 → row maximum' : '0 → ' + fpkmText(Math.pow(2, globalMax) - 1) + ' ' + units),
         { size: 10, fill: '#5d6b62' });
       body += xText(M, ly + 30, 'MaizeGDB · hatched: not measured' +
