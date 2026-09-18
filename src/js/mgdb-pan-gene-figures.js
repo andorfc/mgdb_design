@@ -2480,7 +2480,7 @@
        -- and the threshold is on that same number, so neither changes meaning
        when the scale is switched to "each row to its maximum". */
     var labelMode = 'none';
-    var LABEL_MIN = { all: -Infinity, gt2: 2, gt4: 4 };
+    var LABEL_MIN = { all: -Infinity, gt1: 1, gt2: 2, gt3: 3, gt4: 4 };
     var treeOrder = null, dendro = null;
     var selected = {};
 
@@ -2509,7 +2509,9 @@
             '<label>Labels <select data-role="heat-labels" aria-label="Show the log2 value on cells">' +
               '<option value="none">None</option>' +
               '<option value="all">All</option>' +
+              '<option value="gt1">&gt; 1</option>' +
               '<option value="gt2">&gt; 2</option>' +
+              '<option value="gt3">&gt; 3</option>' +
               '<option value="gt4">&gt; 4</option>' +
             '</select></label>' +
             '<button class="mgdb-rec-tsv" type="button" data-role="heat-png">Export PNG</button>' +
