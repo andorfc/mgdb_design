@@ -3226,7 +3226,7 @@
     function mb(bp) { return bp >= 1e6 ? (bp / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' Mb'
       : (bp / 1e3).toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' kb'; }
 
-    var ROW = 13, PANEL = 20, HEAD = 34, LABEL_W = 118;
+    var ROW = 13, PANEL = 24, HEAD = 34, LABEL_W = 118;
 
     function draw() {
       var W = Math.max((scroller.clientWidth || 900) - 2, 620);
@@ -3294,7 +3294,19 @@
       var y = HEAD;
       rows.forEach(function (r) {
         if (r.panel) {
-          out.push('<text class="mgdb-pg-place-panel" x="4" y="' + (y + PANEL - 6) + '">' + esc(r.panel.toUpperCase()) + '</text>');
+          /* The panel is a heading, so it reads as one: the site's heading
+             green on a pale band across the whole row, with an accent bar --
+             in the same small grey caps as the line names it was easy to read
+             straight past, 66 rows down. */
+          out.push('<rect class="mgdb-pg-place-panelband" x="0" y="' + (y + 3) + '" width="' + W +
+            '" height="' + (PANEL - 4) + '" rx="3"></rect>');
+          out.push('<rect class="mgdb-pg-place-panelbar" x="0" y="' + (y + 3) + '" width="3" height="' +
+            (PANEL - 4) + '" rx="1.5"></rect>');
+          var inPanel = genomes.filter(function (g) { return g.panel === r.panel; });
+          var withMembers = inPanel.filter(function (g) { return g.member_count > 0; }).length;
+          out.push('<text class="mgdb-pg-place-panel" x="10" y="' + (y + PANEL - 5.5) + '">' +
+            esc(r.panel.toUpperCase()) +
+            '<tspan class="mgdb-pg-place-panelcount" dx="8">' + withMembers + '/' + inPanel.length + '</tspan></text>');
           y += PANEL; return;
         }
         var g = r.g, ms = byAssembly[g.assembly] || [];

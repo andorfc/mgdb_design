@@ -796,7 +796,13 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
 .mgdb-pg-place-chrnum:hover { fill: var(--mgdb-ink); }
 .mgdb-pg-place-head { fill: var(--mgdb-muted); font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
 .mgdb-pg-place-tick { fill: var(--mgdb-muted); font-size: 9.5px; font-variant-numeric: tabular-nums; }
-.mgdb-pg-place-panel { fill: var(--mgdb-ink-soft); font-size: 9.5px; font-weight: 700; letter-spacing: .04em; }
+/* Panel headings: the site's heading green (--mgdb-leaf, 5.7:1 on white; on
+   the pale band 5.2:1) -- a lighter, yellower green than the gene marks, so a
+   heading never reads as a mark. */
+.mgdb-pg-place-panelband { fill: var(--mgdb-green-soft); }
+.mgdb-pg-place-panelbar { fill: var(--mgdb-leaf); }
+.mgdb-pg-place-panel { fill: var(--mgdb-leaf); font-size: 11px; font-weight: 800; letter-spacing: .06em; }
+.mgdb-pg-place-panelcount { fill: var(--mgdb-muted); font-size: 10px; font-weight: 600; letter-spacing: 0; }
 .mgdb-pg-place-line { fill: var(--mgdb-ink); font-size: 10.5px; font-weight: 600; }
 .mgdb-pg-place-count { fill: var(--mgdb-muted); font-size: 9.5px; font-variant-numeric: tabular-nums; }
 .mgdb-pg-place-row.is-absent .mgdb-pg-place-line { fill: var(--mgdb-muted); font-weight: 400; }
