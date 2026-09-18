@@ -348,9 +348,192 @@
    cells and sort arrows come from the shared table. */
 .mgdb-rec-table td,
 .mgdb-rec-table th { overflow-wrap: anywhere; }
+/* Except the first column, which is where every table here keeps its
+   identifier -- a gene model, a GO term, an insertion, a locus.
+
+   `anywhere` does two things, and the second is the problem. It lets a line
+   break inside a word, so BonnMu0249932::Mu came out as BonnMu02499 / 32::Mu;
+   and it also counts those break points when the table sizes its columns, so
+   the column's narrowest possible width became one character and the auto
+   layout squeezed it to 117-141 px. `normal` keeps a token whole, which makes
+   its full width the column's minimum, so the table gives it room.
+
+   Prose in a first column is unaffected -- a reference title still wraps, at
+   its spaces -- and it gets wider rather than narrower: the gene record's
+   references title column went from 80 px to 140 px. A token wider than the
+   whole table scrolls inside .mgdb-table-scroll, never the page. Measured
+   2026-09-17 on the pan-gene and gene records: every identifier column stopped
+   wrapping, no scroll region grew, no page overflow. */
+.mgdb-rec-table th[scope="row"] { overflow-wrap: normal; }
 .mgdb-rec-table th[scope="row"] { color: var(--mgdb-ink); }
-.mgdb-rec-table td small { display: block; color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+/* A <small> in a table cell is a note under its value, not a continuation of
+   it -- the authors under a reference title, the hint under a coordinate.
+
+   `th[scope="row"]` has to be named alongside `td`: the first column of every
+   table here is a row header, not a data cell, so with `td` alone the one
+   column most likely to carry a note was the one column that did not get this,
+   and the authors ran on from the end of the title with no space between them.
+   That is the column the note is nearly always in. */
+.mgdb-rec-table td small,
+.mgdb-rec-table th[scope="row"] small {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+  line-height: var(--mgdb-leading-snug);
+}
 .mgdb-rec-table thead th { position: static; }
+
+/* --------------------------------------------------------------------------
+   The references table's two built columns
+
+   Abstract is clamped to four lines with the -webkit- pair and nothing else.
+   The standard `line-clamp: 4` was written beside it as belt and braces and
+   was the opposite: it is a shorthand for the newer clamping model, so Chrome
+   resolved `display: -webkit-box` to `flow-root`, switched models, and clamped
+   at five and a bit lines instead of four. Computed display said `flow-root`
+   even when -webkit-box was forced inline, which is what gave it away.
+
+   The column is given a width so the clamp has something to measure against:
+   left to shrink-to-fit it takes whatever the other columns leave, and four
+   lines of a wide column is a different amount of text on every record.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-table .mgdb-ref-col-abstract { width: 38%; }
+
+.mgdb-ref-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  /* The line the clamp cannot miss.
+
+     -webkit-line-clamp alone did not hold: computed display came back
+     `flow-root` rather than `-webkit-box` even when -webkit-box was forced
+     inline, and the text ran to five and a bit lines. Four lines of this
+     font-size and leading is 4 x 1.4em, so max-height says the same thing in a
+     property nothing reinterprets. Where the clamp does work it stops the text
+     first and the ellipsis still appears; where it does not, this is what makes
+     four lines four lines. */
+  /* Exactly four lines. The class had to be renamed to get here: as
+     .mgdb-ref-abstract it also matched the card view's block in
+     mgdb-modern.css, which adds 12px/16px of padding and a left rule -- and
+     with border-box sizing that padding came out of this height, leaving room
+     for three lines and a shaved fourth. */
+  max-height: 6em;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  /* 1.5 rather than the snug 1.4, and max-height exactly four of them (4 x 1.5
+     = 6em). At 1.4 the line box is 19.6px and four of those is the 78.4px the
+     box was, but the painted glyphs of a 14px face need a little more than
+     19.6 -- so the fourth line had its descenders shaved and read as broken
+     text rather than as a preview. */
+  line-height: 1.5;
+}
+
+/* The cut is a clean edge, not an ellipsis: -webkit-line-clamp is not engaging
+   here (see above), so nothing marks the text as continuing. A fade over the
+   last few pixels does that job and cannot be overridden out of existence the
+   way the clamp was.
+
+   0.4em, not 1.1em. At 1.1 the fade covered most of the fourth line and the
+   preview read as three and a half; this catches only the descenders of the
+   last line, which is enough to say "continues" without spending a line on
+   saying it. */
+.mgdb-ref-preview {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 0.4em), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 0.4em), transparent 100%);
+}
+
+/* Opened, the clamp and the fade both come off -- a fade over the last line of
+   a fully shown abstract would read as more text still hiding. */
+/* Opened, every one of the three things that shortens this has to come off.
+
+   max-height alone was not enough: -webkit-line-clamp is doing its own
+   clamping through the newer model (which is why computed display reads
+   `flow-root` rather than `-webkit-box`), and a line clamp is not undone by
+   giving the box more height. `display: block` drops the box context and
+   `-webkit-line-clamp: none` drops the clamp; the fade goes too, since a fade
+   over the last line of a fully shown abstract would read as more text still
+   hiding. */
+.mgdb-ref-preview.is-open {
+  display: block;
+  max-height: none;
+  -webkit-line-clamp: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* The control that opens it. A link in weight and colour because that is what
+   it behaves like, but a real <button>, because it changes this page rather
+   than going to another one. */
+.mgdb-ref-more {
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-ref-more:hover { color: var(--mgdb-green-dark); }
+
+.mgdb-ref-more:focus-visible {
+  outline: 2px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* The two actions are one block of equal controls, never a wrapped pair: a
+   "Copy DOI" broken across two lines in a narrow column looks like a fault.
+
+   A two-column grid rather than a flex row, because equal is the requirement:
+   "View paper" carries the shell's off-site arrow and "Copy DOI" does not, so
+   sized to their content one is always a few pixels wider than the other. 1fr
+   1fr makes them the same by construction whatever the labels become.
+
+   NOT called .mgdb-ref-actions. That class is the card view's own button row,
+   and mgdb-modern.css styles `.mgdb-ref-actions .mgdb-ref-copy` -- two classes
+   deep, so it beats anything written here with one, and the copy button came
+   out 44px tall beside a 32px link. */
+/* The column is given a real width, and that is what makes the two buttons
+   the same size.
+
+   `width: 1%` shrinks the column to its content, which leaves the grid with no
+   definite width to divide -- so `1fr 1fr` fell back to sizing each track to
+   its own content and the pair came out 127px beside 86px. `minmax(max-content,
+   1fr)` was worse for the same reason. With a definite 18rem the two tracks
+   split it evenly and the labels decide nothing.
+
+   20rem, not 18: a grid track cannot go below its own min-content, and at
+   18rem the tracks worked out to 124px while "View paper" plus the shell's
+   off-site arrow needs 127 -- so the first track pushed out to 127 and the
+   second took what was left, 121. The column has to be wide enough that an
+   even split already clears the longer label. 20rem gives each track 140. */
+.mgdb-rec-table .mgdb-ref-col-actions { width: 20rem; white-space: nowrap; }
+
+.mgdb-ref-cellactions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--mgdb-space-2);
+  align-items: stretch;
+}
+
+.mgdb-rec-table .mgdb-ref-cellactions .mgdb-ref-cta {
+  min-height: 32px;
+  height: 32px;
+  padding: 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .mgdb-ref-cellactions { grid-template-columns: 1fr; }
+}
 
 .mgdb-rec-table .mgdb-rec-links {
   display: flex;
@@ -1023,3 +1206,153 @@
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+/* --------------------------------------------------------------------------
+   Publications by year
+
+   The figure at the head of the reference list (opts.timeline in
+   R.references): one column per year, gaps kept, a hairline baseline, the
+   peak labelled, every other value in the tooltip and the table view. A
+   column is its own hit target the full height of the plot; a filter dims
+   the years outside it rather than recolouring the survivors.
+   -------------------------------------------------------------------------- */
+
+.mgdb-ref-timeline { margin: 0 0 var(--mgdb-space-3); }
+
+.mgdb-ref-years {
+  display: grid;
+  align-items: end;
+  height: 96px;
+  padding-top: 20px;
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-ref-year {
+  --h: 0%;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 1px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.mgdb-ref-year:disabled { cursor: default; }
+
+.mgdb-ref-year i {
+  display: block;
+  width: 100%;
+  max-width: 24px;
+  height: var(--h);
+  border-radius: 4px 4px 0 0;
+  background: var(--mgdb-burgundy);
+  transition: opacity .15s ease;
+}
+
+.mgdb-ref-year:not(:disabled):hover i,
+.mgdb-ref-year:focus-visible i { opacity: .72; }
+.mgdb-ref-year:focus-visible { border-radius: 3px; outline: 2px solid var(--mgdb-focus); outline-offset: 0; }
+.mgdb-ref-years.is-filtered .mgdb-ref-year[aria-pressed="false"] i { opacity: .25; }
+.mgdb-ref-years.is-filtered .mgdb-ref-year[aria-pressed="true"] i { opacity: 1; }
+
+.mgdb-ref-year-label {
+  position: absolute;
+  bottom: calc(var(--h) + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* The bubble's anchor is three custom properties set on the column, not
+   three overriding rules: the hover rule below has a higher specificity
+   than any `.is-left` or `.is-right` rule could, so an override written as
+   a rule lost `left` and `transform` to it and the bubble stretched between
+   `left: 50%` and `right: 0` -- a 10px background behind 150px of text.
+   Custom properties inherit into the pseudo-element regardless. */
+.mgdb-ref-year { --tip-left: 50%; --tip-right: auto; --tip-shift: translateX(-50%); }
+.mgdb-ref-year.is-left { --tip-left: 0; --tip-shift: none; }
+.mgdb-ref-year.is-right { --tip-left: auto; --tip-right: 0; --tip-shift: none; }
+
+.mgdb-ref-year[data-tip]:not(:disabled):hover::after,
+.mgdb-ref-year[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  z-index: 2;
+  bottom: calc(var(--h) + 8px);
+  left: var(--tip-left);
+  right: var(--tip-right);
+  transform: var(--tip-shift);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--mgdb-ink);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.mgdb-ref-axis { display: grid; height: 22px; }
+
+.mgdb-ref-decade {
+  position: relative;
+  grid-row: 1;
+  justify-self: center;
+  min-width: 0;
+  margin: 0;
+  padding: 5px 0 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-muted);
+  font: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mgdb-ref-decade::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 4px;
+  background: var(--mgdb-line);
+}
+
+.mgdb-ref-decade:disabled { cursor: default; }
+.mgdb-ref-decade:not(:disabled):hover,
+.mgdb-ref-decade[aria-pressed="true"] { color: var(--mgdb-ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.mgdb-ref-decade[aria-pressed="true"] { font-weight: 700; }
+.mgdb-ref-decade:focus-visible { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+
+.mgdb-ref-timeline-caption { margin: var(--mgdb-space-2) 0 0; color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+.mgdb-ref-timeline-caption strong { color: var(--mgdb-ink); }
+
+.mgdb-ref-clear {
+  margin-left: var(--mgdb-space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-link, var(--mgdb-green-dark));
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) { .mgdb-ref-year i { transition: none; } }

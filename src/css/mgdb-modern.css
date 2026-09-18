@@ -2423,10 +2423,15 @@ a.mgdb-card h3 { text-decoration: underline; }
    and a bare class selector has one element fewer and silently loses.
    -------------------------------------------------------------------------- */
 
+/* A no-break space before the arrow, not a plain one. With " \2197" the space
+   is a line-break opportunity, so a link that only just fitted its cell broke
+   there and left the arrow alone on a second line: GO:0005634 is 91 px in a
+   135 px column and still wrapped, and a first-column identifier that "wraps"
+   was often exactly this. \00a0 glues the arrow to the last word. */
 .mgdb-page a[href^="http"]::after,
 .mgdb-page a[href^="//"]::after,
 .mgdb-page a[href^="ftp"]::after {
-  content: " \2197";
+  content: "\00a0\2197";
   font-size: .85em;
 }
 
@@ -2481,13 +2486,36 @@ a.mgdb-card h3 { text-decoration: underline; }
   font-size: .85em;
 }
 
-/* Three opt-outs. A link whose content is a picture gets no glyph: the arrow is
-   a text affordance and after an image it lands on its own line under the
-   figure. A resource card marks itself on its title instead, below. And a
+/* Two opt-outs that tie with the rules above and are written after them, so
+   they win: a resource card marks itself on its title instead, below, and a
    pagination control spells its own arrow out in its text. */
-.mgdb-page a:has(> img)::after,
 .mgdb-page .mgdb-resource-list a::after,
 .mgdb-page .mgdb-pagination a::after { content: none; }
+
+/* A link whose whole content is a picture gets no glyph. The arrow is a text
+   affordance; after an image it lands on its own line under the figure, which
+   is where the stray down-arrows under the Phylostrata and Pangenome figures
+   were coming from.
+
+   `a[href]`, not a bare `a`, and the reason is worth keeping. :has() takes the
+   specificity of its own argument, and the argument here is `> img` -- an
+   ELEMENT. So `.mgdb-page a:has(> img)` is (0,1,2) while the rules it has to
+   beat are attribute selectors at (0,2,1), and it lost every one of them
+   however late in the file it sat. It looked like it was working only because
+   `a[href*="maizegdb.org"]` was separately cancelling the off-site arrow; the
+   download arrow had nothing cancelling it. Adding [href] -- true of every
+   link -- takes this to (0,2,2) and it wins on its own merits. */
+.mgdb-page a[href]:has(> img)::after { content: none; }
+
+/* A NOTE FOR WHOEVER WRITES THE NEXT CLICKABLE CARD.
+   
+   The arrow above lives on `a::after`, so a "stretched link" overlay --
+   `content: ""; position: absolute; inset: 0` on the link, making a whole card
+   clickable -- must use `::before`. On ::after the arrow wins the `content`
+   declaration and the invisible hit area becomes a visible glyph pinned to the
+   top-left corner of the card, over whatever is there. That is what happened to
+   the 2027 and 2028 meeting cards; see mgdb-maize-meeting.css. Every other
+   overlay in this codebase is already on ::before. */
 
 /* A card whose link leaves MaizeGDB says so with an arrow after its title.
    maizegdb.org and its subdomains -- jbrowse, wgs, download, images, gcv,
@@ -2502,7 +2530,7 @@ a.mgdb-card h3 { text-decoration: underline; }
    one off-site card on the site with no mark, because this rule listed only the
    two http forms. */
 .mgdb-resource-list a[href^="ftp"] > strong::after {
-  content: " \2197";
+  content: "\00a0\2197";   /* no-break space: see the .mgdb-page rule above */
   font-size: .85em;
   font-weight: 600;
 }

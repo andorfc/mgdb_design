@@ -539,3 +539,34 @@ button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
 }
+
+/* ── Analysis table: assembly names on one line ───────────────────────────
+   The first column holds assembly names up to 35 characters
+   (Zm-Chang-7_2-REFERENCE-CAAS_FIL-1.0), and they break at their hyphens even
+   with overflow-wrap: normal. Holding them on one line alone costs 326 px and
+   pushed the table to 241 px of sideways scroll. The room comes from the
+   headers instead: "% placed in pan-genes" and its neighbours are labels, not
+   data, and letting them take two lines frees enough width that the table
+   fits with NO scroll -- it had been scrolling 31 px before this change.
+   ────────────────────────────────────────────────────────────────────────── */
+#pg-record-analysis .mgdb-rec-table th[scope="row"] { white-space: nowrap; }
+#pg-record-analysis .mgdb-rec-table thead th { white-space: normal; }
+
+/* ── Identifier columns other than the first ──────────────────────────────
+   The shared first-column rule in mgdb-record.css fixed the row headers, but
+   data cells keep `overflow-wrap: anywhere`, and the Insertions table split two
+   identifier columns mid-token: Zm00001eb405860 as Zm00001eb40586 / 0, and
+   chr10:2820208..2829857 as chr10:2820208..2829 / 857. A split gene model reads
+   as a different gene model, which is worse than an untidy wrap.
+
+   Measured on rp1 before scoping this: `normal` on every cell here took the
+   split gene models from 21 to 0 and the split positions from 25 to 0, with no
+   table growing a scroll and no page overflow. Kept to this page rather than
+   changed in mgdb-record.css because that file serves every record type and
+   only this one has been measured.
+   ────────────────────────────────────────────────────────────────────────── */
+section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
+
+/* Assembly names break at their hyphens even so, as in the Analysis table. The
+   domains table has a long, wrappable Domain order column to take the width. */
+#pg-record-domains .mgdb-rec-table td:nth-child(2) { white-space: nowrap; }
