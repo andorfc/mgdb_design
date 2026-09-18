@@ -102,6 +102,47 @@ class MgdbExpression {
     return $rows;
   }
 
+  /* Many genes of one genome in one read, for one assay: gene => decoded
+     values. The single-gene path above is one statement per gene, which is
+     right for a gene record and wrong for a pan-gene, whose members in one
+     genome can number a dozen. Genes absent from the release are simply not
+     in the result. Chunked below SQLite's older 999-variable ceiling. */
+  public static function batchValues($genome, $genes, $assay = 'rna') {
+    $db = self::db($genome);
+    $out = array();
+    $genes = array_values(array_unique(array_filter($genes, 'strlen')));
+    if ($db === null || count($genes) === 0) { return $out; }
+    foreach (array_chunk($genes, 400) as $chunk) {
+      $ph = array();
+      foreach ($chunk as $i => $g) { $ph[] = ':g' . $i; }
+      $stmt = $db->prepare('SELECT gene, "values" FROM profiles WHERE assay = :a AND gene IN (' .
+                           implode(',', $ph) . ')');
+      $stmt->bindValue(':a', $assay, SQLITE3_TEXT);
+      foreach ($chunk as $i => $g) { $stmt->bindValue(':g' . $i, $g, SQLITE3_TEXT); }
+      $res = $stmt->execute();
+      while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
+        $out[$row['gene']] = json_decode($row['values'], true);
+      }
+    }
+    return $out;
+  }
+
+  /* Where each sample of one study sits in a gene's values array for one
+     assay: label => index. Matched on the study and the label rather than on
+     sample ids, because ids are numbered per release and differ between
+     genomes -- the NAM Consortium's ten tissues are ids 1-17 in Oh7B and
+     something else in B73v5, but the same ten labels in all 26 genomes. */
+  public static function samplePositions($genome, $sourceName, $assay = 'rna') {
+    $cat = self::catalog($genome);
+    $pos = array();
+    $ids = isset($cat['by_assay'][$assay]) ? $cat['by_assay'][$assay] : array();
+    foreach ($ids as $i => $sid) {
+      $sample = $cat['samples'][$sid];
+      if ($sample['source'] === $sourceName) { $pos[$sample['label']] = $i; }
+    }
+    return $pos;
+  }
+
   /* Case-insensitive: gene ids are stored as published (Zm00001eb067740),
      and a request may spell them otherwise. One extra read on a miss. */
   public static function exists($genome, $gene) {

@@ -479,7 +479,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
             ),
             array(
               'name' => 'fields', 'in' => 'query', 'required' => false,
-              'description' => 'Comma-separated sections: overview, members, analysis, presence, function, domains, expression, insertions, traits, proteins, pathways, sequence, tree, pangenome, downloads, viewers.',
+              'description' => 'Comma-separated sections: overview, members, analysis, presence, function, domains, expression, expression_matrix, insertions, traits, proteins, pathways, sequence, tree, pangenome, downloads, viewers.',
               'schema' => array('type' => 'string')
             ),
             array(

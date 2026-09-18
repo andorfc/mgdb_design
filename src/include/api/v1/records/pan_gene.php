@@ -26,6 +26,8 @@
  *            function     GO and other ontology terms on the members
  *            domains      PFam domains in order along each member
  *            expression   qTeller and eFP links per member
+ *            expression_matrix  the NAM Consortium's ten tissues for every member
+ *                         in B73v5 and the 25 NAM founders, for the heatmap
  *            insertions   UniformMu and other insertions in the members
  *            traits       SNPs in the members and the traits they associate
  *            proteins     proteins, proteomics coverage, protein structures
@@ -41,7 +43,7 @@
 if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   $SECTIONS = array('overview', 'members', 'analysis', 'presence', 'function', 'domains',
-                    'expression', 'insertions', 'traits', 'proteins', 'pathways',
+                    'expression', 'expression_matrix', 'insertions', 'traits', 'proteins', 'pathways',
                     'sequence', 'tree', 'pangenome', 'downloads', 'viewers');
   $wanted = MgdbApi::sections($SECTIONS);
   $want = array_flip($wanted);
@@ -855,6 +857,23 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   // Viewers: the Genomic Context Viewer, and the two NCBI comparative viewers
   /////
 
+  /////
+  // Expression matrix: the ten NAM Consortium tissues for every member that
+  // sits in one of the 26 genomes that carry them.
+  //
+  // No database query. Each genome's expression release is a read-only SQLite
+  // file keyed by gene; this reads each genome's members in ONE statement
+  // (MgdbExpression::batchValues), so a pan-gene costs one read per genome it
+  // touches rather than one per member -- 26 at most, however many members.
+  /////
+
+  if (isset($want['expression_matrix'])) {
+    include_once('./include/api/v1/lib/mgdb_data.php');
+    include_once('./include/api/v1/lib/mgdb_expression.php');
+    $sections['expression_matrix'] = mgdbPanGeneExpressionMatrix($members);
+    $counts['expression_matrix'] = count($sections['expression_matrix']['rows']);
+  }
+
   if (isset($want['viewers'])) {
     /* The GENE MODEL, not the exemplar transcript. The GCV indexes gene
        models only: its /microservices/genes answers {"genes": []} for
@@ -1019,6 +1038,143 @@ function mgdbPanGeneDomainTotals($rows) {
     return strcmp((string) $a['name'], (string) $b['name']);
   });
   return $totals;
+}
+
+/* The heatmap's data: one row per member gene model in B73v5 or a NAM
+   founder, ten values each, in the tissue order below.
+
+   Twenty-six genomes carry the NAM Consortium's ten RNA-seq tissues -- B73v5
+   and the 25 founders, checked against every expression release 2026-09-17;
+   B73v4 carries none. The tissues are matched by study and label, never by
+   sample id, because ids are numbered per release.
+
+   tau is Yanai et al. 2005 on log2(value + 1), the same definition the
+   expression library uses for a whole genome's samples, but over these ten
+   tissues only so that every row is measured on the same footing: a gene's
+   whole-release tau in B73v5 is over 313 samples and in a founder over 23,
+   and the two are not comparable. */
+function mgdbPanGeneExpressionMatrix($members) {
+  static $TISSUES = array(
+    array('Root 8 days after sowing',            'root',      'Root',      'Seedling'),
+    array('Shoot 8 days after sowing',           'shoot',     'Shoot',     'Seedling'),
+    array('Vegetative base 11',                  'leaf_base', 'Leaf base', 'Leaf'),
+    array('Vegetative middle 11',                'leaf_mid',  'Leaf middle', 'Leaf'),
+    array('Vegetative tip 11',                   'leaf_tip',  'Leaf tip',  'Leaf'),
+    array('Meiotic tassel',                      'tassel',    'Tassel',    'Reproductive'),
+    array('Pre-pollination anther R1',           'anther',    'Anther',    'Reproductive'),
+    array('Meiotic ear',                         'ear',       'Ear',       'Reproductive'),
+    array('Endosperm 16 days after pollination', 'endosperm', 'Endosperm', 'Seed'),
+    array('Embryo 16 days after pollination',    'embryo',    'Embryo',    'Seed')
+  );
+  $SOURCE = 'NAM Consortium';
+
+  $tissues = array();
+  foreach ($TISSUES as $t) {
+    $tissues[] = array('key' => $t[1], 'label' => $t[0], 'short' => $t[2], 'group' => $t[3]);
+  }
+
+  /* Members by genome, for the genomes that have a release. */
+  $by_genome = array();
+  foreach ($members as $m) {
+    $g = $m['assembly'];
+    if ($g === null || $m['name'] === null) { continue; }
+    $by_genome[$g][] = $m;
+  }
+
+  $rows = array();
+  $missing = array();
+  $genomes = array();
+  $in_scope = 0;
+  $release = null;
+  foreach ($by_genome as $genome => $list) {
+    if (!class_exists('MgdbExpression') || !MgdbExpression::available($genome)) { continue; }
+    $pos = MgdbExpression::samplePositions($genome, $SOURCE, 'rna');
+    $idx = array();
+    foreach ($TISSUES as $t) { $idx[] = isset($pos[$t[0]]) ? $pos[$t[0]] : null; }
+    if (count(array_filter($idx, function ($v) { return $v !== null; })) === 0) { continue; }
+
+    $in_scope += count($list);
+    $names = array();
+    foreach ($list as $m) { $names[] = $m['name']; }
+    $values = MgdbExpression::batchValues($genome, $names, 'rna');
+    $genomes[$genome] = true;
+    if ($release === null) {
+      $man = MgdbData::manifest('expression', $genome);
+      $release = isset($man['release']) ? $man['release'] : null;
+    }
+
+    foreach ($list as $m) {
+      $gene = $m['name'];
+      if (!isset($values[$gene])) {
+        /* Stored as published; one case-insensitive read only on a miss. */
+        $alt = MgdbExpression::resolveCase($genome, $gene);
+        if ($alt !== null) {
+          $more = MgdbExpression::batchValues($genome, array($alt), 'rna');
+          if (isset($more[$alt])) { $values[$gene] = $more[$alt]; }
+        }
+      }
+      if (!isset($values[$gene])) { $missing[] = $gene; continue; }
+      $vals = array();
+      foreach ($idx as $i) {
+        $v = ($i === null || !isset($values[$gene][$i])) ? null : $values[$gene][$i];
+        $vals[] = $v === null ? null : (float) $v;
+      }
+      $rows[] = array(
+        'gene' => $gene,
+        'transcript' => $m['transcript'],
+        'genome' => $genome,
+        'line' => mgdbPanGeneShortLabel($genome),
+        'is_exemplar' => (bool) $m['is_exemplar'],
+        'html' => $m['html'],
+        'values' => $vals,
+        'tau' => mgdbPanGeneTau($vals),
+        'max' => count(array_filter($vals, function ($v) { return $v !== null; }))
+                 ? max(array_map(function ($v) { return $v === null ? 0 : $v; }, $vals)) : null
+      );
+    }
+  }
+
+  return array(
+    'source' => $SOURCE,
+    'source_link' => 'https://nam-genomes.github.io/',
+    'release' => $release,
+    'scale' => 'log2(value + 1)',
+    'tau_rule' => 'Computed only where some tissue reaches 1, the expression release\'s detection rule for RNA.',
+    'units_note' => 'Values as published by the NAM Consortium and averaged over biological replicates by qTeller. ' .
+                    'Compare tissues within a row freely; across genomes the samples were grown and sequenced together.',
+    'tissues' => $tissues,
+    'genome_count' => count($genomes),
+    'members_in_scope' => $in_scope,
+    'members_without_profile' => $missing,
+    'rows' => $rows
+  );
+}
+
+/* Tissue specificity, Yanai et al. 2005, on log2(value + 1): 0 when a gene is
+   expressed evenly across the tissues, 1 when it is expressed in one alone.
+
+   Null unless some tissue reaches 1 -- the same "detected" rule the expression
+   library applies to RNA (value >= 1). Without it tau is meaningless at noise
+   level and says the opposite of the truth: rp1's NC350 copy peaks at 0.29 in
+   one tissue and sits at ~0 in the rest, and scored 0.999, "almost perfectly
+   tissue-specific", for a gene barely detectable anywhere. Two of rp1's 98
+   rows scored above 0.99 that way, and neither reached 1 in any tissue.
+   Kryuchkova-Mostacci and Robinson-Rechavi (2017) recommend this filter. */
+function mgdbPanGeneTau($values) {
+  $x = array();
+  $raw_max = 0;
+  foreach ($values as $v) {
+    if ($v === null) { continue; }
+    $x[] = log($v + 1, 2);
+    if ($v > $raw_max) { $raw_max = $v; }
+  }
+  $n = count($x);
+  if ($n < 2 || $raw_max < 1) { return null; }
+  $max = max($x);
+  if ($max <= 0) { return null; }
+  $sum = 0;
+  foreach ($x as $v) { $sum += 1 - $v / $max; }
+  return round($sum / ($n - 1), 3);
 }
 
 /* The panel an assembly belongs to, read from its name. There is no column

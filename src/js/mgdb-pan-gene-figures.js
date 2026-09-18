@@ -2387,6 +2387,448 @@
 
   MGDB.panGeneMsa = panGeneMsa;
 
+  /* ------------------------------------------------------------------------
+     NAM expression heatmap
+
+     spec = {
+       matrix:   sections.expression_matrix
+       treeUrl:  the Newick, for tree order
+       filename: the TSV download name
+     }
+
+     One row per member gene model in B73v5 or a NAM founder, one column per
+     NAM Consortium tissue, and a tau column. Several rows for one line are
+     that line's paralogs -- on rp1, B97 alone carries eleven -- which is the
+     within-genome comparison the figure is for.
+
+     Colour is log2(value + 1) on the site's own heatmap ramp (the one Hot New
+     Papers uses): one hue, light to dark, the lightest step fading into the
+     page. A cell with no value in the release is hatched, never drawn as the
+     lightest colour -- 0 says "not expressed", a missing value says "not
+     measured", and a quarter of lg1's cells are the second.
+     ------------------------------------------------------------------------ */
+
+  var HEAT_RAMP = [[242, 239, 231], [215, 232, 220], [169, 208, 184], [79, 143, 104], [29, 92, 61]];
+
+  function heatColour(t) {
+    if (t == null || isNaN(t)) { return null; }
+    t = Math.max(0, Math.min(1, t));
+    var seg = t * (HEAT_RAMP.length - 1), i = Math.min(Math.floor(seg), HEAT_RAMP.length - 2), f = seg - i;
+    var a = HEAT_RAMP[i], b = HEAT_RAMP[i + 1];
+    return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ',' + Math.round(a[1] + (b[1] - a[1]) * f) + ',' +
+           Math.round(a[2] + (b[2] - a[2]) * f) + ')';
+  }
+
+  function log2p(v) { return v == null ? null : Math.log(v + 1) / Math.LN2; }
+
+  /* Average-linkage clustering of the rows' tissue patterns. Distance is
+     Euclidean on each row scaled to its own maximum, so two genes cluster for
+     sharing a pattern, not a level -- the level is what "Absolute" shows. Only
+     tissues both rows were measured in count, rescaled to all ten. */
+  function clusterRows(rows) {
+    var n = rows.length;
+    var prof = rows.map(function (r) {
+      var l = r.values.map(log2p);
+      var m = Math.max.apply(null, l.map(function (v) { return v == null ? 0 : v; }));
+      return l.map(function (v) { return v == null ? null : (m > 0 ? v / m : 0); });
+    });
+    function dist(a, b) {
+      var s = 0, k = 0;
+      for (var i = 0; i < a.length; i++) {
+        if (a[i] == null || b[i] == null) { continue; }
+        s += (a[i] - b[i]) * (a[i] - b[i]); k++;
+      }
+      return k ? Math.sqrt(s * a.length / k) : 1e9;
+    }
+    var clusters = [];
+    for (var i = 0; i < n; i++) { clusters.push({ id: i, members: [i], left: null, right: null, height: 0 }); }
+    var D = [];
+    for (var a = 0; a < n; a++) { D[a] = []; for (var b = 0; b < n; b++) { D[a][b] = a === b ? 0 : dist(prof[a], prof[b]); } }
+    var active = clusters.slice();
+    function linkage(x, y) {
+      var s = 0;
+      x.members.forEach(function (i) { y.members.forEach(function (j) { s += D[i][j]; }); });
+      return s / (x.members.length * y.members.length);
+    }
+    while (active.length > 1) {
+      var best = Infinity, bi = 0, bj = 1;
+      for (var p = 0; p < active.length; p++) {
+        for (var q = p + 1; q < active.length; q++) {
+          var d = linkage(active[p], active[q]);
+          if (d < best) { best = d; bi = p; bj = q; }
+        }
+      }
+      var merged = { members: active[bi].members.concat(active[bj].members),
+                     left: active[bi], right: active[bj], height: best };
+      active.splice(bj, 1);
+      active.splice(bi, 1, merged);
+    }
+    return active[0] || null;
+  }
+
+  function panGeneHeatmap(container, spec) {
+    var matrix = spec && spec.matrix;
+    if (!container || !matrix || !matrix.rows || !matrix.rows.length) { return null; }
+    var tissues = matrix.tissues || [];
+    var rows = matrix.rows.slice();
+    var mode = 'tree', scale = 'absolute';
+    var treeOrder = null, dendro = null;
+    var selected = {};
+
+    var globalMax = 0;
+    rows.forEach(function (r) { r.values.forEach(function (v) { var l = log2p(v); if (l != null && l > globalMax) { globalMax = l; } }); });
+    if (globalMax <= 0) { globalMax = 1; }
+
+    var lines = {};
+    rows.forEach(function (r) { lines[r.line] = true; });
+
+    container.insertAdjacentHTML('afterbegin',
+      '<div class="mgdb-rec-block mgdb-pg-heat-block">' +
+        '<div class="mgdb-rec-block-head">' +
+          '<h3>Expression across the NAM founders</h3>' +
+          '<div class="mgdb-pg-heat-tools">' +
+            '<label>Order <select data-role="heat-order" aria-label="Order the rows by">' +
+              '<option value="tree">Phylogenetic tree</option>' +
+              '<option value="cluster">Cluster by pattern</option>' +
+              '<option value="genome">Genome</option>' +
+              '<option value="tau">Tissue specificity</option>' +
+            '</select></label>' +
+            '<label>Scale <select data-role="heat-scale" aria-label="Colour scale">' +
+              '<option value="absolute">Absolute</option>' +
+              '<option value="row">Each row to its maximum</option>' +
+            '</select></label>' +
+            '<button class="mgdb-rec-tsv" type="button" data-role="heat-png">Export PNG</button>' +
+            '<button class="mgdb-rec-tsv" type="button" data-role="heat-tsv">Download TSV</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="mgdb-fig-desc">NAM expression heatmap: ' + number(matrix.genome_count) + ' genomes × ' +
+          number(tissues.length) + ' NAM tissues, tree or cluster ordering, with a tissue-specificity τ column.</p>' +
+        '<p class="mgdb-rec-block-status" data-role="heat-status"></p>' +
+        '<div class="mgdb-pg-heat-scroll" data-role="heat-scroll"></div>' +
+        '<div class="mgdb-pg-heat-legend" data-role="heat-legend"></div>' +
+        '<p class="mgdb-pg-heat-detail" data-role="heat-detail" aria-live="polite"></p>' +
+      '</div>');
+    var block = container.firstElementChild;
+    var scroller = block.querySelector('[data-role="heat-scroll"]');
+    var detail = block.querySelector('[data-role="heat-detail"]');
+    var idle = 'Hover a cell for its value; click a row to select that gene model in every figure.';
+    detail.textContent = idle;
+
+    function statusText() {
+      var missing = (matrix.members_without_profile || []).length;
+      var noTau = rows.filter(function (r) { return r.tau == null; }).length;
+      var nulls = 0;
+      rows.forEach(function (r) { r.values.forEach(function (v) { if (v == null) { nulls++; } }); });
+      return number(rows.length) + ' gene model' + (rows.length === 1 ? '' : 's') + ' across ' +
+        number(Object.keys(lines).length) + ' of the ' + number(matrix.genome_count) + ' genomes · ' +
+        esc(matrix.source) + ' RNA-seq, colour ' + esc(matrix.scale) +
+        (nulls ? ' · ' + number(nulls) + ' cell' + (nulls === 1 ? '' : 's') + ' not measured, hatched' : '') +
+        (missing ? ' · ' + number(missing) + ' member' + (missing === 1 ? ' has' : 's have') + ' no profile' : '') +
+        (noTau ? ' · τ is left blank for ' + number(noTau) + ' where no tissue reaches 1, since it ' +
+          'is meaningless at noise level' : '') + '.';
+    }
+    block.querySelector('[data-role="heat-status"]').innerHTML = statusText();
+
+    /* ---- ordering ------------------------------------------------------- */
+
+    function lineSort(a, b) {
+      var ab = a.line.indexOf('B73') === 0, bb = b.line.indexOf('B73') === 0;
+      if (ab !== bb) { return ab ? -1 : 1; }
+      var c = a.line.localeCompare(b.line, undefined, { numeric: true, sensitivity: 'base' });
+      return c || a.gene.localeCompare(b.gene);
+    }
+
+    function applyOrder() {
+      dendro = null;
+      if (mode === 'tree' && treeOrder) {
+        rows.sort(function (a, b) {
+          var x = treeOrder[a.transcript], y = treeOrder[b.transcript];
+          if (x == null && y == null) { return lineSort(a, b); }
+          if (x == null) { return 1; }
+          if (y == null) { return -1; }
+          return x - y;
+        });
+      } else if (mode === 'cluster') {
+        var root = clusterRows(rows);
+        var order = [];
+        (function walk(node) {
+          if (!node.left) { order.push(node.members[0]); return; }
+          walk(node.left); walk(node.right);
+        })(root);
+        var before = rows.slice();
+        rows = order.map(function (i) { return before[i]; });
+        /* Re-index the tree onto the new row order for drawing. */
+        var pos = {};
+        order.forEach(function (orig, k) { pos[orig] = k; });
+        (function reindex(node) {
+          if (!node.left) { node.row = pos[node.members[0]]; return; }
+          reindex(node.left); reindex(node.right);
+          node.row = (node.left.row + node.right.row) / 2;
+        })(root);
+        dendro = root;
+      } else if (mode === 'tau') {
+        rows.sort(function (a, b) {
+          var x = a.tau == null ? -1 : a.tau, y = b.tau == null ? -1 : b.tau;
+          return y - x || lineSort(a, b);
+        });
+      } else {
+        rows.sort(lineSort);
+      }
+    }
+
+    /* ---- drawing -------------------------------------------------------- */
+
+    var ROW = 16, HEAD = 46, GROUP_GAP = 8, TAU_W = 86, LINE_W = 64, GENE_W = 132;
+
+    function draw() {
+      var dendroW = dendro ? 56 : 0;
+      var left = dendroW + LINE_W + GENE_W + 10;
+      var avail = Math.max((scroller.clientWidth || 900) - 2, 560);
+      var groups = [];
+      tissues.forEach(function (t, i) {
+        if (!groups.length || groups[groups.length - 1].name !== t.group) { groups.push({ name: t.group, from: i, to: i }); }
+        else { groups[groups.length - 1].to = i; }
+      });
+      var gaps = (groups.length - 1) * GROUP_GAP;
+      var cellW = Math.max(30, Math.min(78, Math.floor((avail - left - TAU_W - gaps - 8) / tissues.length)));
+      var width = left + tissues.length * cellW + gaps + 12 + TAU_W;
+      var height = HEAD + rows.length * ROW + 6;
+      var x = [];
+      var cx = left;
+      tissues.forEach(function (t, i) {
+        if (i > 0 && tissues[i - 1].group !== t.group) { cx += GROUP_GAP; }
+        x.push(cx); cx += cellW;
+      });
+      var tauX = cx + 12;
+      var any = Object.keys(selected).length > 0;
+      var out = [];
+      out.push('<svg class="mgdb-pg-heat-svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' +
+        width + ' ' + height + '" role="img" aria-label="Expression of ' + rows.length +
+        ' gene models across ' + tissues.length + ' tissues">');
+      out.push('<defs><pattern id="mgdb-heat-hatch" width="6" height="6" patternUnits="userSpaceOnUse" ' +
+        'patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"></rect>' +
+        '<line x1="0" y1="0" x2="0" y2="6" stroke="#cfcac0" stroke-width="2"></line></pattern></defs>');
+
+      /* Column headers: the group over its tissues, then the tissue. */
+      groups.forEach(function (g) {
+        var gx0 = x[g.from], gx1 = x[g.to] + cellW;
+        out.push('<text class="mgdb-pg-heat-group" x="' + ((gx0 + gx1) / 2) + '" y="14" text-anchor="middle">' +
+          esc(g.name) + '</text>');
+        out.push('<path class="mgdb-pg-heat-rule" d="M' + (gx0 + 2) + ' 20H' + (gx1 - 2) + '"></path>');
+      });
+      tissues.forEach(function (t, i) {
+        out.push('<text class="mgdb-pg-heat-tissue" x="' + (x[i] + cellW / 2) + '" y="36" text-anchor="middle">' +
+          '<title>' + esc(t.label) + '</title>' + esc(t.short) + '</text>');
+      });
+      out.push('<text class="mgdb-pg-heat-group" x="' + (tauX + TAU_W / 2) + '" y="36" text-anchor="middle">' +
+        '<title>Tissue specificity over these ten tissues: 0 is even, 1 is one tissue alone.</title>τ</text>');
+
+      rows.forEach(function (r, ri) {
+        var y = HEAD + ri * ROW;
+        var isSel = any && selected[r.gene];
+        var dim = any && !isSel;
+        out.push('<g class="mgdb-pg-heat-row' + (isSel ? ' is-picked' : '') + (dim ? ' is-dim' : '') +
+          '" data-row="' + ri + '">');
+        out.push('<rect class="mgdb-pg-heat-hit" x="' + dendroW + '" y="' + y + '" width="' + (width - dendroW) +
+          '" height="' + ROW + '"></rect>');
+        var firstOfLine = ri === 0 || rows[ri - 1].line !== r.line || mode === 'tree' || mode === 'cluster' || mode === 'tau';
+        if (firstOfLine) {
+          out.push('<text class="mgdb-pg-heat-line" x="' + (dendroW + 4) + '" y="' + (y + ROW - 4.5) + '">' +
+            esc(r.line) + '</text>');
+        }
+        out.push('<text class="mgdb-pg-heat-gene' + (r.is_exemplar ? ' is-exemplar' : '') + '" x="' +
+          (dendroW + LINE_W) + '" y="' + (y + ROW - 4.5) + '">' + esc(r.gene) + '</text>');
+        var rowMax = 0;
+        r.values.forEach(function (v) { var l = log2p(v); if (l != null && l > rowMax) { rowMax = l; } });
+        r.values.forEach(function (v, i) {
+          var l = log2p(v);
+          var fill = l == null ? 'url(#mgdb-heat-hatch)'
+            : heatColour(scale === 'row' ? (rowMax > 0 ? l / rowMax : 0) : l / globalMax);
+          out.push('<rect class="mgdb-pg-heat-cell" data-col="' + i + '" x="' + x[i] + '" y="' + (y + 1) +
+            '" width="' + (cellW - 2) + '" height="' + (ROW - 2) + '" rx="2" fill="' + fill + '"></rect>');
+        });
+        if (r.tau != null) {
+          out.push('<rect class="mgdb-pg-heat-taubar" x="' + tauX + '" y="' + (y + 4) + '" width="' +
+            (r.tau * 44).toFixed(1) + '" height="' + (ROW - 8) + '" rx="2"></rect>');
+          out.push('<text class="mgdb-pg-heat-tau" x="' + (tauX + 50) + '" y="' + (y + ROW - 4.5) + '">' +
+            r.tau.toFixed(2) + '</text>');
+        } else {
+          out.push('<text class="mgdb-pg-heat-tau is-none" x="' + (tauX + 50) + '" y="' + (y + ROW - 4.5) +
+            '">–</text>');
+        }
+        out.push('</g>');
+      });
+
+      if (dendro) {
+        var maxH = dendro.height || 1;
+        var DX = function (h) { return 4 + (1 - h / maxH) * (dendroW - 10); };
+        var DY = function (row) { return HEAD + row * ROW + ROW / 2; };
+        (function link(node) {
+          if (!node.left) { return; }
+          var xh = DX(node.height);
+          [node.left, node.right].forEach(function (c) {
+            var xc = c.left ? DX(c.height) : dendroW - 4;
+            out.push('<path class="mgdb-pg-heat-dendro" d="M' + xh.toFixed(1) + ' ' + DY(c.row).toFixed(1) +
+              'H' + xc.toFixed(1) + '"></path>');
+            link(c);
+          });
+          out.push('<path class="mgdb-pg-heat-dendro" d="M' + xh.toFixed(1) + ' ' + DY(node.left.row).toFixed(1) +
+            'V' + DY(node.right.row).toFixed(1) + '"></path>');
+        })(dendro);
+      }
+
+      out.push('</svg>');
+      scroller.innerHTML = out.join('');
+      block.querySelector('[data-role="heat-legend"]').innerHTML = legendHtml();
+    }
+
+    function legendHtml() {
+      var stops = [];
+      for (var i = 0; i <= 10; i++) { stops.push(heatColour(i / 10) + ' ' + (i * 10) + '%'); }
+      return '<span class="mgdb-pg-heat-ramp" style="background:linear-gradient(to right,' + stops.join(',') +
+        ')" aria-hidden="true"></span>' +
+        '<span class="mgdb-pg-heat-rampcap">' + (scale === 'row'
+          ? '0 → each row’s highest tissue'
+          : '0 → ' + globalMax.toFixed(1) + ' ' + esc(matrix.scale)) + '</span>' +
+        '<span class="mgdb-pg-heat-hatchkey" aria-hidden="true"></span><span>not measured</span>';
+    }
+
+    /* ---- interaction ----------------------------------------------------- */
+
+    scroller.addEventListener('mousemove', function (event) {
+      var g = event.target.closest ? event.target.closest('[data-row]') : null;
+      if (!g) { detail.textContent = idle; return; }
+      var r = rows[+g.getAttribute('data-row')];
+      var cell = event.target.getAttribute('data-col');
+      var bits = [(r.html ? '<a href="' + esc(r.html) + '">' : '') + '<span class="mgdb-sequence">' +
+        esc(r.gene) + '</span>' + (r.html ? '</a>' : ''), '<strong>' + esc(r.line) + '</strong>'];
+      if (cell != null) {
+        var t = tissues[+cell], v = r.values[+cell];
+        bits.push(esc(t.label) + ': ' + (v == null ? 'not measured'
+          : '<strong>' + v.toLocaleString(undefined, { maximumSignificantDigits: 4 }) + '</strong> (log2 ' +
+            log2p(v).toFixed(2) + ')'));
+      }
+      bits.push('τ ' + (r.tau == null ? 'not computed, no tissue reaches 1' : r.tau.toFixed(2)));
+      if (r.is_exemplar) { bits.push('<span class="mgdb-pill mgdb-pill-ok">Exemplar</span>'); }
+      detail.innerHTML = bits.join(' &middot; ');
+    });
+    scroller.addEventListener('mouseleave', function () { detail.textContent = idle; });
+
+    scroller.addEventListener('click', function (event) {
+      var g = event.target.closest ? event.target.closest('[data-row]') : null;
+      if (!g) { return; }
+      var gene = rows[+g.getAttribute('data-row')].gene;
+      var sel = MGDB.panGeneSelection.get();
+      if (sel && sel.genes.length === 1 && sel.genes[0] === gene) { MGDB.panGeneSelection.clear(); return; }
+      MGDB.panGeneSelection.set({ genes: [gene], label: gene, source: 'heatmap', filter: gene });
+    });
+
+    MGDB.panGeneSelection.subscribe(function (sel) {
+      selected = {};
+      if (sel) { sel.genes.forEach(function (g) { selected[g] = true; }); }
+      var any = !!sel;
+      Array.prototype.forEach.call(scroller.querySelectorAll('[data-row]'), function (g) {
+        var hit = any && selected[rows[+g.getAttribute('data-row')].gene];
+        g.classList.toggle('is-dim', any && !hit);
+        g.classList.toggle('is-picked', !!hit);
+      });
+    });
+
+    block.querySelector('[data-role="heat-order"]').addEventListener('change', function () {
+      mode = this.value; applyOrder(); draw();
+    });
+    block.querySelector('[data-role="heat-scale"]').addEventListener('change', function () {
+      scale = this.value; draw();
+    });
+
+    block.querySelector('[data-role="heat-tsv"]').addEventListener('click', function () {
+      var columns = [
+        { label: 'Gene model', get: function (r) { return r.gene; } },
+        { label: 'Line', get: function (r) { return r.line; } },
+        { label: 'Genome', get: function (r) { return r.genome; } }
+      ];
+      tissues.forEach(function (t, i) {
+        columns.push({ label: t.label, get: function (r) { return r.values[i] == null ? '' : r.values[i]; } });
+      });
+      columns.push({ label: 'Tau (these ten tissues)', get: function (r) { return r.tau == null ? '' : r.tau; } });
+      if (window.MGDBRecord && window.MGDBRecord.downloadTsv) {
+        window.MGDBRecord.downloadTsv(spec.filename || 'pan-gene-nam-expression.tsv', columns, rows);
+      }
+    });
+
+    block.querySelector('[data-role="heat-png"]').addEventListener('click', function () {
+      var svg = scroller.querySelector('svg');
+      if (!svg) { return; }
+      var M = 24, HEADER = 54;
+      var w = +svg.getAttribute('width'), h = +svg.getAttribute('height');
+      var clone = inlineSvgStyles(svg);
+      clone.setAttribute('x', M);
+      clone.setAttribute('y', HEADER);
+      var body = xText(M, M + 6, 'Expression across the NAM founders', { size: 17, weight: 700, fill: '#1f2723' });
+      body += xText(M, M + 26, rows.length + ' gene models · ' + matrix.source + ' · ' +
+        (scale === 'row' ? 'each row scaled to its maximum' : matrix.scale + ', 0 to ' + globalMax.toFixed(1)) +
+        ' · ordered by ' + block.querySelector('[data-role="heat-order"] option:checked').textContent.toLowerCase(),
+        { size: 11, fill: '#5d6b62' });
+      body += new XMLSerializer().serializeToString(clone);
+      var lx = M, ly = HEADER + h + 16;
+      for (var i = 0; i < 40; i++) {
+        body += '<rect x="' + (lx + i * 4) + '" y="' + ly + '" width="4" height="10" fill="' + heatColour(i / 39) + '"></rect>';
+      }
+      body += xText(lx + 168, ly + 9, scale === 'row' ? '0 → row maximum' : '0 → ' + globalMax.toFixed(1),
+        { size: 10, fill: '#5d6b62' });
+      body += xText(M, ly + 30, 'MaizeGDB · hatched: not measured · τ over these ten tissues (Yanai 2005), blank where no tissue reaches 1',
+        { size: 10, fill: '#7c837e' });
+      exportSvgToPng(body, w + 2 * M, ly + 40,
+        (spec.filename || 'pan-gene-nam-expression.tsv').replace(/\.tsv$/, '') + '.png');
+    });
+
+    var lastW = 0;
+    function onResize() {
+      if (!scroller.clientWidth || Math.abs(scroller.clientWidth - lastW) < 8) { return; }
+      lastW = scroller.clientWidth; draw();
+    }
+    var debounced = MGDB.debounce ? MGDB.debounce(onResize, 150) : onResize;
+    if (window.ResizeObserver) { new window.ResizeObserver(debounced).observe(scroller); }
+    window.addEventListener('resize', debounced);
+
+    /* Tree order when the tree loads, genome order until then and if it
+       does not. */
+    mode = 'genome';
+    applyOrder();
+    draw();
+    lastW = scroller.clientWidth;
+    if (spec.treeUrl && MGDB.parseNewick) {
+      fetch(spec.treeUrl, { credentials: 'omit' })
+        .then(function (r) { return r.ok ? r.text() : null; })
+        .then(function (text) {
+          if (!text) { throw new Error('no tree'); }
+          var idx = {}, n = 0;
+          (function walk(node) {
+            if (!node.children.length) { if (node.name) { idx[node.name] = n++; } return; }
+            node.children.forEach(walk);
+          })(MGDB.parseNewick(text));
+          treeOrder = idx;
+          mode = 'tree';
+          block.querySelector('[data-role="heat-order"]').value = 'tree';
+          applyOrder();
+          draw();
+        })
+        .catch(function () {
+          var sel = block.querySelector('[data-role="heat-order"]');
+          sel.value = 'genome';
+          sel.querySelector('option[value="tree"]').disabled = true;
+        });
+    } else {
+      block.querySelector('[data-role="heat-order"]').value = 'genome';
+      block.querySelector('[data-role="heat-order"] option[value="tree"]').disabled = true;
+    }
+
+    return { element: block };
+  }
+
+  MGDB.panGeneHeatmap = panGeneHeatmap;
+
+
   MGDB.parseNewick = parseNewick;
 
 

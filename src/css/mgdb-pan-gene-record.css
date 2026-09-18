@@ -647,3 +647,90 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
 @media (max-width: 640px) {
   .mgdb-pg-msa-block .mgdb-pg-msa-detail { padding: var(--mgdb-space-2) var(--mgdb-space-3); }
 }
+
+/* ── NAM expression heatmap ───────────────────────────────────────────────
+   Drawn at real pixel size and scrolled sideways inside its own box on a
+   narrow screen, like the tree, so its labels never shrink.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mgdb-pg-heat-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-pg-heat-tools label { display: inline-flex; gap: 6px; align-items: center; }
+.mgdb-pg-heat-tools select {
+  height: 32px;
+  padding: 0 var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+}
+
+.mgdb-pg-heat-scroll {
+  margin-top: var(--mgdb-space-3);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+}
+/* `.mgdb-page svg { max-width: 100% }` would scale the drawing, and its
+   labels, down to the box. */
+.mgdb-pg-heat-scroll .mgdb-pg-heat-svg { display: block; max-width: none; }
+
+.mgdb-pg-heat-group { fill: var(--mgdb-ink-soft); font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.mgdb-pg-heat-tissue { fill: var(--mgdb-ink-soft); font-size: 10.5px; }
+.mgdb-pg-heat-rule { stroke: var(--mgdb-line); stroke-width: 1; fill: none; }
+.mgdb-pg-heat-line { fill: var(--mgdb-ink); font-size: 10.5px; font-weight: 700; }
+.mgdb-pg-heat-gene {
+  fill: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+}
+.mgdb-pg-heat-gene.is-exemplar { fill: var(--mgdb-ink); font-weight: 700; }
+.mgdb-pg-heat-cell { stroke: none; }
+.mgdb-pg-heat-hit { fill: transparent; }
+.mgdb-pg-heat-row { cursor: pointer; }
+.mgdb-pg-heat-row:hover .mgdb-pg-heat-hit { fill: var(--mgdb-surface-sunken); }
+.mgdb-pg-heat-row.is-dim { opacity: .3; }
+.mgdb-pg-heat-row.is-picked .mgdb-pg-heat-hit { fill: rgba(11, 87, 164, .10); }
+.mgdb-pg-heat-row.is-picked .mgdb-pg-heat-gene { fill: var(--mgdb-focus); font-weight: 700; }
+.mgdb-pg-heat-taubar { fill: var(--mgdb-ink-soft); opacity: .55; }
+.mgdb-pg-heat-tau { fill: var(--mgdb-ink-soft); font-size: 10px; font-variant-numeric: tabular-nums; }
+.mgdb-pg-heat-tau.is-none { fill: var(--mgdb-muted); }
+.mgdb-pg-heat-dendro { stroke: var(--mgdb-muted); stroke-width: 1; fill: none; }
+
+.mgdb-pg-heat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-pg-heat-ramp { display: inline-block; width: 160px; height: 10px; border-radius: 3px; }
+.mgdb-pg-heat-hatchkey {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  margin-left: var(--mgdb-space-3);
+  border-radius: 2px;
+  background: repeating-linear-gradient(45deg, #ffffff 0 2px, #cfcac0 2px 4px);
+}
+
+.mgdb-pg-heat-block .mgdb-pg-heat-detail {
+  min-height: calc(2 * var(--mgdb-leading-snug) * 1em);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-pg-heat-detail strong { color: var(--mgdb-ink); }

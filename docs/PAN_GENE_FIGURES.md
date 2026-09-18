@@ -17,7 +17,7 @@ chr9 while the pan-gene is chr10).
 | 2 | Domain architecture ribbons (collapse identical `domain_string`s) | **Live on dev 2026-09-17** |
 | 3 | Interactive SVG tree from the Newick, linked selection | **Live on dev 2026-09-17** |
 | 4 | Conservation profile + working MSA (windowed canvas) | **Live on dev 2026-09-17** |
-| 5 | NAM expression heatmap (26 genomes x 10 NAM Consortium tissues) | planned |
+| 5 | NAM expression heatmap (26 genomes x 10 NAM Consortium tissues) | **Live on dev 2026-09-17** |
 | 6 | Homeolog / paralog comparison within a genome | planned |
 | 7 | Chromosome placement map | needs gene-model releases for NAM + PanAnd |
 | 8 | Gene structure stack under the MSA | needs gene-model releases |
@@ -251,3 +251,35 @@ figure says so rather than guessing a mapping.
 - `requestAnimationFrame` does not run while the browser pane is hidden
   (`document.hidden`), so a test that awaits frames hangs. Swap in a
   synchronous `requestAnimationFrame` for the duration of the measurement.
+
+## Figure 5: NAM expression heatmap
+
+A new `expression_matrix` section on the record API, drawn by
+`MGDB.panGeneHeatmap` at the top of the Expression section.
+
+- **26 genomes carry the NAM Consortium's ten RNA-seq tissues** -- B73v5 and
+  the 25 founders -- checked against all 27 expression releases; B73v4 carries
+  none. Tissues are matched by study and label, never by sample id, since ids
+  are numbered per release.
+- **Batch reads, server-side.** Each release is a read-only SQLite file keyed
+  by gene. `MgdbExpression::batchValues()` reads one genome's members in one
+  `IN (...)` statement, so a pan-gene costs one read per genome it touches --
+  26 at most -- with no database query. 120 ms for the example, 150 ms for rp1;
+  one request from the page instead of 26 client batch calls, and ~10-30 KB.
+- **Verified cell by cell**: 80 cells checked against the per-gene expression
+  API, 0 mismatches, nulls included.
+- **Not measured is hatched, never drawn as zero.** A quarter of lg1's cells
+  and 48 of rp1's 980 have no value in the release; 0 means "not expressed",
+  null means "not measured".
+- **tau only where a tissue reaches 1**, the release's own RNA detection rule
+  (`detected_threshold.rna = value >= 1`). Without it tau reads the opposite of
+  the truth at noise level: rp1's NC350 copy peaks at 0.29 and scored 0.999,
+  "almost perfectly tissue-specific". Blank for 6 of lg1's 26 rows, 7 of rp1's.
+- Order by phylogenetic tree (default once the Newick loads), cluster by
+  pattern (average linkage on row-scaled log2 profiles, with a dendrogram;
+  18 ms for 98 rows), genome, or tau. Scale absolute or each row to its own
+  maximum. Colour is the site's existing heatmap ramp (Hot New Papers).
+- The figure shows real biology: lg1 is expressed at the leaf base -- where the
+  ligule forms -- and in the tassel, consistently across the founders. rp1's
+  NLR copies (98 rows; B97 alone has eleven) sit in leaf and ear and are quiet
+  in seed.

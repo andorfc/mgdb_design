@@ -729,7 +729,7 @@
       rendered.push('pg-record-domains');
     }
 
-    if (R.collection(els.expressionBody, {
+    var expressionLinks = R.collection(els.expressionBody, {
       title: 'Expression for pan-gene members in qTeller',
       items: sections.expression,
       filename: 'pan-gene-expression.tsv',
@@ -741,7 +741,15 @@
         { key: 'url', label: 'qTeller', sort: false, get: function (e) { return e.url; },
           html: function (e) { return R.link(e.url, 'Expression profile', true); } }
       ]
-    })) { rendered.push('pg-record-expression'); }
+    });
+    /* The heatmap above the qTeller links, drawn from the record's own
+       expression_matrix. Either one is enough to show the section. */
+    var heat = MGDB.panGeneHeatmap ? MGDB.panGeneHeatmap(els.expressionBody, {
+      matrix: sections.expression_matrix,
+      treeUrl: sections.tree ? sections.tree.url : null,
+      filename: 'pan-gene-nam-expression.tsv'
+    }) : null;
+    if (expressionLinks || heat) { rendered.push('pg-record-expression'); }
 
     if (R.collection(els.insertionsBody, {
       title: 'Insertions in pan-gene members',
