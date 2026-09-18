@@ -856,8 +856,19 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   /////
 
   if (isset($want['viewers'])) {
-    $gcv = 'https://gcv.maizegdb.org/gene;maize=' . rawurlencode((string) $exemplar)
-         . '?sources=maize&q=' . rawurlencode((string) $exemplar);
+    /* The GENE MODEL, not the exemplar transcript. The GCV indexes gene
+       models only: its /microservices/genes answers {"genes": []} for
+       Zm00023ab070050_T001 and the viewer draws nothing but its own controls,
+       while Zm00023ab070050 resolves to Zm-CML247-REFERENCE-NAM-1.0-chr2 in
+       family PanZea.v4.pan02070 and draws the micro-synteny tracks. Checked on
+       both test records, 2026-09-17: the example and rp1 (Zm00111aa044643, 38
+       tracks). The legacy template built the same URL from the transcript,
+       so this had never worked on either page. The GCV sends no
+       X-Frame-Options or frame-ancestors, so the embed needs nothing else. */
+    $gcv_id = $exemplar_gene_model !== null && $exemplar_gene_model !== ''
+      ? $exemplar_gene_model : $exemplar;
+    $gcv = 'https://gcv.maizegdb.org/gene;maize=' . rawurlencode((string) $gcv_id)
+         . '?sources=maize&q=' . rawurlencode((string) $gcv_id);
     $ncbi = mgdbPanGeneNcbiViewers($DBConn, isset($sections['overview'])
               ? $sections['overview']['loci'] : array(), $exemplar_gene_model);
     $sections['viewers'] = array(
