@@ -1,0 +1,187 @@
+/* file: mgdb-genome-figure.css
+ *
+ * purpose: /genome_figure -- the toolbar, the figure card and the data table.
+ *
+ *          This sheet styles the page AROUND the chart and nothing inside it.
+ *          The SVG carries its own colours and fonts as presentation
+ *          attributes, because an exported SVG takes no stylesheet with it;
+ *          anything styled from here would be lost the moment the figure was
+ *          downloaded. The only rules that touch the <svg> are its box.
+ *
+ * history:
+ *  09/20/26  claude  created
+ */
+
+/* --------------------------------------------------------------------------
+   Toolbar
+   -------------------------------------------------------------------------- */
+
+.gf-page .gf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.gf-page .gf-views {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid #dfe4d8;
+  border-radius: 9px;
+  background: #f4f6f0;
+}
+
+.gf-page .gf-view {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #4c5245;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gf-page .gf-view:hover { color: var(--mgdb-green); }
+.gf-page .gf-view.is-active {
+  background: #fff;
+  color: #23281c;
+  box-shadow: 0 1px 2px rgba(30, 40, 15, .12);
+}
+.gf-page .gf-view:focus-visible {
+  outline: 2px solid var(--mgdb-green);
+  outline-offset: 2px;
+}
+
+.gf-page .gf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.gf-page .gf-check {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: #697065;
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.gf-page .gf-download,
+.gf-page .gf-table-head button {
+  padding: 8px 14px;
+  border: 1px solid #dfe4d8;
+  border-radius: 7px;
+  background: #fff;
+  color: #4c5245;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gf-page .gf-download:hover,
+.gf-page .gf-table-head button:hover {
+  border-color: var(--mgdb-green);
+  color: var(--mgdb-green);
+}
+.gf-page .gf-download:focus-visible,
+.gf-page .gf-table-head button:focus-visible {
+  outline: 2px solid var(--mgdb-green);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   The figure
+
+   The SVG is the deliverable, so it gets the full width of the section and a
+   plain white bed -- what it will look like on a slide, at the size it will be
+   used. No card chrome inside the drawing area.
+   -------------------------------------------------------------------------- */
+
+.gf-page .gf-figure { margin: 0; }
+.gf-page .gf-canvas { position: relative; }
+
+/* (0,2,0), because .mgdb-page svg { max-width: 100% } from the shared sheet is
+   (0,1,1) and would otherwise win the height. */
+.gf-page .gf-canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: pan-y;
+  border: 1px solid #e6e9e0;
+  border-radius: var(--mgdb-radius-md);
+  background: #fff;
+}
+
+/* The alternative text the SVG's aria-labelledby points at. Off-screen rather
+   than display:none, which would remove it from the accessibility tree and
+   leave the chart unlabelled. */
+.gf-page .gf-alt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.gf-page .gf-tip {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -115%);
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #23281c;
+  color: #fff;
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(30, 40, 15, .07), 0 9px 24px rgba(30, 40, 15, .06);
+  transition: opacity .1s;
+}
+.gf-page .gf-tip.is-visible { opacity: 1; }
+
+.gf-page .gf-figure figcaption {
+  margin-top: var(--mgdb-space-3);
+  color: #697065;
+  font-size: var(--mgdb-text-sm);
+}
+
+.gf-page .gf-status {
+  min-height: 1.4em;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-green);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   The numbers
+   -------------------------------------------------------------------------- */
+
+.gf-page .gf-metrics { margin-bottom: var(--mgdb-space-5); }
+
+.gf-page .gf-table-head { margin-bottom: var(--mgdb-space-3); }
+
+.gf-page .gf-row-projected th,
+.gf-page .gf-row-projected td {
+  background: #eef4fd;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .gf-page .gf-toolbar { align-items: stretch; }
+  .gf-page .gf-views { width: 100%; }
+  .gf-page .gf-view { flex: 1; }
+  /* The checkbox on its own row above the two buttons, which then share one.
+     Left to wrap on their own the three controls set as 2 + 1, which reads as
+     though the second row belonged to something else. */
+  .gf-page .gf-actions { width: 100%; }
+  .gf-page .gf-check { order: -1; width: 100%; }
+  .gf-page .gf-download { flex: 1; }
+}

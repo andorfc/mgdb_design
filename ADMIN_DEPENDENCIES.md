@@ -3248,3 +3248,46 @@ system and could be overwritten.
   it**, so any future key for these four cards must use the new spelling. None
   of the five current links is on one of them.
 - **Status:** proposed
+
+## AD-079 — `chado.genome_information` lists Zm-Mo17-REFERENCE-CAU-2.0 twice, under two cultivar spellings
+
+- **Date:** 2026-09-20
+- **Affected component:** the materialized view `chado.genome_information`;
+  `controllers/genome/genome_center_modern.php`; the Genome Data Hub at
+  `/genome` and the timeline figure at `/genome_figure`
+- **Current limitation:** Project 82, *A complete telomere-to-telomere assembly
+  of the maize genome*, carries the assembly `Zm-Mo17-REFERENCE-CAU-2.0` twice.
+  The two rows are identical in every column the Genome Center reads except
+  `cultivar`, which is `Mo17` on one and `Mo17-2021` on the other:
+
+  | column | row 1 | row 2 |
+  |---|---|---|
+  | `assembly` | `Zm-Mo17-REFERENCE-CAU-2.0` | `Zm-Mo17-REFERENCE-CAU-2.0` |
+  | `cultivar` | `Mo17` | `Mo17-2021` |
+  | `project_id` | 82 | 82 |
+  | `accession` | `PRJNA751841` | `PRJNA751841` |
+  | `assembly_identifier` | `Zm00014b` | `Zm00014b` |
+  | `synonyms` | `Zm-Mo17-REFERENCE-CAU-T2T-assembly` | *same* |
+
+  The hub's assembly query is `SELECT DISTINCT` over seven columns, so the
+  disagreement in one of them defeats the DISTINCT and the assembly comes back
+  twice. That put a duplicate row in the assembly table and made **every count
+  on the page one too high**: Total Assemblies read **161** where 160
+  assemblies are hosted, the hero sentence said 161, Cultivated Maize was one
+  over, and 161 was the final point of the growth chart — the figure people
+  take into talks. It was the only such duplicate: 161 rows over 160 distinct
+  assembly names. The in-progress list is clean, 4 of 4.
+- **Worked around 2026-09-20:** `gcOneRowPerAssembly()` in
+  `controllers/genome/genome_center_modern.php` collapses the rows on the way
+  out, keeping the first in `(assembly, cultivar)` order so the choice is the
+  same on every request rather than whatever the planner returned first. For
+  Mo17 that keeps the line name over the year-tagged spelling. The `mgdb` role
+  has **SELECT only**, so this cannot be fixed in the data from the website.
+- **Requested:** a curator with write access removing the duplicate cultivar
+  value behind the view, so one assembly is one row. `Mo17` is the line;
+  `Mo17-2021` looks like a release tag that reached the cultivar field.
+- **Once done:** `gcOneRowPerAssembly()` can be deleted, though it is harmless
+  to leave — it is a no-op for a collection with no repeated assembly, and it
+  is the only thing standing between another such row and a wrong number on
+  every genome page.
+- **Status:** proposed

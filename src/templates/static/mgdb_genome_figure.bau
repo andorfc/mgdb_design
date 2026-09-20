@@ -1,0 +1,138 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-genome-figure
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page gf-page" id="mgdb-genome-figure-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genome">Genome Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Timeline figure</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="gf-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/assembly_puzzle.png" alt="Genome assembly puzzle icon" />
+      <strong>Genome<br />Timeline</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="gf-title">Genome stewardship timeline</h1>
+      <p class="mgdb-hero-description">The growth chart from the Genome Data Hub on its own, sized and styled for a slide. Switch between the record to date and the same curve projected to $(projection-year), then download it as SVG or PNG.</p>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       The figure
+       ==================================================================== -->
+  <section id="gf-figure" aria-labelledby="gf-figure-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gf-figure-title">Figure</h2></div>
+    </div>
+
+    <div class="gf-toolbar">
+      <div class="gf-views" role="group" aria-label="Which timeline to show">
+        <button type="button" class="gf-view is-active" id="gf-view-current" data-view="current" aria-pressed="true">Current</button>
+        <button type="button" class="gf-view" id="gf-view-projected" data-view="projected" aria-pressed="false">Projected</button>
+      </div>
+      <div class="gf-actions">
+        <label class="gf-check"><input type="checkbox" id="gf-title-toggle" checked> Title in export</label>
+        <button type="button" class="gf-download" id="gf-download-svg">Download SVG</button>
+        <button type="button" class="gf-download" id="gf-download-png">Download PNG</button>
+      </div>
+    </div>
+
+    <figure class="mgdb-figure gf-figure">
+      <div class="gf-canvas">
+        <svg id="gf-chart" viewBox="0 0 960 470" role="img" aria-labelledby="gf-chart-alt"></svg>
+        <p class="gf-alt" id="gf-chart-alt">Line chart of genome assemblies hosted at MaizeGDB by year.</p>
+        <div class="gf-tip" id="gf-tip" role="status" aria-live="polite"></div>
+      </div>
+      <figcaption id="gf-caption"></figcaption>
+    </figure>
+
+    <div class="gf-status" id="gf-status" role="status" aria-live="polite"></div>
+  </section>
+
+  <!-- ====================================================================
+       The numbers
+       ==================================================================== -->
+  <section id="gf-data" aria-labelledby="gf-data-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gf-data-title">The numbers</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid gf-metrics">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>Hosted today</h3>
+          <span class="mgdb-metric-badge">$(current-year)</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(current-total)</strong>
+        </div>
+        <p class="mgdb-metric-description">Completed, publicly visible genome assemblies. The live figure, read from the same query the Genome Data Hub uses.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <h3>$(projection-label)</h3>
+          <span class="mgdb-metric-badge">Projected</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">&#43;$(projection-added)</strong>
+        </div>
+        <p class="mgdb-metric-description">Further assemblies expected by $(projection-year). A stated plan, not a measurement.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>Total by $(projection-year)</h3>
+          <span class="mgdb-metric-badge">If met</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(projection-total)</strong>
+        </div>
+        <p class="mgdb-metric-description">Today's collection plus the projected additions.</p>
+      </article>
+    </div>
+
+    <div class="gf-table-head">
+      <button type="button" id="gf-table-toggle" aria-expanded="false" aria-controls="gf-table-wrap">Show data table</button>
+    </div>
+    <div class="mgdb-table-scroll gf-table-wrap" id="gf-table-wrap" hidden>
+      <table class="mgdb-table" id="gf-table">
+        <caption>Genome assemblies hosted at MaizeGDB by year</caption>
+        <thead><tr><th scope="col">Year</th><th scope="col" class="mgdb-numeric">Assemblies</th><th scope="col" class="mgdb-numeric">Change</th><th scope="col">Landmark release</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-note">$(growth-note)</p>
+    <p class="mgdb-note"><strong>About the projection&#58;</strong> the $(projection-added) additional assemblies are the $(projection-label) target for $(projection-year), not a count of anything held today. The projected segment is drawn dashed, in a second colour, with a hollow end point, and no value is claimed for the intervening year.</p>
+  </section>
+
+  <!-- ====================================================================
+       Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="gf-tools" aria-labelledby="gf-tools-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gf-tools-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/genome#genome-overview">
+          <strong>Genome Data Hub metrics</strong>
+          <span>This same chart in its place on the hub, beside the live collection figures</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Search, filter and open every assembly MaizeGDB hosts</span>
+        </a>
+        <a href="/maize_history">
+          <strong>MaizeGDB and community history</strong>
+          <span>The wider timeline these releases sit in</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script id="gf-figure-data" type="application/json">$(figure-data)</script>
+
+</main>
+)

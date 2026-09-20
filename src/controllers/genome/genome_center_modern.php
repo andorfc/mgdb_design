@@ -62,6 +62,26 @@ $sql = "
 $sth  = make_query($DBConn, $sql);
 $rows = get_all_rows($sth);
 
+/*
+ * One row per assembly.
+ *
+ * genome_information is a materialized view and the DISTINCT above is over
+ * seven columns, so an assembly whose source rows disagree in any one of them
+ * comes back twice. Zm-Mo17-REFERENCE-CAU-2.0 does: project 82 carries it with
+ * cultivar 'Mo17' and again with 'Mo17-2021', every other column identical.
+ * That put a duplicate row in the assembly table and made every count on this
+ * page one too high -- Total Assemblies read 161 where 160 assemblies are
+ * hosted, and the same figure ended the growth chart.
+ *
+ * The database is SELECT-only from here, so the duplicate is collapsed on the
+ * way out: the first row in (assembly, cultivar) order, so the choice is the
+ * same on every request rather than whatever the planner returned first. For
+ * Mo17 that keeps the line name over the year-tagged spelling. Logged as
+ * AD-079. When the view is corrected this block costs nothing -- it is a no-op
+ * for a collection with no repeated assembly.
+ */
+$rows = gcOneRowPerAssembly($rows);
+
 /* In-progress assemblies. */
 $sql_progress = "
     SELECT DISTINCT gi.assembly, gi.cultivar, gi.status, gi.sequencing_technologies, gi.collaborators
@@ -77,13 +97,9 @@ $sql_progress = "
 $progress_rows = get_all_rows(make_query($DBConn, $sql_progress));
 
 /*
- * Release dates, for the growth chart.
- *
- * chado.genome_metadata.release_date is free text. The documented formats are
- * YYYY-MM-DD and YYYY; the column also still holds DD-Mon-YY, M/D/YYYY,
- * "Nov, 2017", "fall 2017" and "1st of February 2017 (pre-release)". Only a
- * year is needed here, so all of those are reduced to one rather than parsed
- * as dates.
+ * Release dates, for the growth chart. The column is free text; only a year is
+ * needed, and gcReleaseYear() in include/genome_growth_lib.php reduces every
+ * shape it holds to one.
  */
 $sql_dates = "
     SELECT gm.assembly_name, btrim(gm.release_date) AS release_date
@@ -91,25 +107,24 @@ $sql_dates = "
     WHERE gm.release_date IS NOT NULL AND btrim(gm.release_date) <> ''";
 $date_rows = get_all_rows(make_query($DBConn, $sql_dates));
 
-function gcReleaseYear($value) {
-    $v = trim((string)$value);
-    if ($v === '' || stripos($v, 'n/a') === 0) { return null; }
-
-    // Documented formats first, then anything carrying a four-digit year.
-    if (preg_match('/^(19|20)\d{2}(-\d{2}-\d{2})?$/', $v, $m)) {
-        return (int)substr($v, 0, 4);
-    }
-    if (preg_match('/(19|20)\d{2}/', $v, $m)) {
-        return (int)$m[0];
-    }
-    // Legacy DD-Mon-YY, the one remaining shape with no four-digit year.
-    if (preg_match('/^\d{1,2}-[A-Za-z]{3}-(\d{2})$/', $v, $m)) {
-        return 2000 + (int)$m[1];
-    }
-    return null;
-}
 
 /* ---- render helpers ------------------------------------------------------ */
+
+function gcOneRowPerAssembly($rows) {
+    usort($rows, function ($a, $b) {
+        $c = strcmp((string)$a['assembly'], (string)$b['assembly']);
+        return $c !== 0 ? $c : strcmp((string)$a['cultivar'], (string)$b['cultivar']);
+    });
+    $seen = array();
+    $out  = array();
+    foreach ($rows as $row) {
+        $key = trim((string)$row['assembly']);
+        if (isset($seen[$key])) { continue; }
+        $seen[$key] = true;
+        $out[] = $row;
+    }
+    return $out;
+}
 
 function gcEsc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
@@ -197,100 +212,18 @@ foreach ($rows as $row) {
 /*
  * Growth over time.
  *
- * Cumulative count of visible completed assemblies by release year, built from
- * genome_metadata.release_date. The chart is only honest if most assemblies
- * carry a date, so coverage is measured and the page falls back to the curated
- * series below it when the column is too sparse. When the release_date cleanup
- * lands this switches over on its own, with no code change.
+ * The series, the landmark labels, their label heights and the data note all
+ * come from include/genome_growth_lib.php. They are shared with the standalone
+ * figure page at /genome_figure, which exists so a talk can be built from this
+ * chart; keeping one definition is what stops the two drifting apart.
  */
-define('GC_GROWTH_COVERAGE_FLOOR', 0.9);
+include_once('./include/genome_growth_lib.php');
 
-$years_by_assembly = array();
-foreach ($date_rows as $row) {
-    $year = gcReleaseYear($row['release_date']);
-    if ($year !== null) { $years_by_assembly[trim((string)$row['assembly_name'])] = $year; }
-}
-
-$year_counts = array();
-$dated_assemblies = 0;
-foreach ($rows as $row) {
-    $name = trim((string)$row['assembly']);
-    if (!isset($years_by_assembly[$name])) { continue; }
-    $year = $years_by_assembly[$name];
-    $year_counts[$year] = isset($year_counts[$year]) ? $year_counts[$year] + 1 : 1;
-    $dated_assemblies++;
-}
-
-$coverage = ($total_assemblies > 0) ? ($dated_assemblies / $total_assemblies) : 0;
-
-/* Landmark releases are editorial annotations on the curve, not database
-   values, so they are kept whichever series is drawn. */
-$GC_MILESTONES = array(
-    2008 => 'B73',
-    2015 => 'W22, PH207',
-    2018 => 'Mo17, A188, European flints',
-    2020 => 'NAM founders',
-    2022 => 'PanAnd v1',
-    2024 => 'PanAnd v2',
-    2026 => 'Highland and lowland landraces',
-);
-
-/* Where each landmark label sits on the chart, in assemblies above the axis,
-   so the stems step up the curve rather than overprinting one another. */
-$GC_MILESTONE_LEVELS = array(
-    2008 => 32, 2015 => 32, 2018 => 64, 2020 => 108, 2022 => 132, 2024 => 156, 2026 => 174,
-);
-
-/* The record kept by hand for the redesign, used while the column is sparse. */
-$GC_CURATED_GROWTH = array(
-    array(2008, 1), array(2009, 1), array(2010, 2), array(2011, 1), array(2012, 1),
-    array(2013, 3), array(2014, 1), array(2015, 1), array(2016, 5), array(2017, 10),
-    array(2018, 15), array(2019, 25), array(2020, 51), array(2021, 52), array(2022, 75),
-    array(2023, 76), array(2024, 101), array(2025, 123), array(2026, 158),
-);
-
-if ($coverage >= GC_GROWTH_COVERAGE_FLOOR && !empty($year_counts)) {
-    ksort($year_counts);
-    $points  = array();
-    $running = 0;
-    $first   = min(array_keys($year_counts));
-    $last    = max(array_keys($year_counts));
-    for ($y = $first; $y <= $last; $y++) {
-        $running += isset($year_counts[$y]) ? $year_counts[$y] : 0;
-        $points[] = array($y, $running);
-    }
-    $growth_source = 'database';
-    $growth_note = 'Cumulative count of assemblies by release year, read live from '
-                 . 'genome_metadata.release_date. All ' . number_format($total_assemblies)
-                 . ' visible completed assemblies carry a release year.';
-} else {
-    /* The final point is today's live published total rather than the
-       hand-kept figure, so the curve ends where the metrics say it does. */
-    $points = $GC_CURATED_GROWTH;
-    $last_index = count($points) - 1;
-    if ($points[$last_index][0] >= (int) date('Y') - 1 && $total_assemblies > 0) {
-        $points[$last_index][1] = $total_assemblies;
-    }
-    $growth_source = 'curated';
-    $growth_note = '<strong>Data note:</strong> this timeline is a curated historical record, '
-                 . 'not a figure derived from the assembly table; its final point is today\'s live '
-                 . 'published total. Only '
-                 . number_format($dated_assemblies) . ' of ' . number_format($total_assemblies)
-                 . ' visible completed assemblies carry a release year in '
-                 . 'genome_metadata.release_date, so a year-by-year count cannot be computed '
-                 . 'from it yet. This chart switches to live data automatically once that '
-                 . 'column is populated. Every other figure on this page is read directly '
-                 . 'from the database.';
-}
-
-$growth_data = array(
-    'source'     => $growth_source,
-    'dated'      => $dated_assemblies,
-    'total'      => $total_assemblies,
-    'points'     => $points,
-    'milestones' => $GC_MILESTONES,
-    'levels'     => $GC_MILESTONE_LEVELS,
-);
+$growth = mgdbGenomeGrowth(array_map(function ($row) { return $row['assembly']; }, $rows),
+                           $date_rows);
+$growth_data      = $growth['data'];
+$growth_note      = $growth['note'];
+$dated_assemblies = $growth_data['dated'];
 
 /* The B73 reference assembly leads the table; everything else keeps the
    database's assembly-name ordering. A user sorting a column overrides this,

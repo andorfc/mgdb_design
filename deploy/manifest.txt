@@ -2763,3 +2763,24 @@ src/controllers/gene_center/gene_record_v5.php  controllers/gene_center/gene_rec
 src/templates/static/mgdb_gene_record_v5.bau  templates/static/mgdb_gene_record_v5.bau
 src/css/mgdb-gene-record-v5.css  css/mgdb-gene-record-v5.css
 src/js/mgdb-gene-record-v5.js  js/mgdb-gene-record-v5.js
+
+# /genome_figure -- the genome stewardship timeline on its own, as a figure to
+# export for a talk (2026-09-20). Two views over one series: the chart under
+# Metrics on /genome, and the same curve projected to 2028 with 350 further
+# USDA pan-genome assemblies. Each downloads as SVG or PNG.
+#
+# The series moved out of controllers/genome/genome_center_modern.php into
+# include/genome_growth_lib.php so both pages read one definition -- a figure
+# used in a talk that quietly disagrees with the site would be worse than no
+# figure at all. genome_center_modern.php now calls the library and is
+# otherwise unchanged, so it is deployed with this set.
+#
+# A top-level controllers/genome_figure.php shadows the route (controller.php
+# finds it before redirect.php, which would otherwise load the legacy chrome).
+# Rollback is deleting it; /genome_figure then answers the site 404.
+src/include/genome_growth_lib.php                include/genome_growth_lib.php
+src/controllers/genome/genome_center_modern.php  controllers/genome/genome_center_modern.php
+src/controllers/genome_figure.php                controllers/genome_figure.php
+src/templates/static/mgdb_genome_figure.bau      templates/static/mgdb_genome_figure.bau
+src/css/mgdb-genome-figure.css                   css/mgdb-genome-figure.css
+src/js/mgdb-genome-figure.js                     js/mgdb-genome-figure.js
