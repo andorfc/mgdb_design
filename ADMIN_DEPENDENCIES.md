@@ -110,6 +110,7 @@ Grouped by who has to act, because that is how the list gets worked. An entry wh
 | **AD-075** | The 2027 MaizeGDB redesign timeline entry lives in the controller, not in `mgdb.maize_history` |
 | **AD-076** | `chado.transcript.translation_name` is filled for canonical transcripts only |
 | **AD-077** | The sequence server: three things only an administrator can do |
+| **AD-078** | Four genome milestones in `mgdb.maize_history` do not say they are B73 |
 
 ## What is closed
 
@@ -1315,6 +1316,22 @@ record pages. The original entry follows, with the corrections marked.
   than the hub's earlier one found. `records/reference.php` already read both
   stores. What this entry asks curation for is unchanged: nothing in the
   database holds a DOI for the other ~46,400.
+- **Also fixed 2026-09-18, the same rule on four more surfaces:** Hot New
+  Papers (201 of 838 papers showed a DOI; 716 DOI buttons now), the all-data
+  search's References section and header suggestions ("waxy": 0 of the first
+  25 showed a DOI, now 25), the reference record page (which printed stored
+  text as it was -- `doi: 10.1093/...`, a trailing full stop, `%2F`), and the
+  QTL record, whose references section returned no DOI at all and printed a
+  term id, "50639", as one reference's name.
+- **Five DOI typos a curator can correct** (`mgdb.ext_db_key`, db_person
+  2738676). The pages list them unlinked rather than guess:
+  reference 9036642 `10.1371/ journal.pone.0174270` (space after the slash),
+  9038223 `0.1186/s12870-017-1181-5`, 9046068 `0.3390/ijms21249506`,
+  9052219 `!0.3389/fpls.2022.847234`, 10751708 `0.1093/g3journal/jkag090`
+  (each missing its leading `1`). Six more rows under that source are not
+  DOIs at all -- `none`, `unpublished`, an ISBN, two citations, a bare number
+  (references 2738541, 2738566, 2738628, 2738843, 2804541, 3220038) -- and
+  could be deleted.
 - **Required administrator:** MaizeGDB curation staff
 - **Status:** proposed
 - **Validation:** `/api/v1/records/variation/bz1` returns a non-null `doi` on
@@ -2931,7 +2948,7 @@ system and could be overwritten.
   | `event_type` | `cooperative_resource` |
   | `year` | `2027` |
   | `title` | `MaizeGDB redesign` |
-  | `description` | `The MaizeGDB team launches a full redesign of the entire MaizeGDB website at 15 years.` |
+  | `description` | `The MaizeGDB team launches a full redesign of the entire MaizeGDB website, the first in 15 years.` |
   | `image_name` | `MaizeGDBv3.png` |
   | `image_caption` | `The MaizeGDB home page in 2027.` |
 
@@ -3198,4 +3215,36 @@ system and could be overwritten.
     the service restarts.
     - **Requested:** `mkdir /home/cache/sequence` owned by apache with
       `chcon -t httpd_sys_rw_content_t`, as was done for the other two.
+- **Status:** proposed
+
+---
+
+## AD-078 — Four genome milestones in `mgdb.maize_history` do not say they are B73
+
+- **Date:** 2026-09-19
+- **Affected component:** `mgdb.maize_history`;
+  `controllers/community/maize_history_modern.php`; the timeline on
+  `/maize_history` and `/timelines`
+- **Current limitation:** The four assembly milestones are titled `Maize
+  genome`, `Maize genome v2`, `Maize genome v3` and `Maize genome v4`, none of
+  which says whose genome. All four are B73, the maize representative genome --
+  the 2009 card's own description already says so ("The first draft of the B73
+  representative maize genome assembly is released"). The `mgdb` role has
+  **SELECT only** on the table, the same constraint as AD-071 and AD-075, so
+  the titles are corrected on the way out by `$MGDB_HISTORY_TITLES` in the
+  controller, keyed `"<year>|<lowercased title>"` like `$MGDB_HISTORY_LINKS`.
+- **Requested:** a curator with write access updating the four titles:
+
+  | year | `title` now | `title` should be |
+  |---|---|---|
+  | 2009 | `Maize genome` | `Maize B73 genome` |
+  | 2010 | `Maize genome v2` | `Maize B73 genome v2` |
+  | 2013 | `Maize genome v3` | `Maize B73 genome v3` |
+  | 2016 | `Maize genome v4` | `Maize B73 genome v4` |
+
+- **Once done:** delete `$MGDB_HISTORY_TITLES` from the controller and the
+  three lines in the renderer that apply it. Note that `$MGDB_HISTORY_LINKS`
+  and the duplicate check are both keyed on the title **as the table spells
+  it**, so any future key for these four cards must use the new spelling. None
+  of the five current links is on one of them.
 - **Status:** proposed

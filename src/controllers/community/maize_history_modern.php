@@ -76,6 +76,25 @@ $MGDB_HISTORY_LINKS = array(
     ),
 );
 
+/* Card titles the table spells without B73.
+
+   Four assemblies are titled "Maize genome", "Maize genome v2", v3 and v4,
+   which does not say whose genome: all four are B73, the maize representative
+   genome, and the 2009 card's own description already says so. The web user
+   has SELECT only on mgdb.maize_history -- the same reason
+   $MGDB_HISTORY_LINKS above lives here -- so the wording is corrected on the
+   way out and recorded as AD-078 for a curator with write access.
+
+   Keyed "<year>|<lowercased title as the table spells it>", like the links.
+   The key is built from the row, never from the replacement, so overriding a
+   title cannot move a card's link or defeat the duplicate check. */
+$MGDB_HISTORY_TITLES = array(
+    '2009|maize genome'    => 'Maize B73 genome',
+    '2010|maize genome v2' => 'Maize B73 genome v2',
+    '2013|maize genome v3' => 'Maize B73 genome v3',
+    '2016|maize genome v4' => 'Maize B73 genome v4',
+);
+
 /* One event the timeline should carry that mgdb.maize_history cannot hold.
 
    The web user has SELECT only on that table -- the same reason
@@ -99,7 +118,7 @@ $MGDB_HISTORY_EXTRA_EVENTS = array(
         'event_type'       => 'cooperative_resource',
         'year'             => '2027',
         'title'            => 'MaizeGDB redesign',
-        'description'      => 'The MaizeGDB team launches a full redesign of the entire MaizeGDB website at 15 years.',
+        'description'      => 'The MaizeGDB team launches a full redesign of the entire MaizeGDB website, the first in 15 years.',
         'publication'      => '',
         'pub_link'         => '',
         'image_name'       => 'MaizeGDBv3.png',
@@ -115,7 +134,7 @@ $MGDB_HISTORY_EXTRA_EVENTS = array(
    any edit to this renderer. That is exactly what happened to two other pages
    before it was written down. */
 $page_data = dashboardCache($system, 'history/page_' . (int) @filemtime(__FILE__),
-                            function () use ($DBConn, $MGDB_HISTORY_LINKS, $MGDB_HISTORY_EXTRA_EVENTS) {
+                            function () use ($DBConn, $MGDB_HISTORY_LINKS, $MGDB_HISTORY_TITLES, $MGDB_HISTORY_EXTRA_EVENTS) {
     $events = array();
     $breakthroughs = 0;
     $meetings = 0;
@@ -188,7 +207,12 @@ $page_data = dashboardCache($system, 'history/page_' . (int) @filemtime(__FILE__
             $breakthroughs++;
         }
 
-        $title = isset($e['title']) ? htmlspecialchars($e['title']) : '';
+        /* The displayed title only: $link_key below is built from the row's
+           own title, so both survive an override. */
+        $raw_title = isset($e['title']) ? trim((string) $e['title']) : '';
+        $title_key = $year . '|' . strtolower($raw_title);
+        if (isset($MGDB_HISTORY_TITLES[$title_key])) { $raw_title = $MGDB_HISTORY_TITLES[$title_key]; }
+        $title = htmlspecialchars($raw_title);
         $desc  = isset($e['description']) ? $e['description'] : '';
         $pub   = isset($e['publication']) ? trim($e['publication']) : '';
         $pub_link = isset($e['pub_link']) ? trim($e['pub_link']) : '';
