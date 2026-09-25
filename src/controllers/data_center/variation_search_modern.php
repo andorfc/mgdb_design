@@ -48,7 +48,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $asset_version('/css/mgdb-hub.css'
 $bauplan->includeCss('/css/mgdb-variation.css?v=' . $asset_version('/css/mgdb-variation.css'));
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-variation.js?v=' . $asset_version('/js/mgdb-variation.js'));
 $bauplan->head('<meta name="description" content="Search 1.7 million curated maize variations: classical alleles, transposon insertions, polymorphisms, their phenotypic effects, and the stocks that carry them.">');
 

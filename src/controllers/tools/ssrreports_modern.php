@@ -117,8 +117,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . ssrrAssetVersion($doc_root, '/css/
 $bauplan->includeCss('/css/mgdb-ssr-reports.css?v=' . ssrrAssetVersion($doc_root, '/css/mgdb-ssr-reports.css'));
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-// Plotly must be parsed before the page script calls MGDB.chart().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-ssr-reports.js?v=' . ssrrAssetVersion($doc_root, '/js/mgdb-ssr-reports.js'));
 $bauplan->head('<meta name="description" content="Two reports over the archived MaizeGDB simple sequence repeat collection: every SSR marker record that carries a repeat motif, and the SSR markers derived from mapped genes. Both are filterable, sortable, and downloadable as TSV.">');
 

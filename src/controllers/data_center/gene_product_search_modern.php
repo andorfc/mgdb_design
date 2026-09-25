@@ -46,7 +46,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-gene-product.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-gene-product.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Explore maize gene products, functional enzymes, EC numbers, transcription factors, and metabolic pathways mapped to encoding genetic loci and gene models.">');
 

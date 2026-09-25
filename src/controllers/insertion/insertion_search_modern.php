@@ -53,7 +53,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-insertion.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-insertion.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Search over 1.2 million maize transposon insertion alignments from UniformMu, BonnMu, and Ac/Ds collections by gene model, genome position, or insertion identifier, and find the seed stocks that carry them.">');
 

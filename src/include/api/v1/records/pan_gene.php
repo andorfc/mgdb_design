@@ -214,6 +214,118 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       );
     }
 
+    /* Hand-curated associations the pan-gene does not honour: a gene model a
+       curator tied to one of this pan-gene's loci that is not a member of it.
+       MaizeGDB's own curators ('Gene Model - MaizeGDB', 'Classical Genes') and
+       Grassius, the two the legacy page reported; mgdb.ext_db_key holds much
+       else besides (AGOL WebFPC alone is 373,681 rows), none of it curation of
+       gene models. Each group is one locus and one curator, returned only
+       when it has a gene model missing, with every gene model it names so the
+       reader sees which ones did make it in. Where a missing one went is read
+       from both member columns of chado.pan_gene: the legacy lookup read only
+       gene_model_name and so called additional members "not in any
+       pan-gene". One query, 29 ms on rp1. */
+    $curated_groups = array();
+    $curated_names = array();
+    $sth = make_query($DBConn, $MEMBERS_CTE . ",
+      loci AS (
+        SELECT DISTINCT pla.locus_name FROM chado.pan_gene_locus_assoc pla WHERE pla.pan_gene_name = :pg
+      ),
+      curated AS (
+        SELECT DISTINCT l.name AS locus, TRIM(k.key) AS gene_model, k.ext_db_comment AS comment,
+               CASE WHEN p.name = 'Grassius' THEN 'Grassius' ELSE 'MaizeGDB' END AS curator
+        FROM loci
+          JOIN mgdb.locus l ON l.name = loci.locus_name
+          JOIN mgdb.id_num idn ON idn.id = l.id AND idn.curation_lvl = 0
+          JOIN mgdb.ext_db_key k ON k.id = l.id
+          JOIN mgdb.person p ON p.id = k.db_person
+            AND p.name IN ('Gene Model - MaizeGDB', 'Classical Genes', 'Grassius')
+        WHERE EXISTS (SELECT 1 FROM chado.feature f WHERE f.name = k.key)
+      )
+      SELECT c.locus, c.curator, c.gene_model, c.comment,
+             EXISTS (SELECT 1 FROM members m WHERE m.member = c.gene_model) AS is_member,
+             ARRAY(SELECT DISTINCT x.exemplar_gene_model FROM chado.pan_gene x
+                   WHERE (x.gene_model_name = c.gene_model OR x.additional_gene_model_name = c.gene_model)
+                     AND x.pan_gene_name <> :pg AND x.exemplar_gene_model IS NOT NULL
+                   ORDER BY 1) AS elsewhere
+      FROM curated c
+      ORDER BY c.locus, c.curator, c.gene_model", 1, array('pg' => $pan_gene_name));
+    MgdbApi::countQuery();
+    while ($row = retrieve_row($sth)) {
+      $key = $row['locus'] . '|' . $row['curator'];
+      if (!isset($curated_groups[$key])) {
+        $curated_groups[$key] = array('locus' => MgdbApi::text($row['locus']), 'curator' => MgdbApi::text($row['curator']),
+                                      'gene_models' => array(), 'missing' => 0);
+      }
+      $is_member = in_array($row['is_member'], array(true, 't', 1, '1'), true);
+      $elsewhere = array();
+      foreach (explode(',', trim((string) $row['elsewhere'], '{}')) as $ex) {
+        $ex = trim($ex, " \"");
+        if ($ex !== '') { $elsewhere[] = array('exemplar' => $ex, 'html' => '/pan_gene_center/pan_gene/' . rawurlencode($ex)); }
+      }
+      $gm = MgdbApi::text($row['gene_model']);
+      $curated_groups[$key]['gene_models'][] = array(
+        'gene_model' => $gm,
+        'comment' => MgdbApi::text($row['comment']),
+        'member' => $is_member,
+        'elsewhere' => $elsewhere,
+        'html' => '/gene_center/gene/' . rawurlencode($gm)
+      );
+      if (!$is_member) { $curated_groups[$key]['missing']++; }
+    }
+    $hand_curated = array();
+    foreach ($curated_groups as $g) {
+      if ($g['missing'] > 0) {
+        $hand_curated[] = $g;
+        foreach ($g['gene_models'] as $m) { $curated_names[$m['gene_model']] = true; }
+      }
+    }
+
+    /* Where those gene models sit on the current B73 reference, for one
+       browser view of the lot -- what the legacy page offered -- when they
+       share the pan-gene's chromosome. And the alignments MaizeGDB built for
+       the curated groups: one file per locus, hand_curated/<locus>.fa, but
+       not for every locus (rp1 has three of its six; pan00009's first locus
+       has none, so the legacy page, which always asked for the first, drew
+       an empty viewer there). Every MaizeGDB-curated locus with a
+       discrepancy is a candidate; the page asks which exist when the alert
+       is opened, so a closed alert costs no requests. */
+    $curated_region = null;
+    $curated_alignments = array();
+    if ($hand_curated) {
+      $params = array('chr' => $identity['chr']);
+      $marks = array();
+      foreach (array_keys($curated_names) as $i => $name) { $params['g' . $i] = $name; $marks[] = ':g' . $i; }
+      $sth = make_query($DBConn, "
+        SELECT MIN(gm.gm_start) AS lo, MAX(gm.gm_end) AS hi, COUNT(DISTINCT gm.feature_id) AS n
+        FROM chado.gene_model gm
+        WHERE gm.gene_name IN (" . implode(',', $marks) . ")
+          AND gm.analysis_is_current = 'yes'
+          AND gm.assembly_version = 'Zm-B73-REFERENCE-NAM-5.0'
+          AND gm.chr = :chr", 1, $params);
+      MgdbApi::countQuery();
+      $row = retrieve_row($sth);
+      if ($row && $row['lo'] !== null && (int) $row['n'] > 0) {
+        $lo = max(1, (int) $row['lo'] - 5000);
+        $hi = (int) $row['hi'] + 5000;
+        $curated_region = array(
+          'assembly' => 'Zm-B73-REFERENCE-NAM-5.0',
+          'chr' => $identity['chr'], 'start' => $lo, 'end' => $hi, 'gene_models' => (int) $row['n'],
+          /* ?data=B73 is the B73 v5 dataset id in jbrowse.conf; see the
+             /assembly note on why the id, not the assembly name. */
+          'browser_url' => 'https://jbrowse.maizegdb.org/?data=B73&loc=' . $identity['chr'] . ':' . $lo . '..' . $hi
+        );
+      }
+      foreach ($hand_curated as $g) {
+        if ($g['curator'] === 'MaizeGDB' && !isset($curated_alignments[$g['locus']])) {
+          $curated_alignments[$g['locus']] = array(
+            'locus' => $g['locus'],
+            'url' => 'https://ftpprivate.maizegdb.org/pangene/pan-zea/hand_curated/' . rawurlencode($g['locus']) . '.fa'
+          );
+        }
+      }
+    }
+
     $sections['overview'] = array(
       'pan_gene_name' => $pan_gene_name,
       'analysis' => $analysis_name,
@@ -226,11 +338,17 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'loci' => $loci,
       'alerts' => array(
         'overlaps' => $overlaps,
-        'chromosome_mismatches' => $mismatched
+        'chromosome_mismatches' => $mismatched,
+        'hand_curated' => $hand_curated,
+        'hand_curated_region' => $curated_region,
+        'hand_curated_alignments' => array_values($curated_alignments)
       )
     );
     $counts['loci'] = count($loci);
     $counts['overlaps'] = count($overlaps);
+    $missing_total = 0;
+    foreach ($hand_curated as $g) { $missing_total += $g['missing']; }
+    $counts['curation_discrepancies'] = $missing_total;
   }
 
   /////

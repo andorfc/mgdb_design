@@ -42,7 +42,6 @@ $bauplan->includeCss('/css/mgdb-megamenu.css');
    `mgdb-hub-page` on <main> opts in. */
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-data-center-hub.css?v=' . $v_css);
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-data-center-hub.js?v=' . $v_js);

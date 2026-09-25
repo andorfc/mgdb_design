@@ -60,6 +60,90 @@
 
 .mgdb-rec-synonyms a { font-weight: 600; }
 
+/* --------------------------------------------------------------------------
+   Record type bubble (trial on the map record, 2026-09-18)
+
+   The data type's name in a pill at the top right, so a reader coming back to
+   a browser tab can tell at a glance what kind of record it holds -- including
+   after scrolling, when the header is long gone. It carried the hub's emblem
+   as a thumbnail at first; at 22px the emblem was more texture than picture,
+   and the word alone says it (Carson, 2026-09-18).
+
+   How it stays put without script: the bubble hangs from a zero-height wrapper
+   placed just before the header. The wrapper is sticky at the top of the
+   window, so at load it lies along the header's top edge and the bubble sits
+   in the header's corner, where a hub puts its freshness stamp; once the
+   header scrolls past, the wrapper holds at the top and the bubble rides
+   above the sticky section tabs. z-index 25 clears the tabs' 20.
+
+   Pinned, it goes where it covers nothing: beside the last tab on the bar's
+   last row when that row has room, else just under the bar. Script measures
+   which (js/mgdb-record.js, typeBubble) and sets the offset; the bar itself is
+   never widened or padded for it, because reserving room there wrapped the
+   map record's eight tabs onto a second row, and the tab offset ladder reads
+   the bar's height.
+   -------------------------------------------------------------------------- */
+
+/* The page is a flex column with one gap between children. A zero-height
+   child still takes a gap, which put 32px more above the header and lifted
+   the wrapper that far above the header's edge; the negative margin gives it
+   back. Named with both page classes to beat the rule that zeroes children's
+   margins. */
+.mgdb-rec-type-dock {
+  position: sticky;
+  z-index: 25;
+  top: 0;
+  height: 0;
+}
+.mgdb-page.mgdb-record-page > .mgdb-rec-type-dock { margin-bottom: calc(-1 * var(--mgdb-space-6)); }
+
+/* Under .mgdb-page so it outranks `.mgdb-page a`, which would otherwise
+   underline the label and colour it burgundy.
+
+   Centred on the title's first line rather than aligned to the panel's top
+   padding: the title's line box is its font size times the snug leading, both
+   of which change with the window, so the offset is written from the same two
+   values the title uses. 30px is the pill's own height, set below. */
+.mgdb-page .mgdb-rec-type {
+  position: absolute;
+  top: calc(var(--mgdb-space-5) + 1px
+            + (clamp(1.6rem, 1.1rem + 1.6vw, 2.25rem) * var(--mgdb-leading-snug) - 30px) / 2);
+  right: calc(var(--mgdb-space-6) + 1px);
+  display: inline-flex;
+  box-sizing: border-box;
+  height: 30px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #bcd9c6;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 1px 2px rgba(23, 70, 52, .08);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: top .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.mgdb-page .mgdb-rec-type:hover { border-color: var(--mgdb-green); background: #fff; }
+
+.mgdb-page .mgdb-rec-type-dock.is-docked .mgdb-rec-type {
+  top: var(--mgdb-rec-type-docked-top, 12px);
+  box-shadow: 0 2px 8px rgba(23, 70, 52, .16);
+}
+
+/* The title's clear band, sized for "Maps": the pill is 63px wide and
+   stands 1px in from the body's own right padding, so 4.75rem leaves 13px.
+   Named through the hub's own selector, which zeroes a record title's padding
+   and otherwise wins. */
+.mgdb-hub-page > section.mgdb-hub-record-hero.mgdb-rec-hero-has-type h1 { padding-right: 4.75rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-rec-type { transition: none; }
+}
+
 .mgdb-rec-headfacts { margin-top: var(--mgdb-space-2); }
 .mgdb-rec-headfacts dd { font-size: var(--mgdb-text-base); }
 .mgdb-rec-headfacts dd.mgdb-record-id { font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-sm); }
@@ -366,6 +450,10 @@
    wrapping, no scroll region grew, no page overflow. */
 .mgdb-rec-table th[scope="row"] { overflow-wrap: normal; }
 .mgdb-rec-table th[scope="row"] { color: var(--mgdb-ink); }
+/* And a number, for the same reason: the gene model scores table squeezed
+   its Value column until 0.00904 came out as 0.0090 over 4 -- two numbers,
+   neither of them the score. */
+.mgdb-rec-table td.mgdb-numeric { overflow-wrap: normal; }
 /* A <small> in a table cell is a note under its value, not a continuation of
    it -- the authors under a reference title, the hint under a coordinate.
 
@@ -599,6 +687,42 @@
 .mgdb-rec-page-btn.is-active { background: var(--mgdb-green-dark); border-color: var(--mgdb-green-dark); color: #fff; }
 .mgdb-rec-page-btn:disabled { opacity: .45; cursor: default; }
 .mgdb-rec-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
+
+/* One set of rows at a time, in place of pages (collection()'s `groups`): a
+   gene's scores one transcript at a time. The buttons are the pager's own, so
+   the pressed one is `.is-active` as well as aria-pressed -- that is what keeps
+   the pager's hover rule off it. The row sits above the rows it chooses, and
+   is a toolbar so that the select form past thirty sets matches the Show
+   select beside the filter. The buttons wrap inside their own box, so a
+   second row starts under the first button rather than under the label, and
+   the label sits on the first row's baseline however many rows there are.
+   The box's zero basis is what keeps it beside the label: sized to its
+   content, one line of thirty buttons, it would wrap below the label whole. */
+.mgdb-rec-groups {
+  align-items: baseline;
+  gap: var(--mgdb-space-1);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-rec-groups-label {
+  margin-right: var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mgdb-rec-group-btns {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  min-width: 0;
+}
+
+.mgdb-rec-groups label { margin-right: var(--mgdb-space-1); }
+.mgdb-rec-group-btn { font-variant-numeric: tabular-nums; }
+.mgdb-rec-group-mark { margin-left: .3em; font-size: .8em; }
 
 .mgdb-rec-empty {
   margin: 0;

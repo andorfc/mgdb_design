@@ -38,6 +38,8 @@
 
 /* Pan-genes are matched by the pan-gene hub's own query, not a copy of it. */
 include_once(__DIR__ . '/../pan_gene/pan_gene_search_lib.php');
+/* So are a reference's DOI and PubMed ID, by the rule the record pages use. */
+include_once(__DIR__ . '/../../include/reference_ids_lib.php');
 
 /* --------------------------------------------------------------------------
    Query text
@@ -881,31 +883,32 @@ function saTypeQuery($key, $type, $term) {
     $lower = strtolower($term);
 
     switch ($key) {
-        /* The abstract and the PubMed key are laterals, not plain joins.
-           mgdb.reference_abstract holds up to eight rows for one reference —
-           three references have more than one — and a plain LEFT JOIN turned
-           each into that many cards: "Chao Wu" counted 18 references and
-           listed 23. mgdb.ext_db_key is the same shape (155,352 id/source
-           pairs carry more than one row) and is only safe today because the
-           PubMed source happens to have none. A card is one row per record, so
-           the query says so. */
+        /* The abstract is a lateral, not a plain join. mgdb.reference_abstract
+           holds up to eight rows for one reference — three references have
+           more than one — and a plain LEFT JOIN turned each into that many
+           cards: "Chao Wu" counted 18 references and listed 23. A card is one
+           row per record, so the query says so.
+
+           The DOI and PubMed ID are the shared rule in
+           include/reference_ids_lib.php, scalar subqueries that return one
+           value each. This section used to read mgdb.reference.doi alone,
+           which is filled for 478 references: of the 245 whose title matches
+           "waxy", it showed a DOI on one and 40 have one. `select` is read
+           only by the page query, after the LIMIT, so both run for the
+           twenty-five rows shown and never for the whole match. */
         case 'reference':
             return array(
                 'select' => "r.id, r.title, r.author_desc, r.year, j.name AS journal,
-                             r.volume, r.pages, r.doi,
+                             r.volume, r.pages,
+                             " . mgdbReferenceDoiSql('r') . " AS doi,
                              left(coalesce(ra.abstract_1, ''), 420) AS abstract,
-                             x.key AS pubmed",
+                             " . mgdbReferencePubmedSql('r') . " AS pubmed",
                 'record' => "INNER JOIN mgdb.reference r ON r.id=m.id",
                 'display' => "LEFT JOIN mgdb.journal j ON j.id=r.in1
                               LEFT JOIN LATERAL (SELECT a.abstract_1 FROM mgdb.reference_abstract a
                                                   WHERE a.id=r.id
                                                     AND coalesce(a.abstract_1, '') <> ''
-                                                  LIMIT 1) ra ON true
-                              LEFT JOIN LATERAL (SELECT k.key FROM mgdb.ext_db_key k
-                                                  WHERE k.id=r.id
-                                                    AND k.db_person=(SELECT id FROM mgdb.person
-                                                                      WHERE name='Medline -- PubMed')
-                                                  LIMIT 1) x ON true",
+                                                  LIMIT 1) ra ON true",
                 'order' => "r.year DESC NULLS LAST, r.id",
             );
 

@@ -206,12 +206,13 @@
     return total;
   }
 
-  function matchesFilters(resource) {
-    if (state.category && resource.category !== state.category) { return false; }
-    if (state.topic && resource.topics.indexOf(state.topic) === -1) { return false; }
-    if (state.genome && resource.genomes.indexOf(state.genome) === -1) { return false; }
-    if (state.access === 'internal' && resource.external) { return false; }
-    if (state.access === 'external' && !resource.external) { return false; }
+  function matchesFilters(resource, filters) {
+    var f = filters || state;
+    if (f.category && resource.category !== f.category) { return false; }
+    if (f.topic && resource.topics.indexOf(f.topic) === -1) { return false; }
+    if (f.genome && resource.genomes.indexOf(f.genome) === -1) { return false; }
+    if (f.access === 'internal' && resource.external) { return false; }
+    if (f.access === 'external' && !resource.external) { return false; }
     return true;
   }
 
@@ -474,16 +475,37 @@
       });
     }
 
+    /* Typing offers suggestions and does not search: results change when the
+       reader submits, as on every hub. Suggestions are the resources the search
+       itself would return for the text so far, under the filters now set in the
+       form, in the search's own order -- score() is the same function. */
     if (query) {
-      query.addEventListener('input', function () {
-        updateClearButton();
-        // Once results are on the page, keep them in step as the term changes;
-        // before the first search, typing must not open the section on its own.
-        if (state.searched) {
-          readForm();
-          runSearch({});
-        }
-      });
+      query.addEventListener('input', updateClearButton);
+      if (window.MGDB && MGDB.typeahead) {
+        MGDB.typeahead(query, {
+          source: function (qn) {
+            var terms = qn.split(/\s+/).filter(Boolean);
+            var filters = {
+              category: (byId('ai-filter-category') || {}).value || '',
+              topic: (byId('ai-filter-topic') || {}).value || '',
+              genome: (byId('ai-filter-genome') || {}).value || '',
+              access: (byId('ai-filter-access') || {}).value || ''
+            };
+            var hits = [];
+            catalog.resources.forEach(function (resource) {
+              if (!matchesFilters(resource, filters)) { return; }
+              var value = score(resource, terms);
+              if (value >= 0) { hits.push({ value: value, resource: resource }); }
+            });
+            hits.sort(function (a, b) { return b.value - a.value || a.resource.name.localeCompare(b.resource.name); });
+            return hits.map(function (h) {
+              var summary = h.resource.summary || '';
+              if (summary.length > 110) { summary = summary.slice(0, 109).replace(/\s+\S*$/, '') + '\u2026'; }
+              return { v: h.resource.name, name: h.resource.name, meta: summary };
+            });
+          }
+        });
+      }
     }
 
     var clear = byId('ai-query-clear');

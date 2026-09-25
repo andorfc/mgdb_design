@@ -1,0 +1,235 @@
+$$SYNTAX-LEVEL 2
+*(fpt-effectors
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Fusarium Protein Toolkit Effectors | Predicted Effector Proteins in Six Fusarium Species">
+<meta property="og:description" content="Candidate effector proteins for six Fusarium species from EffectorP, SecretSanta and LOCALIZER, with functional annotation and links to each protein's structures.">
+
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page fpt-page fpt-effectors-page" id="fef-main"
+      data-source="$(data_url)"
+      data-species="$(initial_species)"
+      data-query="$(initial_query)"
+      data-class="$(initial_class)"
+      data-signal="$(initial_signal)">
+
+  <section class="mgdb-hero fpt-hero" aria-labelledby="fef-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/fusarium/conidia-emblem.jpg" alt="" class="fpt-hero-photo" width="240" height="240" />
+      <strong>Effectors</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fef-title">Predicted Fusarium effectors</h1>
+      <p class="mgdb-hero-description">Fusarium species secrete small proteins, effectors, that help them overcome plant defenses and cause disease. These are the candidate effectors predicted for six representative species, each with the confidence of its prediction, where in the plant cell it is likely to go, its predicted function, and its structures.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="$(xlsx_url)">Download the workbook</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/fusarium/structures">Structures</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fef-table" class="is-current" aria-current="true">Effector table</a>
+    <a href="#fef-methods">How they were predicted</a>
+    <a href="#fef-references">References</a>
+    <a href="#fef-metrics">Metrics</a>
+    <a href="#fef-related">Related resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Effector table
+       ==================================================================== -->
+  <section id="fef-table" aria-labelledby="fef-table-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fef-table-title">Effector table</h2></div>
+    </div>
+
+    ;; The species chips are real links, so the table works without the page
+    ;; script: each reloads this page on that species. The script takes them
+    ;; over and adds All species, which needs the whole table in hand.
+    <div class="fef-species" role="group" aria-label="Species">
+      $(species_chips)
+    </div>
+
+    <form class="fef-filters" id="fef-filters" role="search" action="/fusarium/effectors" method="get" autocomplete="off">
+      <input type="hidden" name="species" value="$(initial_species)" />
+      <div class="mgdb-hub-field fef-field-q">
+        <label for="fef-q">Filter</label>
+        <input id="fef-q" name="q" type="search" value="$(initial_query)" spellcheck="false"
+               placeholder="Gene id, UniProt, description, GO term or EC number" />
+      </div>
+      <div class="mgdb-hub-field">
+        <label for="fef-class">EffectorP class</label>
+        <select id="fef-class" name="class">
+          $(class_options)
+        </select>
+      </div>
+      <div class="mgdb-hub-field">
+        <label for="fef-signal">Localization signal</label>
+        <select id="fef-signal" name="signal">
+          $(signal_options)
+        </select>
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action fef-apply">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Apply</button>
+      </div>
+    </form>
+
+    <div class="fef-bar">
+      <p class="fef-count" id="fef-count" role="status" aria-live="polite">$(count_line)</p>
+      <div class="fef-bar-actions">
+        <label class="fef-size">Show
+          <select id="fef-size" aria-label="Rows per page">
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+            <option value="0">All</option>
+          </select>
+        </label>
+        <button class="mgdb-button mgdb-button-quiet mgdb-button-sm" type="button" id="fef-tsv" disabled>Download these rows as TSV</button>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll fef-scroll">
+      <table class="mgdb-table fef-table $(table_class)" id="fef-grid">
+        <caption class="mgdb-visually-hidden">Predicted effectors, $(caption_scope)</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-fef-sort="gene" aria-sort="ascending">Gene</th>
+            <th scope="col" class="fef-col-species" data-fef-sort="species" aria-sort="none">Species</th>
+            <th scope="col" class="mgdb-numeric" data-fef-sort="apoplastic" aria-sort="none">Apoplastic</th>
+            <th scope="col" class="mgdb-numeric" data-fef-sort="cytoplasmic" aria-sort="none">Cytoplasmic</th>
+            <th scope="col" data-fef-sort="signal" aria-sort="none">Localization</th>
+            <th scope="col" data-fef-sort="description" aria-sort="none">Predicted function</th>
+            <th scope="col">Open</th>
+          </tr>
+        </thead>
+        <tbody id="fef-rows">
+          $(initial_rows)
+        </tbody>
+      </table>
+    </div>
+    <nav class="fef-pager" id="fef-pager" aria-label="Pages of effectors">$(initial_pager)</nav>
+  </section>
+
+  <!-- ====================================================================
+       2. How they were predicted
+       ==================================================================== -->
+  <section id="fef-methods" aria-labelledby="fef-methods-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fef-methods-title">How they were predicted</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid fef-method-grid">
+      <article class="mgdb-card">
+        <h3>EffectorP</h3>
+        <p>EffectorP 3.0 predicted the putative effectors of each species and whether each acts outside the plant cell, <b>apoplastic</b>, or is taken inside it, <b>cytoplasmic</b>. Each column is its probability for that class, from 0.5 to 1; a protein predicted as both carries two.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>SecretSanta</h3>
+        <p>SecretSanta's secretome pipeline kept only the candidates likely to be secreted from the fungus into the plant, so every protein here is predicted to be secreted.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>LOCALIZER</h3>
+        <p>LOCALIZER looked for targeting signals to the <b>chloroplast</b>, <b>mitochondria</b> and <b>nucleus</b> of the plant cell. A chloroplast or mitochondrial signal is shown with its probability and the residues it spans; a nuclear signal is present or not.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>OrthoFinder and OmicsBox</h3>
+        <p>OrthoFinder traced how the putative secreted effectors are shared among and within the species, and OmicsBox predicted their functions: the description, Gene Ontology terms and enzyme codes in the table.</p>
+      </article>
+    </div>
+    <p class="fpt-note">Structure links open each protein's AlphaFold and ESMFold models. Foldseek links appear for <i>F. graminearum</i> and <i>F. verticillioides</i>, the two species whose proteins were searched, and PanEffect links for the same two, which have its per-gene heatmaps. $(model_note)</p>
+  </section>
+
+  <!-- ====================================================================
+       3. References
+       ==================================================================== -->
+  <section id="fef-references" aria-labelledby="fef-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fef-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. Metrics
+       ==================================================================== -->
+  <section id="fef-metrics" aria-labelledby="fef-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fef-metrics-title">Metrics</h2></div>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9673;</span>
+        <div><strong class="mgdb-metric-value">$(m_total)</strong><h3>Predicted effectors</h3><p>Across the six species.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9711;</span>
+        <div><strong class="mgdb-metric-value">$(m_apoplastic)</strong><h3>Apoplastic</h3><p>Predicted apoplastic only.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9679;</span>
+        <div><strong class="mgdb-metric-value">$(m_cytoplasmic)</strong><h3>Cytoplasmic</h3><p>Predicted cytoplasmic only; $(m_both) more are predicted as both.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#8889;</span>
+        <div><strong class="mgdb-metric-value">$(m_signal)</strong><h3>With a targeting signal</h3><p>To the chloroplast, mitochondria or nucleus.</p></div>
+      </article>
+    </div>
+
+    <figure class="mgdb-figure fef-figure">
+      <h3>Effectors by species and class</h3>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table fef-breakdown">
+          <caption class="mgdb-visually-hidden">Predicted effectors in each species, by EffectorP class and targeting signal</caption>
+          <thead>
+            <tr>
+              <th scope="col">Species</th>
+              <th scope="col" class="mgdb-numeric">Effectors</th>
+              <th scope="col" class="fef-breakdown-bar">Apoplastic &middot; both &middot; cytoplasmic</th>
+              <th scope="col" class="mgdb-numeric">Chloroplast</th>
+              <th scope="col" class="mgdb-numeric">Mitochondria</th>
+              <th scope="col" class="mgdb-numeric">Nucleus</th>
+            </tr>
+          </thead>
+          <tbody>
+            $(breakdown_rows)
+          </tbody>
+        </table>
+      </div>
+      <figcaption>$(breakdown_caption)</figcaption>
+    </figure>
+  </section>
+
+  <!-- ====================================================================
+       5. Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="fef-related" aria-labelledby="fef-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="fef-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/fusarium/structures">
+          <strong>Structures</strong>
+          <span>AlphaFold and ESMFold models for any protein of the six species</span>
+        </a>
+        <a href="/fusarium/foldseek">
+          <strong>Foldseek</strong>
+          <span>Structural matches for <i>F. graminearum</i> and <i>F. verticillioides</i> proteins in nine proteomes</span>
+        </a>
+        <a href="$(snptools_url)">
+          <strong>SNPTools</strong>
+          <span>Variant diversity and predicted variant effects across Fusarium genomes</span>
+        </a>
+        <a href="https\://fungidb.org/">
+          <strong>FungiDB</strong>
+          <span>Gene records, expression and functional data for Fusarium and other fungi</span>
+        </a>
+        <a href="https\://effectorp.csiro.au/">
+          <strong>EffectorP</strong>
+          <span>The effector predictor behind the table, from CSIRO</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

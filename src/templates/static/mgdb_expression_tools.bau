@@ -1,0 +1,51 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-expression-tools
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/expression/tools">
+<meta property="og:title" content="MaizeGDB Expression Tools">
+<meta property="og:description" content="Gene reports, genome-wide co-expression, tissue-specific genes, sample maps, GO enrichment, and every copy of a pan-gene compared across the 26 NAM genomes.">
+
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-exptools-page" id="exptools-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/expression">Expression Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Expression Tools</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="et-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/gene_expression.png" alt="" width="192" height="150" decoding="async" />
+      <strong>Expression<br />Tools</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="et-title">Expression Tools</h1>
+      <p class="mgdb-hero-description">Gene reports, co-expression, tissue-specific genes and GO enrichment for $(genome_count) maize genome annotations, with $(b73_samples) RNA samples for B73 v5 alone, and $(pangene_count) pan-genes compared across the $(nam_count) NAM genomes in the $(shared_samples) samples they share.</p>
+    </div>
+  </section>
+
+  <!-- The application. The rail, the genome and search bar, and the view are
+       drawn by js/mgdb-exptools-core.js from the embedded genome list and
+       search/expression_tools/expression_tools_api.php. -->
+  <div class="et-app" id="et-app" data-api="$(api_url)">
+    <aside class="et-rail" id="et-rail" aria-label="Expression tools">
+      <p class="et-muted">The tools need JavaScript. The same expression profiles are on every <a href="/gene_center/gene">gene record</a>, and in the <a href="/api/v1/data/expression">expression API</a>.</p>
+    </aside>
+    <div class="et-work">
+      <div class="et-context" id="et-context"></div>
+      <div class="et-view" id="et-view">
+        <div class="mgdb-loading" role="status"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading Expression Tools&hellip;</span></div>
+      </div>
+    </div>
+  </div>
+  <aside class="et-drawer" id="et-basket" aria-label="Gene basket" hidden></aside>
+  <div class="et-toasts" id="et-toasts" aria-live="polite"></div>
+  <script type="application/json" id="et-bootstrap">$(bootstrap)</script>
+
+  <!-- The reference cards, rendered by include/references_lib.php like every
+       hub's, but inert here: the References view in the rail's Data group
+       clones them in. Nothing sits below the application, so the rail drives
+       the whole page; the Related resources section went with them. -->
+  <template id="et-references-cards">$(reference_cards)</template>
+
+</main>
+)

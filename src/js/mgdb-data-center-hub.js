@@ -203,7 +203,7 @@
     }
     var m = metrics();
 
-    window.MGDB.chart({
+    var whenDrawn = window.MGDB.chart({
       target: el,
       traces: [{
         type: 'bar',
@@ -235,7 +235,11 @@
       }
     });
 
-    if (window.Plotly && window.Plotly.relayout) {
+    /* Relayout when the breakpoint is crossed. Installed once the figure is
+       drawn: Plotly is fetched when the figure comes into view, so it is not
+       on the page when this runs. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
       var lastNarrow = m.narrow;
       var timer = null;
       window.addEventListener('resize', function () {
@@ -252,7 +256,7 @@
           window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
         }, 180);
       });
-    }
+    });
   }
 
   function domainFigure(rows) {

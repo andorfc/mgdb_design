@@ -123,8 +123,23 @@
      driven per page, and this page shipped without a spy: the bar highlighted
      whatever the template marked and never changed, silently. MGDB.sectionTabs
      is that behaviour, shared, so this is the only line a page needs. */
+  /* The suggestions demo searches nothing: submitting says what a hub would
+     search for, which is the whole of what a pick does. */
+  function initSuggestDemo() {
+    var form = document.getElementById('pattern-suggest-form');
+    var input = document.getElementById('pattern-suggest-query');
+    var status = document.getElementById('pattern-suggest-status');
+    if (!form || !input || !status) { return; }
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var term = input.value.trim();
+      status.textContent = term ? 'The stock hub would now search for \u201c' + term + '\u201d.' : '';
+    });
+  }
+
   function boot() {
     init();
+    initSuggestDemo();
     if (window.MGDB && MGDB.sectionTabs) { MGDB.sectionTabs(); }
   }
 

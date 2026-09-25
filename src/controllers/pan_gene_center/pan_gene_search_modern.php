@@ -48,7 +48,6 @@
      documents. `mgdb-hub-page` on <main> opts in. */
   $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
   $bauplan->includeCss('/css/mgdb-pan-gene.css?v=' . $v_css);
-  $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-pan-gene.js?v=' . $v_js);
@@ -261,14 +260,11 @@
   $content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
     // How the pan-gene resources on this page were built and what they hold.
     array('doi' => '10.1093/genetics/iyae036'),
-    // The 26 de novo assemblies the analysis is largely drawn from.
-    array('doi' => '10.1126/science.abg5289'),
     // Why a genome database is organised around a pan-genome at all.
     array('doi' => '10.1186/s12870-021-03173-5'),
-    // Reading variant effects across the pan-genome.
-    array('doi' => '10.1093/bioinformatics/btae073'),
-    // The database of record.
-    array('doi' => '10.1093/nar/gky1046'),
+    // Carson, 2026-09-19: the 26-genome paper (10.1126/science.abg5289),
+    // PanEffect (10.1093/bioinformatics/btae073) and MaizeGDB 2018
+    // (10.1093/nar/gky1046) are not what a reader of this page needs.
   )));
 
   include_once('translation.php');

@@ -172,26 +172,13 @@
     });
   }
 
+  /* The shared reference block every other record page uses: the DOI,
+     PubMed and Full text links, authors and abstract, Cards and Table. This
+     was a plain two-column table of citation and year, with no way to the
+     paper. */
   function renderReferences(data) {
-    var out = R.byId('qtl-record-references-body');
-    if (!out) { return false; }
-    out.innerHTML = '';
-    return R.collection(out, {
-      title: 'References describing this experiment',
-      items: data.references || [],
-      filename: 'qtl-references.tsv',
-      columns: [
-        { key: 'reference', label: 'Reference',
-          get: function (r) { return refText(r.reference); },
-          html: function (r) { return refHtml(r.reference); } },
-        { key: 'year', label: 'Year',
-          get: function (r) { return r.year === null ? '' : String(r.year); },
-          html: function (r) {
-            return r.year === null ? '<span class="mgdb-muted">&mdash;</span>' : R.escape(String(r.year));
-          } },
-        R.urlColumn(function (r) { return r.reference ? r.reference.html : ''; })
-      ]
-    });
+    return R.references(R.byId('qtl-record-references-body'), data.references || [],
+                        'qtl-record-references', 'qtl-ref');
   }
 
   function fillSynonyms(attributes) {

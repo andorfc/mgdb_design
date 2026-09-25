@@ -72,7 +72,9 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   /////
 
   $record = retrieve_row(make_query($DBConn, "
-    SELECT r.id, r.name, r.title, r.year, r.volume, r.pages, r.doi,
+    SELECT r.id, r.name, r.title, r.year, r.volume, r.pages,
+           " . mgdbReferenceDoiSql('r') . " AS doi,
+           " . mgdbReferencePubmedSql('r') . " AS pubmed,
            r.ref_number, r.author_desc, r.issn,
            t.id AS type_id, t.name AS type_name,
            j.id AS journal_id, j.name AS journal_name,
@@ -102,18 +104,30 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   /////
   // External identifiers
   //
-  // Needed by three sections — the citation, the link list, and the header —
-  // so they are fetched once and classified once. reference.doi is often
-  // empty even when a DOI exists as an external key, and a DOI sometimes
-  // arrives in the pages field of older records; both are picked up.
+  // The DOI and PubMed ID that the header, the citation and every export
+  // (formatted, BibTeX, RIS, JSON-LD) carry come from the record query above,
+  // by the rule every reference listing shares -- include/reference_ids_lib.php.
+  // This page used to take the stored text as it was: the column, else the
+  // first DOI key, else a "doi:" in the pages field. So 59 references showed a
+  // wrapped DOI that made a broken link ("doi: 10.1093/plcell/koac184", a
+  // trailing full stop, a %2F for the slash), 12 linked a typo or a word as a
+  // DOI, and 24 showed none where the citation carries one. The pages field
+  // supplies no DOI the shared rule misses (0 of the 3,537 that hold one), so
+  // it is no longer read for this.
+  //
+  // The link list shows every stored key, one row each. A DOI key is shown
+  // and linked as the DOI it contains; one that contains none -- a typo, "dup"
+  // -- is still listed as stored, with no link, rather than linked to nothing.
+  // A PubMed key is linked only when it is a number.
   /////
 
   $external = array();
   $doi = MgdbApi::text($record['doi']);
-  $pubmed = null;
+  $pubmed = MgdbApi::text($record['pubmed']);
 
   $sth = make_query($DBConn, "
-    SELECT p.id AS db_id, p.name AS db_name, x.key, pup.url_prefix
+    SELECT p.id AS db_id, p.name AS db_name, x.key, pup.url_prefix,
+           " . mgdbDoiFromTextSql('x.key') . " AS doi_key
     FROM mgdb.ext_db_key x
       INNER JOIN mgdb.person p ON p.id = x.db_person
       INNER JOIN mgdb.id_num i ON i.id = x.db_person AND i.curation_lvl = 0
@@ -130,27 +144,27 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     $database = MgdbApi::text($row['db_name']);
     $kind = referenceLinkKind($database);
 
-    if ($kind === 'doi' && $doi === null) {
-      $doi = $key;
+    $accession = $key;
+    $linkable = true;
+    if ($kind === 'doi') {
+      $clean = MgdbApi::text($row['doi_key']);
+      $linkable = ($clean !== null);
+      if ($linkable) { $accession = $clean; }
     }
-    if ($kind === 'pubmed') {
-      $pubmed = $key;
+    elseif ($kind === 'pubmed') {
+      $linkable = (bool) preg_match('/^\d+$/', $key);
     }
 
     $external[] = array(
       'kind' => $kind,
       'database' => referenceLinkLabel($database, $kind),
       'database_id' => MgdbApi::int($row['db_id']),
-      'accession' => $key,
-      'url' => referenceLinkUrl($kind, $key, MgdbApi::text($row['url_prefix'])),
-      'destination' => referenceLinkDestination($kind, $database),
+      'accession' => $accession,
+      'url' => $linkable ? referenceLinkUrl($kind, $accession, MgdbApi::text($row['url_prefix'])) : null,
+      'destination' => $linkable ? referenceLinkDestination($kind, $database)
+                     : 'Not linked: the stored value is not a valid ' . ($kind === 'pubmed' ? 'PubMed ID' : 'DOI'),
       'is_external' => ($kind !== 'mnl' && $kind !== 'ancillary')
     );
-  }
-
-  // Some older records carry the DOI in the pages field: "doi: 10.1016/...".
-  if ($doi === null && $pages !== null && preg_match('~\bdoi:\s*(\S+)~i', $pages, $matches)) {
-    $doi = rtrim($matches[1], '.');
   }
 
   /////

@@ -45,7 +45,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-assembly.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-assembly.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Explore maize B73 representative reference genome assemblies (v1 to v5), structural gene model annotations, change histories, GenBank accessions, and bulk downloads.">');
 

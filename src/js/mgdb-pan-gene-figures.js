@@ -283,7 +283,7 @@
 
     html += '</div>' +
       '<p class="mgdb-pg-presence-detail" data-role="detail" aria-live="polite">' +
-        'Hover or focus a cell for its members; click one to filter the table below to it.</p>';
+        'Hover over or focus on a cell for its members; click one to filter the table below to it.</p>';
 
     var unplaced = presence.unplaced || [];
     if (unplaced.length) {
@@ -1092,7 +1092,7 @@
     var tools = block.querySelector('[data-role="tools"]');
     scroller = block.querySelector('[data-role="scroll"]');
     detail = block.querySelector('[data-role="tree-detail"]');
-    var idleDetail = 'Hover a tip for its member; click a node to collapse a clade, or a tip to select it.';
+    var idleDetail = 'Hover over a tip for its member; click a node to collapse a clade, or a tip to select it.';
     detail.textContent = idleDetail;
 
     /* ---- geometry ------------------------------------------------------- */
@@ -1720,7 +1720,7 @@
     var sizer = block.querySelector('[data-role="sizer"]');
     var canvas = block.querySelector('[data-role="canvas"]');
     var detail = block.querySelector('[data-role="msa-detail"]');
-    var idleDetail = 'Hover the alignment for a column’s consensus and conservation; click a row to select ' +
+    var idleDetail = 'Hover over the alignment for a column’s consensus and conservation; click a row to select ' +
       'that gene model in every figure. Click or drag the profile to move along the alignment.';
     detail.textContent = idleDetail;
 
@@ -2415,6 +2415,10 @@
        matrix:   sections.expression_matrix
        treeUrl:  the Newick, for tree order
        filename: the TSV download name
+       toolsUrl: optional, this pan-gene in Expression Tools, which draws all
+                 23 samples the NAM genomes share (these are the NAM
+                 Consortium's 10) and calls each genome expressed, low or
+                 silent
      }
 
      One row per member gene model in B73v5 or a NAM founder, one column per
@@ -2644,7 +2648,8 @@
           '</div>' +
         '</div>' +
         '<p class="mgdb-fig-desc">NAM expression heatmap: ' + number(matrix.genome_count) + ' genomes × ' +
-          number(tissues.length) + ' NAM tissues, tree or cluster ordering, with a tissue-specificity τ column.</p>' +
+          number(tissues.length) + ' NAM tissues, tree or cluster ordering, with a tissue-specificity τ column.' +
+          (spec.toolsUrl ? ' <a href="' + esc(spec.toolsUrl) + '">All 23 shared samples, and which genomes carry it silent, in Expression Tools</a>.' : '') + '</p>' +
         '<p class="mgdb-rec-block-status" data-role="heat-status"></p>' +
         '<div class="mgdb-pg-heat-scroll" data-role="heat-scroll"></div>' +
         '<div class="mgdb-pg-heat-legend" data-role="heat-legend"></div>' +
@@ -2655,7 +2660,7 @@
     var detail = block.querySelector('[data-role="heat-detail"]');
     var labelSel = block.querySelector('[data-role="heat-labels"]');
     var scaleSel = block.querySelector('[data-role="heat-scale"]');
-    var idle = 'Hover a cell for its value; click a row to select that gene model in every figure.';
+    var idle = 'Hover over a cell for its value; click a row to select that gene model in every figure.';
     detail.textContent = idle;
 
     function statusText() {
@@ -3152,7 +3157,7 @@
     var block = container.firstElementChild;
     var scroller = block.querySelector('[data-role="place-scroll"]');
     var detail = block.querySelector('[data-role="place-detail"]');
-    var idle = 'Hover a mark for its gene model and position; click it to select that gene model in every ' +
+    var idle = 'Hover over a mark for its gene model and position; click it to select that gene model in every ' +
       'figure; click a chromosome number to close in on it.';
     detail.textContent = idle;
 

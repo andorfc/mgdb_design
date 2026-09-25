@@ -355,12 +355,47 @@
     var queryInput = byId('gv-dataset-query');
     var queryClear = byId('gv-dataset-query-clear');
 
+    /* Typing offers suggestions and does not filter: the table changes when
+       the reader submits, as on every hub. A suggestion is a dataset the
+       filter keeps for that text under everything else now set -- the same
+       matchesCriteria(), asked about the text so far. */
+    var queryForm = byId('gv-dataset-search-form');
     if (queryInput) {
       queryInput.addEventListener('input', function () {
-        datasetState.query = queryInput.value.trim();
         if (queryClear) {
-          queryClear.hidden = (datasetState.query === '');
+          queryClear.hidden = (queryInput.value.trim() === '');
         }
+      });
+      if (window.MGDB && window.MGDB.typeahead) {
+        window.MGDB.typeahead(queryInput, {
+          source: function (qn) {
+            var saved = datasetState.query;
+            datasetState.query = qn;
+            var hits = originalDatasetRows.filter(matchesCriteria);
+            datasetState.query = saved;
+            /* One row per dataset name: a release ships a High Quality and a
+               High Coverage build under one name, and the name finds both. */
+            var byName = {};
+            var order = [];
+            hits.forEach(function (item) {
+              if (!byName[item.name]) { byName[item.name] = { builds: [], refs: [] }; order.push(item.name); }
+              var entry = byName[item.name];
+              if (item.build && entry.builds.indexOf(item.build) === -1) { entry.builds.push(item.build); }
+              if (item.ref && entry.refs.indexOf(item.ref) === -1) { entry.refs.push(item.ref); }
+            });
+            return order.map(function (name) {
+              var entry = byName[name];
+              return { v: name, name: name,
+                       meta: [entry.builds.join(' and '), entry.refs.join(', ')].filter(Boolean).join(' \u00b7 ') };
+            });
+          }
+        });
+      }
+    }
+    if (queryForm && queryInput) {
+      queryForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        datasetState.query = queryInput.value.trim();
         applyDatasetFiltering();
       });
     }

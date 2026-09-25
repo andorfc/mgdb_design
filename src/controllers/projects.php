@@ -121,13 +121,6 @@
                    . implode(' ', $topic_labels) . ' ' . $category_label . ' '
                    . (isset($entry['lead']) ? $entry['lead'] : ''));
 
-      $tag_html = '';
-      foreach ($entry['topics'] as $topic) {
-          $tag_html .= '<span class="mgdb-pill mgdb-pill-info">'
-                     . mgdb_project_esc(isset($topics[$topic]) ? $topics[$topic] : $topic)
-                     . '</span>';
-      }
-
       /* The kernels from the site mark, on the projects MaizeGDB itself runs.
          Decorative: the meta line already says "led by MaizeGDB" in words, so a
          reader who cannot see the mark loses nothing.
@@ -203,14 +196,9 @@
         . ' data-search="' . mgdb_project_esc($search) . '">'
         . '<h3>' . $mark_html . '<a href="' . mgdb_project_esc($project['url']) . '"' . $link_attrs . '>'
         . mgdb_project_esc($entry['title']) . '</a></h3>'
-        /* The topic pills sit above the summary rather than below the facts
-           strip. A card's paragraph is the one part of it that stretches to
-           fill the card's height, so anything above the paragraph can be one
-           row of pills on one card and two on the next without moving what
-           follows, while anything below it carries that difference down into
-           every band under it. With the pills up here the facts strip and the
-           meta line land at the same height in every card of the row. */
-        . '<div class="projects-card-tags">' . $tag_html . '</div>'
+        /* No topic pills on the card (Carson, 2026-09-19). The topic labels
+           are still in data-search above, so typing "immunity" or "stocks"
+           still finds a project whose card copy never uses the word. */
         . '<p>' . mgdb_project_esc($entry['card_summary']) . '</p>'
         . $facts_html
         . '<p class="mgdb-small mgdb-muted projects-card-meta">' . implode(' &middot; ', $meta) . '</p>'

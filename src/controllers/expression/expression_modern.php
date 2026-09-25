@@ -66,7 +66,6 @@ $bauplan->includeCss('/css/mgdb-gene-expression.css?v=' . $v_gecss);
 $bauplan->includeCss('/css/mgdb-expression.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-gene-expression.js?v=' . $v_gejs);
 $bauplan->includeScript('/js/mgdb-expression.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Search maize gene expression across the B73 reference assemblies and the NAM founder lines, open a per-gene expression profile from qTeller\'s atlases, and reach qTeller, the eFP browser, JBrowse RNA-seq tracks and the bulk downloads.">');

@@ -26,7 +26,6 @@
     loading: false
   };
 
-  var debounceTimer = null;
 
   function byId(id) {
     return document.getElementById(id);
@@ -163,7 +162,13 @@
   }
 
   function fetchMaps(scrollToResults) {
-    if (state.loading) return;
+    /* A search asked for while one is running runs after it rather than being
+       dropped, and the older answer is not drawn. */
+    if (state.loading) {
+      state.pending = true;
+      state.pendingScroll = state.pendingScroll || !!scrollToResults;
+      return;
+    }
     state.loading = true;
     updateExportLinks();
 
@@ -193,6 +198,7 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         state.loading = false;
+        if (runPending()) { return; }
         if (!data || !data.ok) {
           showError('Failed to fetch maps.');
           return;
@@ -212,9 +218,19 @@
       })
       .catch(function (err) {
         state.loading = false;
+        if (runPending()) { return; }
         console.error('Map search error', err);
         showError('Network error while searching maps.');
       });
+  }
+
+  function runPending() {
+    if (!state.pending) { return false; }
+    var scroll = state.pendingScroll;
+    state.pending = false;
+    state.pendingScroll = false;
+    fetchMaps(scroll);
+    return true;
   }
 
   function updateStatus(summary) {
@@ -553,7 +569,7 @@
 
   function initChart() {
     var chrChart = byId('map-chr-chart');
-    if (!chrChart || typeof Plotly === 'undefined') return;
+    if (!chrChart || !window.MGDB || !window.MGDB.loadPlotly) return;
 
     var rawLabels = chrChart.getAttribute('data-labels');
     var rawValues = chrChart.getAttribute('data-values');
@@ -603,19 +619,31 @@
 
       var config = { responsive: true, displayModeBar: false };
 
-      /* Plotly appends; it does not replace. The fallback div is meant to be
-         "shown until Plotly renders, and left in place if it never loads", but
-         nothing ever took it away, so "Loading top map marker breakdown..."
-         stayed on top of the finished chart. It also filled the container's
-         340px, which left Plotly's own plot-container measuring 0 tall.
+      /* Plotly is not on the page until a figure needs it, so the figure is
+         drawn when it comes into view, the same way MGDB.chart() draws. */
+      window.MGDB.whenNear(chrChart, function () {
+        window.MGDB.loadPlotly().then(function (Plotly) {
+          /* Plotly appends; it does not replace. The fallback div is meant to
+             be "shown until Plotly renders, and left in place if it never
+             loads", but nothing ever took it away, so "Loading top map marker
+             breakdown..." stayed on top of the finished chart. It also filled
+             the container's 340px, which left Plotly's own plot-container
+             measuring 0 tall.
 
-         Cleared here rather than earlier: everything that can fail -- a missing
-         Plotly, absent data attributes, a JSON parse error -- has already
-         returned or thrown by this point, so the fallback still survives every
-         case it exists for. */
-      chrChart.innerHTML = '';
-
-      Plotly.newPlot(chrChart, data, layout, config);
+             Cleared here rather than earlier: everything that can fail -- a
+             Plotly that never arrives, absent data attributes, a JSON parse
+             error -- has already returned or thrown by this point, so the
+             fallback still survives every case it exists for. */
+          layout.height = chrChart.clientHeight || 340;
+          chrChart.innerHTML = '';
+          Plotly.newPlot(chrChart, data, layout, config);
+        }, function () {
+          var fallback = chrChart.querySelector('.mgdb-chart-fallback');
+          if (fallback) {
+            fallback.textContent = 'This chart could not be displayed.';
+          }
+        });
+      });
     } catch (e) {
       console.error('Error rendering top map marker chart', e);
     }
@@ -717,18 +745,12 @@
       });
     }
 
-    // Live query typing with debounce
+    /* Typing offers suggestions (data-suggest, MGDB.typeahead) and does not
+       search: results change when the reader submits, so the table never
+       shows the answer to text that is no longer in the box. */
     if (queryInput) {
       queryInput.addEventListener('input', function () {
         updateClearBtn();
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(function () {
-          // Before the first search, typing must not open the results section.
-          if (!state.searched) { return; }
-          state.term = queryInput.value.trim();
-          state.page = 1;
-          fetchMaps(false);
-        }, 300);
       });
     }
 

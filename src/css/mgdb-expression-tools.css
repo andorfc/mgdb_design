@@ -1,0 +1,987 @@
+/* ==========================================================================
+   Expression Tools -- /expression/tools
+
+   An application inside the modern shell. The page ground, the hero and the
+   closing References and Related resources sections are the Data Hub shell's
+   (css/mgdb-hub.css, loaded before this); everything scoped under .et-app is
+   the application: a rail of tools, a bar for the genome and the search, and
+   the view, whose panels are the same white cards on the same ground with
+   the shell's rotating top edges, so the page reads as one of the hubs.
+
+   Colors are the shared tokens. The chart palettes live in
+   js/mgdb-exptools-core.js, where they were validated; the few that appear
+   here (legend swatches, the NAM strip) repeat those values.
+   ========================================================================== */
+
+.mgdb-exptools-page {
+  --et-line: var(--hub-line, #e3e9f2);
+  --et-line-soft: var(--hub-line-soft, #eef2f8);
+  --et-ground: var(--hub-ground, #f4f7fc);
+  --et-shadow: var(--hub-shadow-lift, 0 2px 4px rgba(16, 30, 54, .07), 0 4px 12px rgba(16, 30, 54, .08));
+  --et-shadow-sm: var(--hub-shadow, 0 1px 2px rgba(16, 30, 54, .06), 0 1px 3px rgba(16, 30, 54, .08));
+  --et-rail: 228px;
+  --et-heat: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Layout
+   -------------------------------------------------------------------------- */
+
+/* The shell spaces the hero from what follows with `.mgdb-page > section`,
+   and the app is a <div>, so it sat flush against the hero. 24px is the tab
+   bar's distance from the hero on every hub -- the rail stands in for that
+   bar here -- and the app's own gap between the rail and the view. */
+.mgdb-exptools-page .et-app {
+  display: grid;
+  grid-template-columns: var(--et-rail) minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-exptools-page .et-work {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  min-width: 0;
+}
+
+.mgdb-exptools-page .et-view,
+.mgdb-exptools-page .et-view-body,
+.mgdb-exptools-page .et-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-5);
+  min-width: 0;
+}
+
+.mgdb-exptools-page .et-grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+.mgdb-exptools-page .et-grid2.et-grid-tight { gap: var(--mgdb-space-4); }
+
+/* --------------------------------------------------------------------------
+   The rail
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-rail {
+  position: sticky;
+  top: var(--mgdb-space-3);
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border: 1px solid var(--et-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: #fff;
+  box-shadow: var(--et-shadow);
+}
+
+.mgdb-exptools-page .et-rail-home,
+.mgdb-exptools-page .et-rail-link {
+  display: block;
+  padding: 6px var(--mgdb-space-3);
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.35;
+  text-decoration: none;
+}
+.mgdb-exptools-page .et-rail-home { font-weight: 700; margin-bottom: var(--mgdb-space-2); }
+.mgdb-exptools-page .et-rail-home:hover,
+.mgdb-exptools-page .et-rail-link:hover { background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); }
+.mgdb-exptools-page .et-rail-home.is-current,
+.mgdb-exptools-page .et-rail-link.is-current {
+  border-left-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+.mgdb-exptools-page .et-rail-link.is-unavailable { color: var(--mgdb-muted); }
+.mgdb-exptools-page .et-rail-link.is-unavailable::after { content: " \2014 n/a"; font-size: .85em; }
+
+.mgdb-exptools-page .et-rail-group + .et-rail-group { margin-top: var(--mgdb-space-3); }
+.mgdb-exptools-page .et-rail-group h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  padding: 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.mgdb-exptools-page .et-rail-group ul { margin: 0; padding: 0; list-style: none; }
+.mgdb-exptools-page .et-rail-note {
+  margin: var(--mgdb-space-4) var(--mgdb-space-3) 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Genome and search bar
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-context {
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--et-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: #fff;
+  box-shadow: var(--et-shadow);
+}
+.mgdb-exptools-page .et-context:empty { display: none; }
+.mgdb-exptools-page .et-context > .mgdb-hub-field { margin: 0; min-width: 0; }
+
+.mgdb-exptools-page .et-badge {
+  display: inline-flex;
+  min-width: 1.5em;
+  justify-content: center;
+  margin-left: var(--mgdb-space-1);
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   Controls. The hub field row, with the controls the application builds.
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-input,
+.mgdb-exptools-page .et-select {
+  width: 100%;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  box-sizing: border-box;
+}
+.mgdb-exptools-page textarea.et-input { min-height: 7rem; resize: vertical; line-height: 1.45; }
+.mgdb-exptools-page .et-input:focus,
+.mgdb-exptools-page .et-select:focus { outline: 3px solid var(--mgdb-focus); outline-offset: 1px; border-color: var(--mgdb-focus); }
+.mgdb-exptools-page .et-select-sm { width: auto; min-height: 36px; padding: 4px var(--mgdb-space-2); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-mono { font-family: var(--mgdb-font-mono); font-size: .92em; }
+
+/* A form row: fields side by side, their controls on one line. Top-aligned,
+   not bottom-aligned as the hub's search rows are: some fields here carry a
+   hint under the control, and bottom alignment lifted exactly those
+   controls above their neighbors. Every label reserves the hub's two-line
+   band (2.8em of its 13px type), so the controls start level; a field with
+   no label -- the submit button, a checkbox -- reserves the same band with
+   an empty ::before. It wraps as flex, not grid: a grid cell sized for a
+   select was narrower than "Find co-expressed genes", and the button hung
+   out of the panel. A field's own top margin (.mgdb-field + .mgdb-field in
+   the shared sheet) is a stacked-form rule, so the gap spaces them. */
+.mgdb-exptools-page .et-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: flex-start;
+  margin: 0;
+}
+.mgdb-exptools-page .et-form-row > .mgdb-hub-field {
+  flex: 1 1 10rem;
+  margin: 0;
+  min-width: 0;
+}
+.mgdb-exptools-page .et-form-row > .mgdb-hub-field-action { flex: 0 0 auto; align-self: flex-start; }
+.mgdb-exptools-page .et-form-row > .mgdb-hub-field-action::before,
+.mgdb-exptools-page .et-form-row > .et-field-check::before {
+  content: "";
+  display: block;
+  min-height: 2.8em;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-exptools-page .et-field > label { font-weight: 700; font-size: var(--mgdb-text-sm); color: var(--mgdb-ink-soft); }
+.mgdb-exptools-page .et-field .mgdb-hint { margin-top: 4px; font-size: var(--mgdb-text-xs); color: var(--mgdb-muted); }
+.mgdb-exptools-page .et-form-row > .et-field-check { flex: 0 1 auto; }
+/* A checkbox's own label is a sentence beside the box, not the shell's
+   small-caps field label, which it would otherwise be as the field's first
+   label (.mgdb-hub-field > label:first-child in css/mgdb-hub.css). */
+.mgdb-exptools-page .mgdb-hub-field > label.et-check {
+  min-height: var(--mgdb-tap-target);
+  align-items: center;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.mgdb-exptools-page .et-check {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+.mgdb-exptools-page .et-check input { width: 18px; height: 18px; margin: 0; }
+
+.mgdb-exptools-page .et-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+.mgdb-exptools-page .et-toolbar-label { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-weight: 700; }
+.mgdb-exptools-page .et-spacer { flex: 1 1 auto; }
+
+.mgdb-exptools-page .et-seg { display: inline-flex; flex-wrap: wrap; gap: var(--mgdb-space-1); }
+.mgdb-exptools-page .et-seg .mgdb-chip { min-height: 32px; font-size: var(--mgdb-text-sm); }
+
+.mgdb-exptools-page .et-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: var(--mgdb-space-3) 0 0;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-exptools-page .et-examples > span { color: var(--mgdb-muted); font-weight: 700; margin-right: var(--mgdb-space-1); }
+.mgdb-exptools-page .et-examples a.mgdb-chip { text-decoration: none; }
+
+/* Typeahead */
+.mgdb-exptools-page .et-ta { position: relative; min-width: 0; }
+.mgdb-exptools-page .et-ta-list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 22rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--mgdb-space-1) 0;
+  list-style: none;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  box-shadow: var(--mgdb-shadow-lg);
+}
+.mgdb-exptools-page .et-ta-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--mgdb-space-2);
+  align-items: baseline;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  cursor: pointer;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-exptools-page .et-ta-item.is-active,
+.mgdb-exptools-page .et-ta-item:hover { background: var(--mgdb-green-soft); }
+.mgdb-exptools-page .et-ta-meta { flex-basis: 100%; color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+.mgdb-exptools-page .et-ta-big .et-input { min-height: 52px; font-size: var(--mgdb-text-lg); }
+
+/* Gene list input */
+.mgdb-exptools-page .et-genelist-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-2);
+}
+.mgdb-exptools-page .et-count { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-file { cursor: pointer; }
+
+/* Gene chips */
+.mgdb-exptools-page .et-chips { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); align-items: center; }
+.mgdb-exptools-page .et-chips > .et-ta { flex: 1 1 16rem; }
+.mgdb-exptools-page .et-chip-list { display: contents; margin: 0; padding: 0; list-style: none; }
+.mgdb-exptools-page .et-chip {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: 4px 4px 4px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-exptools-page .et-chip-x {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.mgdb-exptools-page .et-chip-x:hover { background: var(--mgdb-red-soft); color: var(--mgdb-red); }
+
+/* --------------------------------------------------------------------------
+   The view
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-view-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.mgdb-exptools-page .et-view-title { margin: 0; color: var(--mgdb-green-dark); font-size: var(--mgdb-text-2xl); line-height: 1.2; }
+.mgdb-exptools-page .et-view-title:focus { outline: none; }
+.mgdb-exptools-page .et-view-sub { max-width: 80ch; margin: var(--mgdb-space-1) 0 0; color: var(--mgdb-ink-soft); font-family: inherit; font-size: var(--mgdb-text-base); line-height: 1.5; }
+.mgdb-exptools-page .et-view-sub:empty { display: none; }
+
+/* The sample selection */
+.mgdb-exptools-page .et-selbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--et-line);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  box-shadow: var(--et-shadow-sm);
+}
+.mgdb-exptools-page .et-selbar-label { font-weight: 700; font-size: var(--mgdb-text-sm); }
+/* The select shrinks: sized to its longest option it was 480px wide, and on
+   a phone that one control widened the whole layout viewport. */
+.mgdb-exptools-page .et-selbar .et-select { flex: 1 1 12rem; width: auto; min-width: 0; max-width: 30rem; }
+.mgdb-exptools-page .et-selbar-count { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* Panels: the hub's white card, with its top edges rotating by position. */
+.mgdb-exptools-page .et-panel {
+  min-width: 0;
+  padding: var(--mgdb-space-5) var(--mgdb-space-5) var(--mgdb-space-5);
+  border: 1px solid var(--et-line);
+  border-top: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-lg);
+  background: #fff;
+  box-shadow: var(--et-shadow);
+}
+.mgdb-exptools-page .et-panel:nth-of-type(8n+2) { border-top-color: var(--mgdb-gold); }
+.mgdb-exptools-page .et-panel:nth-of-type(8n+3) { border-top-color: var(--mgdb-status-info); }
+.mgdb-exptools-page .et-panel:nth-of-type(8n+4) { border-top-color: var(--mgdb-burgundy); }
+.mgdb-exptools-page .et-panel:nth-of-type(8n+5) { border-top-color: var(--mgdb-leaf); }
+.mgdb-exptools-page .et-panel:nth-of-type(8n+6) { border-top-color: var(--mgdb-orange); }
+.mgdb-exptools-page .et-panel:nth-of-type(8n+7) { border-top-color: var(--mgdb-wine); }
+.mgdb-exptools-page .et-panel:nth-of-type(8n+8) { border-top-color: var(--mgdb-gold-dark); }
+
+.mgdb-exptools-page .et-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-4);
+}
+.mgdb-exptools-page .et-panel-titles { min-width: 0; flex: 1 1 24rem; }
+.mgdb-exptools-page .et-panel-head h2 { margin: 0; color: var(--mgdb-green-dark); font-size: var(--mgdb-text-xl); line-height: 1.25; }
+.mgdb-exptools-page .et-panel-sub { margin: var(--mgdb-space-1) 0 0; color: var(--mgdb-muted); font-family: inherit; font-size: var(--mgdb-text-sm); line-height: 1.45; }
+.mgdb-exptools-page .et-panel-actions { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); align-items: center; min-width: 0; max-width: 100%; }
+.mgdb-exptools-page .et-panel-actions .et-select-sm { max-width: 100%; }
+.mgdb-exptools-page .et-panel-body > * + * { margin-top: var(--mgdb-space-3); }
+.mgdb-exptools-page .et-panel-body > .et-grid2 { margin-top: 0; }
+
+.mgdb-exptools-page .et-subhead { margin: 0 0 var(--mgdb-space-2); color: var(--mgdb-ink); font-size: var(--mgdb-text-base); font-weight: 700; }
+.mgdb-exptools-page .et-muted { color: var(--mgdb-muted); font-family: inherit; font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page p.et-muted,
+.mgdb-exptools-page p.et-caption,
+.mgdb-exptools-page .et-panel-body > p { font-family: inherit; }
+.mgdb-exptools-page .et-warn { color: var(--mgdb-status-warn); font-weight: 700; }
+.mgdb-exptools-page .et-strong { font-weight: 700; }
+.mgdb-exptools-page .et-nowrap { white-space: nowrap; }
+.mgdb-exptools-page .et-sym { color: var(--mgdb-green-dark); font-weight: 700; }
+.mgdb-exptools-page .et-r { font-variant-numeric: tabular-nums; font-weight: 700; }
+.mgdb-exptools-page .et-message { font-size: var(--mgdb-text-sm); line-height: 1.5; }
+.mgdb-exptools-page .et-empty { padding: var(--mgdb-space-5); }
+
+/* Tiles */
+.mgdb-exptools-page .et-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--mgdb-space-3);
+}
+.mgdb-exptools-page .et-tiles:empty { display: none; }
+.mgdb-exptools-page .et-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--et-line);
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  box-shadow: var(--et-shadow-sm);
+}
+.mgdb-exptools-page .et-tile:nth-child(4n+2) { border-left-color: var(--mgdb-gold); }
+.mgdb-exptools-page .et-tile:nth-child(4n+3) { border-left-color: var(--mgdb-status-info); }
+.mgdb-exptools-page .et-tile:nth-child(4n+4) { border-left-color: var(--mgdb-burgundy); }
+.mgdb-exptools-page .et-tile-label { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); font-weight: 700; }
+.mgdb-exptools-page .et-tile-value { color: var(--mgdb-ink); font-size: var(--mgdb-text-xl); font-weight: 800; line-height: 1.2; }
+.mgdb-exptools-page .et-tile-value small { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-weight: 400; }
+.mgdb-exptools-page .et-tile-note { color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-xs); line-height: 1.35; }
+
+/* The overview's metric row and tool cards. Four metrics in one row, then
+   two by two: an auto-fit grid leaves the fourth alone on a row of its own. */
+.mgdb-exptools-page .et-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.mgdb-exptools-page .et-toolgroup + .et-toolgroup { margin-top: var(--mgdb-space-5); }
+.mgdb-exptools-page .et-toolgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.mgdb-exptools-page a.et-toolcard { color: var(--mgdb-ink); text-decoration: none; }
+.mgdb-exptools-page a.et-toolcard h4 { margin: 0 0 var(--mgdb-space-1); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-exptools-page a.et-toolcard p { margin: 0; font-family: inherit; font-size: var(--mgdb-text-sm); line-height: 1.45; color: var(--mgdb-ink-soft); }
+.mgdb-exptools-page a.et-toolcard:hover h4 { text-decoration: underline; }
+.mgdb-exptools-page a.et-toolcard.is-unavailable { opacity: .7; }
+.mgdb-exptools-page .et-checks { margin: 0; padding-left: 1.25rem; font-size: var(--mgdb-text-sm); line-height: 1.5; }
+.mgdb-exptools-page .et-checks li + li { margin-top: var(--mgdb-space-2); }
+
+/* --------------------------------------------------------------------------
+   Gene identity
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-gene-title { margin: 0; font-size: var(--mgdb-text-2xl); line-height: 1.2; color: var(--mgdb-ink); }
+.mgdb-exptools-page .et-gene-title .et-mono { font-size: .8em; }
+.mgdb-exptools-page .et-gene-symbol { color: var(--mgdb-green-dark); font-weight: 800; }
+.mgdb-exptools-page .et-gene-counterpart { color: var(--mgdb-muted); font-size: .62em; font-weight: 700; white-space: nowrap; }
+.mgdb-exptools-page .et-gene-name { margin: var(--mgdb-space-1) 0 0; font-family: inherit; font-size: var(--mgdb-text-lg); color: var(--mgdb-ink-soft); }
+.mgdb-exptools-page .et-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-6);
+  align-items: baseline;
+  margin: var(--mgdb-space-4) 0 0;
+}
+.mgdb-exptools-page .et-facts > div { display: flex; gap: var(--mgdb-space-2); align-items: baseline; }
+.mgdb-exptools-page .et-facts dt { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-weight: 700; }
+.mgdb-exptools-page .et-facts dd { margin: 0; font-size: var(--mgdb-text-base); }
+.mgdb-exptools-page .et-gene-links { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); margin-top: var(--mgdb-space-4); }
+.mgdb-exptools-page .et-pan-lead { margin: 0 0 var(--mgdb-space-3); font-family: inherit; }
+
+/* Ranked lists: rank, gene, value on one grid row, the rank drawn by a
+   counter so the list keeps its numbers without the marker's own box. */
+.mgdb-exptools-page .et-ranked { margin: 0; padding: 0; list-style: none; counter-reset: et-rank; font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-ranked li {
+  counter-increment: et-rank;
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--et-line-soft);
+}
+.mgdb-exptools-page .et-ranked li::before { content: counter(et-rank) "."; color: var(--mgdb-muted); text-align: right; font-variant-numeric: tabular-nums; }
+.mgdb-exptools-page .et-ranked li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.mgdb-exptools-page .et-ranked .et-r { text-align: right; }
+
+/* GO terms */
+.mgdb-exptools-page .et-go { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--mgdb-space-4); }
+.mgdb-exptools-page .et-go > .et-caption { grid-column: 1 / -1; }
+.mgdb-exptools-page .et-go-terms { margin: 0; padding: 0; list-style: none; font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-go-terms li { padding: 3px 0; border-bottom: 1px solid var(--et-line-soft); }
+
+/* --------------------------------------------------------------------------
+   Figures
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-figure { min-width: 0; margin: 0; }
+.mgdb-exptools-page .et-figure-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+.mgdb-exptools-page .et-figure-legend:empty { display: none; }
+.mgdb-exptools-page .et-figure-legend .et-legend { margin: 0 0 var(--mgdb-space-2); }
+.mgdb-exptools-page .et-plot { width: 100%; min-height: 120px; }
+.mgdb-exptools-page .et-caption {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.5;
+}
+.mgdb-exptools-page .et-caption:empty { display: none; }
+.mgdb-exptools-page .et-figure-table { margin-top: var(--mgdb-space-3); }
+
+.mgdb-exptools-page .et-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-4);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-exptools-page .et-legend li { display: inline-flex; gap: var(--mgdb-space-1); align-items: center; }
+.mgdb-exptools-page .et-swatch {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+.mgdb-exptools-page .et-legend-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--mgdb-space-2);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.mgdb-exptools-page .et-legend-btn[aria-pressed="false"] { opacity: .45; text-decoration: line-through; }
+
+/* Locus track and gene model */
+.mgdb-exptools-page .et-locus-host,
+.mgdb-exptools-page .et-structure-svg { width: 100%; overflow-x: auto; }
+.mgdb-exptools-page .et-locus,
+.mgdb-exptools-page .et-structure { display: block; max-width: none; }
+.mgdb-exptools-page .et-locus-grid { stroke: var(--et-line-soft); stroke-width: 1; }
+.mgdb-exptools-page .et-locus-axis { stroke: var(--mgdb-line); stroke-width: 1; }
+.mgdb-exptools-page .et-locus-tick { fill: var(--mgdb-muted); font-size: 11px; }
+.mgdb-exptools-page .et-locus-label { fill: var(--mgdb-ink-soft); font-size: 10px; }
+.mgdb-exptools-page .et-locus-label.is-focus { fill: var(--mgdb-ink); font-weight: 700; }
+.mgdb-exptools-page .et-locus-gene path { stroke: #fff; stroke-width: 1; }
+.mgdb-exptools-page .et-locus-gene:hover path,
+.mgdb-exptools-page .et-locus-gene:focus path { stroke: var(--mgdb-ink); stroke-width: 1.5; }
+.mgdb-exptools-page .et-locus-gene.is-focus path { stroke: var(--mgdb-orange); stroke-width: 2.5; }
+.mgdb-exptools-page .et-structure-name { fill: var(--mgdb-ink-soft); font-size: 11px; font-family: var(--mgdb-font-mono); }
+.mgdb-exptools-page .et-structure-intron { stroke: var(--mgdb-muted); stroke-width: 1.2; }
+.mgdb-exptools-page .et-structure-utr { fill: #9ec5f4; }
+.mgdb-exptools-page .et-structure-cds { fill: #256abf; }
+.mgdb-exptools-page .et-structure-protein { fill: var(--et-line); }
+
+/* --------------------------------------------------------------------------
+   The NAM genomes: a strip of 26 cells. The state is carried by fill and
+   by a mark, never by color alone.
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-namstrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.1rem, 1fr));
+  gap: var(--mgdb-space-2) var(--mgdb-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mgdb-exptools-page .et-namstrip li { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.mgdb-exptools-page .et-namname { max-width: 100%; overflow: hidden; color: var(--mgdb-ink-soft); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.mgdb-exptools-page .et-namcell {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--mgdb-green);
+  border-radius: 4px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.mgdb-exptools-page .is-expressed > .et-namcell { background: var(--mgdb-green); }
+.mgdb-exptools-page .is-low > .et-namcell { background: linear-gradient(to top, var(--mgdb-green) 45%, #fff 45%); }
+.mgdb-exptools-page .is-silent > .et-namcell { border-color: var(--mgdb-burgundy); }
+.mgdb-exptools-page .is-silent > .et-namcell::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--mgdb-burgundy) calc(50% - 1px), var(--mgdb-burgundy) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.mgdb-exptools-page .is-absent > .et-namcell { border: 2px dashed #b9bdb6; }
+.mgdb-exptools-page .is-unmeasured > .et-namcell {
+  border-color: #9a9994;
+  background: repeating-linear-gradient(45deg, #fff 0 3px, #d9dbd6 3px 5px);
+}
+.mgdb-exptools-page .et-namkey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-exptools-page .et-namkey li { display: inline-flex; gap: 6px; align-items: center; }
+.mgdb-exptools-page .et-namkey .et-namcell { width: 14px; height: 14px; }
+
+.mgdb-exptools-page .et-state {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+.mgdb-exptools-page .et-state.is-expressed { background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); }
+.mgdb-exptools-page .et-state.is-low { background: var(--mgdb-gold-soft); color: var(--mgdb-gold-dark); }
+.mgdb-exptools-page .et-state.is-silent { background: var(--mgdb-burgundy-soft); color: var(--mgdb-burgundy); }
+.mgdb-exptools-page .et-state.is-absent,
+.mgdb-exptools-page .et-state.is-not-measured { background: var(--mgdb-surface-sunken); color: var(--mgdb-muted); }
+
+/* Presence in the 66 annotations */
+.mgdb-exptools-page .et-presence { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-4) var(--mgdb-space-6); }
+.mgdb-exptools-page .et-presence-panel ul { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; max-width: 36rem; }
+.mgdb-exptools-page .et-presence-panel li { display: flex; flex-direction: column; align-items: center; width: 3.1rem; }
+.mgdb-exptools-page .et-pcell {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b9bdb6;
+  border-radius: 3px;
+  background: #fff;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.mgdb-exptools-page .et-presence-panel li.is-present .et-pcell { border-color: var(--mgdb-green); background: var(--mgdb-green); }
+.mgdb-exptools-page .et-presence-panel li[data-nam] .et-pcell { outline: 2px solid var(--mgdb-gold); outline-offset: 1px; }
+.mgdb-exptools-page .et-pname { max-width: 100%; overflow: hidden; color: var(--mgdb-ink-soft); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+
+.mgdb-exptools-page .et-silent-list { max-width: 22rem; font-size: var(--mgdb-text-xs); }
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+
+.mgdb-exptools-page .et-dt-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+.mgdb-exptools-page .et-dt-filter { flex: 0 1 16rem; }
+.mgdb-exptools-page .et-dt-filter .et-input { min-height: 36px; padding: 4px var(--mgdb-space-3); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-dt-count { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-dt-tools { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); }
+.mgdb-exptools-page .et-dt-scroll { max-height: 38rem; }
+/* .mgdb-visually-hidden is position: absolute, and an absolutely positioned
+   caption or label is clipped by a scroll container only when that
+   container is its containing block. Without this, a hidden caption in a
+   wide table resolves against the page and widens the document -- the trap
+   first found on /genetic_variation. Every scroller here that holds one. */
+.mgdb-exptools-page .mgdb-table-scroll,
+.et-dialog .mgdb-table-scroll,
+.mgdb-exptools-page .et-namstrip li { position: relative; }
+.mgdb-exptools-page .et-table { font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-table th,
+.mgdb-exptools-page .et-table td { padding: 6px 10px; vertical-align: top; }
+.mgdb-exptools-page .et-table thead th { position: sticky; top: 0; z-index: 1; background: #fff; }
+.mgdb-exptools-page .et-table td.et-heat { background-color: rgb(57 135 229 / calc(var(--et-heat) * .32)); }
+.mgdb-exptools-page .et-table .et-sel { width: 2.2rem; }
+.mgdb-exptools-page .et-dt-empty { padding: var(--mgdb-space-5); color: var(--mgdb-muted); text-align: center; }
+.mgdb-exptools-page .et-dt-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--mgdb-space-2);
+}
+.mgdb-exptools-page .et-dt-page { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-gene-link { font-family: var(--mgdb-font-mono); font-size: .95em; }
+.mgdb-exptools-page tr.is-unusable td { color: var(--mgdb-muted); }
+
+.mgdb-exptools-page .et-tabs { margin-bottom: var(--mgdb-space-3); }
+
+/* --------------------------------------------------------------------------
+   Dialog, drawer, toasts
+   -------------------------------------------------------------------------- */
+
+.et-dialog {
+  width: min(44rem, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 1px solid var(--mgdb-line, #dcd8cf);
+  border-radius: var(--mgdb-radius-lg, 14px);
+  background: #fff;
+  color: var(--mgdb-ink, #1f2723);
+  font-family: var(--mgdb-font, system-ui, sans-serif);
+  box-shadow: 0 24px 60px rgba(16, 30, 54, .28);
+}
+.et-dialog.is-wide { width: min(72rem, calc(100vw - 32px)); }
+.et-dialog::backdrop { background: rgba(16, 30, 54, .45); }
+.et-dialog-head,
+.et-dialog-foot {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+.et-dialog-head { border-bottom: 1px solid var(--mgdb-line, #dcd8cf); }
+.et-dialog-head h2 { margin: 0; color: var(--mgdb-green-dark, #174634); font-size: 1.25rem; }
+.et-dialog-foot { justify-content: flex-end; border-top: 1px solid var(--mgdb-line, #dcd8cf); }
+.et-dialog-body { max-height: calc(100vh - 220px); overflow: auto; padding: 16px 20px; }
+.et-dialog .et-picker { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: 20px; }
+.et-dialog .et-picker-facets { max-height: 60vh; overflow-y: auto; }
+.et-dialog .et-facet { margin: 0 0 12px; padding: 0; border: 0; }
+.et-dialog .et-facet legend { margin-bottom: 4px; font-weight: 700; font-size: .875rem; }
+.et-dialog .et-check { display: flex; gap: 6px; align-items: center; padding: 3px 0; font-size: .875rem; cursor: pointer; }
+.et-dialog .et-check em { margin-left: auto; color: #5b655e; font-style: normal; font-size: .8125rem; }
+.et-dialog .et-picker-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.et-dialog .et-picker-tools .et-input { flex: 1 1 14rem; }
+.et-dialog .et-picker-table { max-height: 56vh; }
+.et-dialog .et-picker-count { margin-right: auto; color: #5b655e; font-size: .875rem; }
+.et-dialog .et-input { min-height: 40px; padding: 6px 10px; border: 1px solid #dcd8cf; border-radius: 6px; font: inherit; }
+.et-dialog .et-table { font-size: .875rem; }
+
+.mgdb-exptools-page .et-drawer {
+  position: fixed;
+  z-index: 60;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-3);
+  width: min(24rem, 100vw);
+  padding: var(--mgdb-space-5);
+  overflow-y: auto;
+  border-left: 1px solid var(--mgdb-line);
+  background: #fff;
+  box-shadow: -12px 0 32px rgba(16, 30, 54, .18);
+}
+.mgdb-exptools-page .et-drawer[hidden] { display: none; }
+.mgdb-exptools-page .et-drawer h2 { margin: 0; color: var(--mgdb-green-dark); font-size: var(--mgdb-text-xl); }
+.mgdb-exptools-page .et-drawer-actions,
+.mgdb-exptools-page .et-drawer-foot { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); }
+.mgdb-exptools-page .et-basket-list { flex: 1 1 auto; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+.mgdb-exptools-page .et-basket-list li {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--et-line-soft);
+}
+
+.mgdb-exptools-page .et-toasts {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: var(--mgdb-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.mgdb-exptools-page .et-toast {
+  max-width: min(36rem, calc(100vw - 32px));
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-sm);
+  box-shadow: var(--mgdb-shadow-lg);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.mgdb-exptools-page .et-toast.is-in { opacity: 1; transform: none; }
+
+.mgdb-exptools-page .et-choices { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); align-items: center; margin-top: var(--mgdb-space-3); }
+.mgdb-exptools-page .et-prose p { font-family: inherit; }
+.mgdb-exptools-page .et-prose p + p { margin-top: var(--mgdb-space-3); }
+
+/* --------------------------------------------------------------------------
+   Narrow screens: the rail becomes a scrolling row of groups above the work.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .mgdb-exptools-page .et-grid2 { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-exptools-page .et-metrics,
+  .mgdb-exptools-page .et-toolgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 960px) {
+  .mgdb-exptools-page .et-app { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-exptools-page .et-rail {
+    position: static;
+    max-height: none;
+    display: flex;
+    gap: var(--mgdb-space-4);
+    overflow-x: auto;
+    padding: var(--mgdb-space-3);
+  }
+  .mgdb-exptools-page .et-rail-nav { display: flex; gap: var(--mgdb-space-4); }
+  .mgdb-exptools-page .et-rail-group + .et-rail-group { margin-top: 0; }
+  .mgdb-exptools-page .et-rail-group ul { display: flex; gap: 2px; }
+  .mgdb-exptools-page .et-rail-home,
+  .mgdb-exptools-page .et-rail-link { white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; border-radius: var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0 0; }
+  .mgdb-exptools-page .et-rail-home.is-current,
+  .mgdb-exptools-page .et-rail-link.is-current { border-bottom-color: var(--mgdb-green); }
+  .mgdb-exptools-page .et-rail-home { margin-bottom: 0; align-self: flex-end; }
+  .mgdb-exptools-page .et-rail-note { display: none; }
+  .mgdb-exptools-page .et-context { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .mgdb-exptools-page .et-panel { padding: var(--mgdb-space-4); }
+  .mgdb-exptools-page .et-toolgrid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-exptools-page .et-facts { gap: var(--mgdb-space-2) var(--mgdb-space-4); }
+  .mgdb-exptools-page .et-form-row > .mgdb-hub-field { flex-basis: 100%; }
+  .mgdb-exptools-page .et-form-row > .mgdb-hub-field-action::before,
+  .mgdb-exptools-page .et-form-row > .et-field-check::before { display: none; }
+  .et-dialog .et-picker { grid-template-columns: minmax(0, 1fr); }
+  .et-dialog .et-picker-facets { max-height: 30vh; }
+}
+
+@media (max-width: 560px) {
+  .mgdb-exptools-page .et-metrics { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-exptools-page .et-toast { transition: none; }
+}
+
+
+/* ---- The profile explorer under a bar strip (EX.explorer) ----------------
+   The bracket is positioned over the strip from Plotly's layout, so the
+   figure is the containing block; its fill lets pointer events through to
+   the bars, and only the grip and the two edges take the pointer. */
+.mgdb-exptools-page .et-figure { position: relative; }
+.mgdb-exptools-page .et-figure.is-busy .et-plot { opacity: .45; }
+.mgdb-exptools-page .et-plot:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; border-radius: var(--mgdb-radius-sm); }
+.mgdb-exptools-page .et-px {
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+.mgdb-exptools-page .et-px-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+}
+.mgdb-exptools-page .et-px-find { flex: 1 1 200px; max-width: 320px; }
+.mgdb-exptools-page .et-px-find .et-input { min-height: 36px; padding: 4px var(--mgdb-space-2); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-px-status { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-px-nav { display: inline-flex; gap: var(--mgdb-space-1); margin-left: auto; }
+.mgdb-exptools-page .et-px-marks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-1) var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-exptools-page .et-px-marks .mgdb-chip { min-height: 28px; padding: 2px 10px; font-size: var(--mgdb-text-xs); }
+.mgdb-exptools-page .et-px-marks .mgdb-chip b { margin-right: 5px; font-weight: 800; }
+.mgdb-exptools-page .et-px-list { margin: var(--mgdb-space-2) 0 0; padding: 0; list-style: none; }
+.mgdb-exptools-page .et-px-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30% 72px;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: 26px;
+  padding: 0 4px;
+  font-size: var(--mgdb-text-sm);
+  break-inside: avoid;
+}
+.mgdb-exptools-page .et-px-row.is-focus { background: var(--mgdb-green-soft); border-radius: var(--mgdb-radius-sm); }
+.mgdb-exptools-page .et-px-label { overflow: hidden; color: var(--mgdb-ink); white-space: nowrap; text-overflow: ellipsis; }
+.mgdb-exptools-page .et-px-label .et-muted { font-size: var(--mgdb-text-xs); }
+.mgdb-exptools-page .et-px-bars { display: flex; flex-direction: column; gap: 2px; }
+.mgdb-exptools-page .et-px-bars i { display: block; height: 12px; min-width: 0; border-radius: 0 3px 3px 0; }
+.mgdb-exptools-page .et-px-bars i[data-missing] { height: 2px; width: 100% !important; background: var(--mgdb-line) !important; }
+.mgdb-exptools-page .et-px-val {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.mgdb-exptools-page .et-px-hd { margin: var(--mgdb-space-2) 0 2px; break-after: avoid; }
+.mgdb-exptools-page .et-px-hd:first-child { margin-top: 0; }
+.mgdb-exptools-page .et-px-hdbtn {
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mgdb-exptools-page .et-px-hdbtn:hover { text-decoration: underline; }
+.mgdb-exptools-page .et-px-hdbtn span { color: var(--mgdb-muted); font-weight: 400; }
+.mgdb-exptools-page .et-px-cols { column-width: 230px; column-gap: var(--mgdb-space-5); }
+.mgdb-exptools-page .et-px-cols .et-px-row { grid-template-columns: minmax(0, 1fr) 54px 48px; min-height: 20px; font-size: var(--mgdb-text-xs); }
+.mgdb-exptools-page .et-px-cols .et-px-bars i { height: 8px; }
+.mgdb-exptools-page .et-px-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-2);
+}
+.mgdb-exptools-page .et-px-panel {
+  display: block;
+  width: 100%;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: #fff;
+  color: var(--mgdb-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mgdb-exptools-page .et-px-panel:hover { border-color: var(--mgdb-green); }
+.mgdb-exptools-page .et-px-panel:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 1px; }
+.mgdb-exptools-page .et-px-panel-head { display: flex; justify-content: space-between; gap: var(--mgdb-space-2); font-size: var(--mgdb-text-sm); }
+.mgdb-exptools-page .et-px-panel-name { overflow: hidden; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.mgdb-exptools-page .et-px-panel-n,
+.mgdb-exptools-page .et-px-panel-max { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); white-space: nowrap; }
+.mgdb-exptools-page .et-px-panel svg { display: block; width: 100%; height: 42px; margin: 4px 0 2px; }
+.mgdb-exptools-page .et-brush { position: absolute; z-index: 2; pointer-events: none; }
+.mgdb-exptools-page .et-brush-fill {
+  position: absolute;
+  inset: 0;
+  border-right: 2px solid var(--mgdb-ink);
+  border-left: 2px solid var(--mgdb-ink);
+  border-radius: 3px;
+  background: rgba(31, 39, 35, .07);
+}
+.mgdb-exptools-page .et-brush-edge { position: absolute; top: 0; bottom: 0; width: 12px; cursor: ew-resize; pointer-events: auto; touch-action: none; }
+.mgdb-exptools-page .et-brush-edge.is-left { left: -6px; }
+.mgdb-exptools-page .et-brush-edge.is-right { right: -6px; }
+.mgdb-exptools-page .et-brush-grip {
+  position: absolute;
+  right: 0;
+  bottom: -13px;
+  left: 0;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--mgdb-ink);
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+}
+.mgdb-exptools-page .et-brush-grip:active { cursor: grabbing; }
+.mgdb-exptools-page .et-px-short { display: none; }
+@media (max-width: 767px) {
+  .mgdb-exptools-page .et-px-row { grid-template-columns: minmax(0, 1fr) 26% 60px; }
+  .mgdb-exptools-page .et-px-nav { margin-left: 0; }
+  .mgdb-exptools-page .et-px-find { flex-basis: 100%; max-width: none; }
+  .mgdb-exptools-page .et-px-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mgdb-exptools-page .et-px-short { display: inline; }
+}

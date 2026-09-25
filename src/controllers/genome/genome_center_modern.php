@@ -325,7 +325,6 @@ $css_file = $doc_root . '/css/mgdb-genomes.css';
 $js_file  = $doc_root . '/js/mgdb-genome-center.js';
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . (file_exists($hub_file) ? filemtime($hub_file) : time()));
 $bauplan->includeCss('/css/mgdb-genomes.css?v=' . (file_exists($css_file) ? filemtime($css_file) : time()));
-$bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-genome-center.js?v=' . (file_exists($js_file) ? filemtime($js_file) : time()));

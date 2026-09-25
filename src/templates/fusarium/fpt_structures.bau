@@ -1,0 +1,170 @@
+$$SYNTAX-LEVEL 2
+*(fpt-structures
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Fusarium Protein Toolkit Structures | AlphaFold and ESMFold Models for Six Fusarium Species">
+<meta property="og:description" content="AlphaFold and ESMFold models for every protein of six Fusarium species, colored by confidence and superposed to show where the two predictors agree.">
+
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page fpt-page fpt-structures-page" id="fst-main"
+      data-api="/search/fusarium/fusarium_api.php"
+      data-initial="$(initial_term)"
+      data-initial-model="$(initial_model)">
+
+  <section class="mgdb-hero fpt-hero" aria-labelledby="fst-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/data_center/protein_structure.png?v=20260915" alt="" class="fpt-hero-icon" width="256" height="252" />
+      <strong>Structures</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fst-title">AlphaFold and ESMFold models</h1>
+      <p class="mgdb-hero-description">Predicted structures for every protein of six Fusarium species: AlphaFold's, as published in the AlphaFold Protein Structure Database, and for <i>F. graminearum</i> and <i>F. verticillioides</i> ESMFold's as well, predicted for the toolkit. Look a protein up to see a model colored by its confidence, or the two superposed to see where the predictors agree.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/fusarium/foldseek">Foldseek</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/fusarium/effectors">Effectors</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fst-search" class="is-current" aria-current="true">Search</a>
+    <a href="#fst-reading">Reading the models</a>
+    <a href="#fst-sources">Data sources</a>
+    <a href="#fst-references">References</a>
+    <a href="#fst-related">Related resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Search
+       ==================================================================== -->
+  <section id="fst-search" aria-labelledby="fst-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fst-search-title">Search</h2></div>
+    </div>
+
+    <form id="fst-form" class="fpt-lookup-form" role="search" autocomplete="off" action="/fusarium/structures" method="get">
+      <div class="mgdb-hub-field fpt-lookup-field">
+        <label for="fst-term">Gene id, gene symbol or UniProt accession</label>
+        <input id="fst-term" name="id" type="search" value="$(initial_term)" spellcheck="false"
+               aria-describedby="fst-term-hint"
+               placeholder="FGSG_09786, FVEG_13850, FOXG_00008, A0A139YB70&hellip;" />
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Show models</button>
+      </div>
+      <p class="mgdb-hint fpt-hint" id="fst-term-hint">Any of the six species: <code>FGSG_</code> and <code>FGRRES_</code> ids for <i>F. graminearum</i>, <code>FVEG_</code> for <i>F. verticillioides</i>, <code>FFUJ_</code>, <code>FOXG_</code>, <code>FPRO_</code> and <code>NECHADRAFT_</code> for the others, gene symbols such as <code>TRI5</code>, and UniProt accessions.</p>
+      <div class="fpt-example-row" aria-label="Example searches">
+        <span>Examples</span>
+        <button class="mgdb-chip" type="button" data-fst-example="FVEG_13850">FVEG_13850</button>
+        <button class="mgdb-chip" type="button" data-fst-example="FGSG_09786">FGSG_09786</button>
+        <button class="mgdb-chip" type="button" data-fst-example="TRI5">TRI5</button>
+        <button class="mgdb-chip" type="button" data-fst-example="FOXG_00008">FOXG_00008</button>
+        <button class="mgdb-chip" type="button" data-fst-example="NECHADRAFT_100325">NECHADRAFT_100325</button>
+      </div>
+    </form>
+
+    <div class="fpt-status" id="fst-status" role="status" aria-live="polite"></div>
+
+    <noscript>
+      <p class="mgdb-message mgdb-message-info">The 3D viewers need JavaScript. The model files themselves are listed at <a href="https\://fusarium.maizegdb.org/protein_structure/structures/">fusarium.maizegdb.org</a>.</p>
+    </noscript>
+  </section>
+
+  ;; Hidden until a search runs, and not a tab, as on every hub.
+  <section id="fst-results" aria-labelledby="fst-results-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><h2 id="fst-results-title">Results</h2></div>
+    </div>
+    <div id="fst-results-body"></div>
+  </section>
+
+  <!-- ====================================================================
+       2. Reading the models
+       ==================================================================== -->
+  <section id="fst-reading" aria-labelledby="fst-reading-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fst-reading-title">Reading the models</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid">
+      <article class="mgdb-card">
+        <h3>Confidence</h3>
+        <p>Both predictors score every residue from 0 to 100, as pLDDT, and the viewers color by it: above 90 the backbone and most side chains are placed well; 70 to 90 the backbone is usually right; below 50 the region is usually disordered or not predictable from this sequence alone, and its shape should not be read.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Two predictors</h3>
+        <p>AlphaFold predicts from an alignment of the protein's homologs; ESMFold from the single sequence, through a protein language model. ESMFold is far faster and, for proteins with few relatives, often less confident. A region both call confident is the firmest ground a prediction offers.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Comparing them</h3>
+        <p>The comparison superposes the ESMFold model on the AlphaFold one residue for residue and scores the fit with TM-align's TM-score: above 0.5 the two share a fold, 1 is identical. Residues are then shaded by how far apart the two predictions put them. Disagreement where both are confident is worth a closer look; where either is not, it is expected.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. Data sources
+       ==================================================================== -->
+  <section id="fst-sources" aria-labelledby="fst-sources-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fst-sources-title">Data sources</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid">
+      <article class="mgdb-card">
+        <h3>The models</h3>
+        <p>$(count_af) AlphaFold models, version 4 of the AlphaFold Protein Structure Database, for <i>F. graminearum</i>, <i>F. verticillioides</i>, <i>F. fujikuroi</i>, <i>F. oxysporum</i>, <i>F. proliferatum</i> and <i>F. solani</i>, and $(count_esm) ESMFold models for the first two. They are drawn from the toolkit's own copies on fusarium.maizegdb.org, so a model opens whatever has since happened to its UniProt entry. The ESMFold models of the other four species are in the download archive but are not served one at a time.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Identifiers</h3>
+        <p>Gene ids come from UniProt, from the synonym files the toolkit's PanEffect resolves ids with, and from UniParc for entries UniProt has deleted &mdash; the whole <i>F. oxysporum</i> 4287 proteome among them. Some genes were entered twice under different accessions, and some ids name more than one protein; the page lists every one.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Downloads</h3>
+        <p>Every model, one archive per species and predictor, is in the toolkit's <a href="https\://ars-usda.app.box.com/v/maizegdb-public/folder/227029737169">protein structures folder</a>. A single model downloads from its viewer, and the superposition from the comparison.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. References
+       ==================================================================== -->
+  <section id="fst-references" aria-labelledby="fst-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fst-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="fst-related" aria-labelledby="fst-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="fst-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/fusarium/foldseek">
+          <strong>Foldseek</strong>
+          <span>The closest structures to a <i>F. graminearum</i> or <i>F. verticillioides</i> protein in nine proteomes</span>
+        </a>
+        <a href="/fusarium/effectors">
+          <strong>Effectors</strong>
+          <span>Predicted effector proteins in six species, each linked to its structure</span>
+        </a>
+        <a href="$(snptools_url)">
+          <strong>SNPTools</strong>
+          <span>Variant diversity and predicted variant effects across Fusarium genomes</span>
+        </a>
+        <a href="/data_center/protein_structure">
+          <strong>Protein Structure Hub</strong>
+          <span>The same viewer for maize: AlphaFold monomers, dimers and ESMFold models</span>
+        </a>
+        <a href="https\://alphafold.ebi.ac.uk/">
+          <strong>AlphaFold Protein Structure Database</strong>
+          <span>EMBL-EBI's archive of AlphaFold predictions</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

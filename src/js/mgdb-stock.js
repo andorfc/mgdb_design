@@ -34,7 +34,6 @@
     loading: false
   };
 
-  var debounceTimer = null;
 
   function byId(id) {
     return document.getElementById(id);
@@ -134,7 +133,14 @@
   /* ── Query Execution ────────────────────────────────────────────────────── */
 
   function fetchResults(scrollToResults) {
-    if (state.loading) return;
+    /* A search asked for while one is running runs after it rather than being
+       dropped, and the older answer is not drawn: what the table shows is
+       always the answer to what was asked for last. */
+    if (state.loading) {
+      state.pending = true;
+      state.pendingScroll = state.pendingScroll || !!scrollToResults;
+      return;
+    }
     state.loading = true;
 
     var statusEl = byId('stock-results-status');
@@ -190,6 +196,7 @@
       })
       .then(function (data) {
         state.loading = false;
+        if (runPending()) { return; }
         if (!data) {
           renderError();
           return;
@@ -225,8 +232,18 @@
       })
       .catch(function (error) {
         state.loading = false;
+        if (runPending()) { return; }
         renderError();
       });
+  }
+
+  function runPending() {
+    if (!state.pending) { return false; }
+    var scroll = state.pendingScroll;
+    state.pending = false;
+    state.pendingScroll = false;
+    fetchResults(scroll);
+    return true;
   }
 
   function updateSourceBadges() {
@@ -711,7 +728,7 @@
     }
     var m = metrics();
 
-    window.MGDB.chart({
+    var whenDrawn = window.MGDB.chart({
       target: el,
       traces: [{
         type: 'bar',
@@ -738,8 +755,11 @@
 
     /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which rescales
        the figure but keeps the margins it was drawn with. Crossing the
-       breakpoint has to relayout. */
-    if (window.Plotly && window.Plotly.relayout) {
+       breakpoint has to relayout.
+       Installed once the figure is drawn: Plotly is fetched when the figure
+       comes into view, so it is not on the page when this runs. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
       var lastNarrow = m.narrow;
       var timer = null;
       window.addEventListener('resize', function () {
@@ -760,7 +780,7 @@
           });
         }, 180);
       });
-    }
+    });
   }
 
   /* ── Initialization ────────────────────────────────────────────────────── */
@@ -831,19 +851,14 @@
     var mgdbSourceBtn = byId('stock-source-mgdb');
     var grinSourceBtn = byId('stock-source-grin');
 
+    /* Typing offers suggestions (data-suggest on the field, MGDB.typeahead)
+       and does not search: results change when the reader submits, so the
+       table never shows the answer to text that is no longer in the box.
+       state.term is set by the submit handler for the same reason -- paging
+       or re-sorting must not quietly search for unsubmitted text. */
     if (queryInput) {
       queryInput.addEventListener('input', function () {
-        state.term = queryInput.value.trim();
         if (clearBtn) clearBtn.hidden = !queryInput.value;
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(function () {
-          state.page = 1;
-          if (hasSearchState()) {
-            fetchResults(false);
-          } else {
-            hideResults();
-          }
-        }, 300);
       });
       if (clearBtn) clearBtn.hidden = !queryInput.value;
     }

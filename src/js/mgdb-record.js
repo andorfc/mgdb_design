@@ -8,8 +8,8 @@
    What a page gets:
 
      collection()   any list, as a sortable table (the default) or a grid of
-                    the same rows, with a filter, a page size and a TSV of
-                    exactly the columns on screen
+                    the same rows, with a filter, a page size (or one set of
+                    rows at a time) and a TSV of exactly the columns on screen
      notes()        curator prose on the warm surface
      images()       the gallery of image cards over a lightbox, with a
                     table of the same rows behind the view toggle
@@ -36,6 +36,11 @@
      The image gallery keeps its own 16: that is a 4-across grid and 10 would
      leave a ragged half-row. */
   var REFERENCE_PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  /* A collection shown one set at a time lists its sets as buttons up to this
+     many, and in a select past it. 96% of gene models have one to four
+     transcripts, but a B73 v4 model can have hundreds -- Zm00001d038675 has
+     366, every one scored -- and as buttons that is twenty rows of them. */
+  var GROUP_BUTTON_LIMIT = 30;
 
   function byId(id) { return document.getElementById(id); }
   function escape(value) { return MGDB.escapeHtml(value == null ? '' : String(value)); }
@@ -101,6 +106,15 @@
        views      extra views beside Table and Grid: [{ key, label, icon (an
                   svg string), render(rows) -> markup }]. The toggle shows
                   them in order; `view` may name one of them as the start.
+       groups     show the rows one set at a time instead of in pages -- a
+                  gene's scores one transcript at a time:
+                  { label, noun: [one, many], key(item) -> set id,
+                    sets: [{ id, label, name, note, marked }], current }.
+                  The picker lists the sets in the order given and opens on
+                  `current`. Every row of the open set is shown, so there is
+                  no page size and no pager; the filter and the sort work
+                  inside the set, and the TSV still carries every set, as it
+                  carried every page. A set with no rows gets no button.
 
      Returns true when it rendered rows, so a caller can decide whether its
      section has anything in it. */
@@ -126,6 +140,77 @@
     var allColumns = spec.columns;
     var columns = allColumns.filter(function (c) { return !c.tsvOnly; });
     var titleColumn = columns.filter(function (c) { return c.tile; })[0] || columns[0];
+
+    /* One set at a time (spec.groups). The sets are the listed ones that have
+       rows, in the order listed; a row whose set is not listed gets a set of
+       its own at the end rather than going quietly unreachable, since the
+       count in the heading includes it. */
+    var groups = null;
+    function groupOf(item) {
+      var id = groups.key(item);
+      return id == null ? '' : String(id);
+    }
+    if (spec.groups && spec.groups.key) {
+      groups = {
+        label: spec.groups.label || 'Set',
+        noun: spec.groups.noun || ['row', 'rows'],
+        key: spec.groups.key,
+        sets: []
+      };
+      var seen = {}, unlisted = [];
+      items.forEach(function (item) {
+        var id = groupOf(item);
+        if (!seen[id]) { seen[id] = true; unlisted.push(id); }
+      });
+      (spec.groups.sets || []).forEach(function (s) {
+        var id = String(s.id);
+        if (seen[id] === true) {
+          seen[id] = 'listed';
+          groups.sets.push({ id: id, label: s.label, name: s.name, note: s.note, marked: !!s.marked });
+        }
+      });
+      unlisted.forEach(function (id) { if (seen[id] === true) { groups.sets.push({ id: id }); } });
+      var opening = groups.sets.filter(function (s) { return s.id === String(spec.groups.current); })[0] || groups.sets[0];
+      state.group = opening.id;
+      state.size = 'all';
+    }
+    function setName(s) { return s.name || s.id || '—'; }
+    function setLabel(s) { return s.label || setName(s); }
+    function currentSet() {
+      return groups.sets.filter(function (s) { return s.id === state.group; })[0];
+    }
+
+    /* Buttons, like the pager they replace; past GROUP_BUTTON_LIMIT, a select
+       with Prev and Next. Above the rows rather than below them, because the
+       choice decides what the rows are, and because sets differ in length --
+       under them, the button just clicked would move out from under the
+       pointer whenever the next set had a row more or less. */
+    function groupsHtml() {
+      if (!groups) { return ''; }
+      var noun = escape(groups.label.toLowerCase());
+      if (groups.sets.length <= GROUP_BUTTON_LIMIT) {
+        return '<div class="mgdb-rec-toolbar mgdb-rec-groups" role="group" aria-labelledby="' + key + '-group">' +
+          '<span class="mgdb-rec-groups-label" id="' + key + '-group">' + escape(groups.label) + '</span>' +
+          '<div class="mgdb-rec-group-btns">' + groups.sets.map(function (s, i) {
+            var on = s.id === state.group;
+            return '<button class="mgdb-rec-page-btn mgdb-rec-group-btn' + (on ? ' is-active' : '') + '" type="button"' +
+              ' data-group="' + i + '" aria-pressed="' + on + '" title="' + escape(setName(s) + (s.note ? ', ' + s.note : '')) + '">' +
+              escape(setLabel(s)) +
+              (s.marked ? '<span class="mgdb-rec-group-mark" aria-hidden="true">★</span>' : '') +
+              (s.note ? '<span class="mgdb-visually-hidden">, ' + escape(s.note) + '</span>' : '') +
+            '</button>';
+          }).join('') + '</div>' +
+        '</div>';
+      }
+      return '<div class="mgdb-rec-toolbar mgdb-rec-groups">' +
+        '<label>' + escape(groups.label) + ' <select data-role="group">' + groups.sets.map(function (s, i) {
+          return '<option value="' + i + '"' + (s.id === state.group ? ' selected' : '') + '>' +
+            escape(setLabel(s) + (s.note ? ' — ' + s.note : '')) + '</option>';
+        }).join('') + '</select></label>' +
+        '<button class="mgdb-rec-page-btn" type="button" data-step="-1" aria-label="Previous ' + noun + '">&larr; Prev</button>' +
+        '<button class="mgdb-rec-page-btn" type="button" data-step="1" aria-label="Next ' + noun + '">Next &rarr;</button>' +
+      '</div>';
+    }
 
     /* A block may ask for a size that is not one of the standard three -- the
        image gallery pages at sixteen, a four-by-four grid. Without adding it
@@ -154,10 +239,11 @@
                 (v.icon || '') + escape(v.label) + '</button>';
             }).join('') +
           '</div>' +
-          '<label>Show <select data-role="size" aria-label="Rows per page">' + sizeOptions + '</select></label>' +
+          (groups ? '' : '<label>Show <select data-role="size" aria-label="Rows per page">' + sizeOptions + '</select></label>') +
           '<button class="mgdb-rec-tsv" type="button" data-role="tsv">Download TSV</button>' +
         '</div>' +
       '</div>' +
+      groupsHtml() +
       '<p class="mgdb-rec-block-status" data-role="status" aria-live="polite"></p>' +
       '<div data-role="body"></div>' +
       '<nav class="mgdb-rec-pagination" data-role="pagination" aria-label="' + escape(spec.title) + ' pages" hidden></nav>' +
@@ -175,7 +261,8 @@
       return text === '' ? '<span class="mgdb-muted">—</span>' : escape(text);
     }
 
-    function filtered() {
+    /* Every row the filter lets through, sorted. This is what the TSV takes. */
+    function matching() {
       var rows = items.slice();
       if (state.query) {
         var needle = state.query.toLowerCase();
@@ -203,6 +290,26 @@
         }
       }
       return rows;
+    }
+
+    /* What the views draw: the matching rows, and of those only the open
+       set's when the block is shown one set at a time. */
+    function filtered() {
+      var rows = matching();
+      return groups ? rows.filter(function (item) { return groupOf(item) === state.group; }) : rows;
+    }
+
+    /* "Showing all 15 scores for Zm00001eb374090_T004, the canonical
+       transcript." The full name, because the button carries the short one. */
+    function groupStatus(shown) {
+      if (!shown) { return ''; }
+      var set = currentSet();
+      var inSet = items.filter(function (item) { return groupOf(item) === set.id; }).length;
+      var noun = inSet === 1 ? groups.noun[0] : groups.noun[1];
+      var count = shown === inSet
+        ? (inSet === 1 ? '1 ' + noun : 'all ' + number(inSet) + ' ' + noun)
+        : number(shown) + ' of ' + number(inSet) + ' ' + noun;
+      return 'Showing ' + count + ' for ' + setName(set) + (set.note ? ', ' + set.note : '') + '.';
     }
 
     function renderTable(rows) {
@@ -249,10 +356,11 @@
 
       var extraView = (spec.views || []).filter(function (v) { return v.key === state.view; })[0];
       body.innerHTML = total === 0
-        ? '<p class="mgdb-rec-empty">Nothing in ' + escape(spec.title.toLowerCase()) + ' matches “' + escape(state.query) + '”.</p>'
+        ? '<p class="mgdb-rec-empty">Nothing in ' + escape(spec.title.toLowerCase()) +
+          (groups ? ' for ' + escape(setName(currentSet())) : '') + ' matches “' + escape(state.query) + '”.</p>'
         : (extraView ? extraView.render(pageRows) : (state.view === 'grid' ? renderGrid(pageRows) : renderTable(pageRows)));
 
-      status.textContent = total === 0 ? '' :
+      status.textContent = groups ? groupStatus(total) : total === 0 ? '' :
         (total === items.length
           ? (total > size ? 'Showing ' + (start + 1) + '–' + Math.min(start + size, total) + ' of ' + number(total) : '')
           : number(total) + ' of ' + number(items.length) + ' shown' +
@@ -318,11 +426,55 @@
       render();
     }, 150));
 
-    block.querySelector('[data-role="size"]').addEventListener('change', function (event) {
-      state.size = event.target.value === 'all' ? 'all' : Number(event.target.value);
-      state.page = 1;
+    var sizeSelect = block.querySelector('[data-role="size"]');
+    if (sizeSelect) {
+      sizeSelect.addEventListener('change', function (event) {
+        state.size = event.target.value === 'all' ? 'all' : Number(event.target.value);
+        state.page = 1;
+        render();
+      });
+    }
+
+    /* Opening a set redraws the rows and moves the pressed state; focus stays
+       on the control that was used, and the status line, which is aria-live,
+       says what is now shown. */
+    var groupRow = groups ? block.querySelector('.mgdb-rec-groups') : null;
+    function syncSteps() {
+      var index = groups.sets.indexOf(currentSet());
+      Array.prototype.forEach.call(groupRow.querySelectorAll('[data-step]'), function (btn) {
+        var to = index + Number(btn.getAttribute('data-step'));
+        btn.disabled = to < 0 || to >= groups.sets.length;
+      });
+    }
+    function openSet(index) {
+      var s = groups.sets[index];
+      if (!s || s.id === state.group) { return; }
+      state.group = s.id;
+      Array.prototype.forEach.call(groupRow.querySelectorAll('[data-group]'), function (btn) {
+        var on = Number(btn.getAttribute('data-group')) === index;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      var select = groupRow.querySelector('select[data-role="group"]');
+      if (select) { select.value = String(index); }
+      syncSteps();
       render();
-    });
+    }
+    if (groupRow) {
+      Array.prototype.forEach.call(groupRow.querySelectorAll('[data-group]'), function (btn) {
+        btn.addEventListener('click', function () { openSet(Number(btn.getAttribute('data-group'))); });
+      });
+      var groupSelect = groupRow.querySelector('select[data-role="group"]');
+      if (groupSelect) {
+        groupSelect.addEventListener('change', function () { openSet(Number(groupSelect.value)); });
+      }
+      Array.prototype.forEach.call(groupRow.querySelectorAll('[data-step]'), function (btn) {
+        btn.addEventListener('click', function () {
+          openSet(groups.sets.indexOf(currentSet()) + Number(btn.getAttribute('data-step')));
+        });
+      });
+      syncSteps();
+    }
 
     Array.prototype.forEach.call(block.querySelectorAll('.mgdb-view-btn'), function (btn) {
       btn.addEventListener('click', function () {
@@ -335,7 +487,7 @@
     });
 
     block.querySelector('[data-role="tsv"]').addEventListener('click', function () {
-      downloadTsv(spec.filename || (spec.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.tsv'), allColumns, filtered());
+      downloadTsv(spec.filename || (spec.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.tsv'), allColumns, matching());
     });
 
     render();
@@ -664,6 +816,11 @@
   function references(target, items, section, idPrefix, opts) {
     if (!items || !items.length) { return false; }
     opts = opts || {};
+    /* The element or its id. Six pages (gel, locus, primer, qtl,
+       recombination, term) pass the id, and the pager's
+       `section.scrollIntoView` then threw on a string: the next page drew but
+       the list never scrolled back to its top. */
+    if (typeof section === 'string') { section = document.getElementById(section); }
     target.innerHTML = '';
     var state = { view: 'table', page: 1, size: REFERENCE_PAGE_SIZE, query: '', years: null, sortKey: null, sortDir: 'ascending' };
     var sizeOptions = [5, 10, 25].map(function (n) {
@@ -1414,4 +1571,44 @@
     yearsChart: yearsChart,
     tabs: tabs, apiCard: apiCard, notice: notice, focusHash: focusHash
   };
+
+  /* Record type bubble: the sticky wrapper in the template does the pinning
+     (css/mgdb-record.css). This marks which of its two resting places it is
+     in -- the header's corner, or pinned once its wrapper has reached the top
+     of the window -- and, pinned, where it covers nothing: level with the last
+     tab when the bar's last row has room beside it, else just under the bar.
+     The bar is rebuilt by tabs() and wraps with the record, so this is
+     measured, not assumed. A few rect reads per scroll event, and nothing at
+     all on a page without the bubble. */
+  function typeBubble() {
+    var dock = document.querySelector('.mgdb-rec-type-dock');
+    var bubble = dock && dock.querySelector('.mgdb-rec-type');
+    if (!bubble) { return; }
+    var bar = document.querySelector('.mgdb-rec-tabs');
+    function update() {
+      var docked = window.scrollY > 0 && dock.getBoundingClientRect().top <= 0.5;
+      dock.classList.toggle('is-docked', docked);
+      if (!docked) { return; }
+      var top = 12;
+      var last = bar && !bar.hidden && bar.lastElementChild;
+      if (last) {
+        var barBox = bar.getBoundingClientRect();
+        var lastBox = last.getBoundingClientRect();
+        var mine = bubble.getBoundingClientRect();
+        top = mine.left - lastBox.right >= 12
+          ? lastBox.top + (lastBox.height - mine.height) / 2
+          : barBox.bottom + 8;
+      }
+      dock.style.setProperty('--mgdb-rec-type-docked-top', Math.round(top - dock.getBoundingClientRect().top) + 'px');
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', typeBubble);
+  } else {
+    typeBubble();
+  }
 })(window, document);

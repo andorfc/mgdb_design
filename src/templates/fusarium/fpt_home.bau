@@ -1,0 +1,249 @@
+$$SYNTAX-LEVEL 2
+*(fpt-home
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Fusarium Protein Toolkit | Protein Structures, Structural Matches and Effectors for Fusarium">
+<meta property="og:description" content="AlphaFold and ESMFold models for six Fusarium species, Foldseek structural matches, predicted effectors and variant effects, from MaizeGDB.">
+
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page fpt-page fpt-home-page" id="fpt-main" data-fpt-tabs
+      data-api="/search/fusarium/fusarium_api.php">
+
+  <section class="mgdb-hero fpt-hero" aria-labelledby="fpt-home-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/fusarium/fpt-mark.png" alt="" class="fpt-hero-mark" width="240" height="115" />
+      <strong>Home</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fpt-home-title">Fusarium Protein Toolkit</h1>
+      <p class="mgdb-hero-description">Tools and datasets to explore the structures and functions of Fusarium proteins: predicted structures for six species, structural matches across the genus and four outgroups, predicted effectors, and the predicted effects of amino acid changes. Built with MaizeGDB's pipelines, so a pathogen protein can be set beside its maize host's.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="/fusarium/foldseek">Foldseek</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/fusarium/structures">Structures</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/fusarium/effectors">Effectors</a>
+        <a class="mgdb-button mgdb-button-secondary" href="$(snptools_url)">SNPTools</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fpt-lookup" class="is-current" aria-current="true">Look up a protein</a>
+    <a href="#fpt-tools">Tools</a>
+    <a href="#fpt-species">Species</a>
+    <a href="#fpt-downloads">Downloads</a>
+    <a href="#fpt-references">References</a>
+    <a href="#fpt-metrics">Metrics</a>
+    <a href="#fpt-related">Related resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Look up a protein
+       ==================================================================== -->
+  <section id="fpt-lookup" aria-labelledby="fpt-lookup-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fpt-lookup-title">Look up a protein</h2></div>
+    </div>
+
+    ;; A plain GET to the Structures page, which is the toolkit's page for one
+    ;; protein: both models, and every tool that has it. The typeahead only
+    ;; suggests; nothing here searches until the reader submits.
+    <form class="fpt-lookup-form" role="search" action="/fusarium/structures" method="get" autocomplete="off">
+      <div class="mgdb-hub-field fpt-lookup-field">
+        <label for="fpt-lookup-term">Gene id, gene symbol or UniProt accession</label>
+        <input id="fpt-lookup-term" name="id" type="search" spellcheck="false" aria-describedby="fpt-lookup-hint"
+               data-fpt-suggest placeholder="FGSG_09786, FVEG_13850, TRI5, A0A139YB70&hellip;" />
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Look up</button>
+      </div>
+      <p class="mgdb-hint fpt-hint" id="fpt-lookup-hint">Any of the six species: <code>FGSG_</code> and <code>FGRRES_</code> ids for <i>F. graminearum</i>, <code>FVEG_</code> for <i>F. verticillioides</i>, <code>FFUJ_</code>, <code>FOXG_</code>, <code>FPRO_</code> and <code>NECHADRAFT_</code> for the others, gene symbols such as <code>TRI5</code>, and UniProt accessions.</p>
+      <div class="fpt-example-row" aria-label="Example searches">
+        <span>Examples</span>
+        <a class="mgdb-chip" href="/fusarium/structures?id=FVEG_13850">FVEG_13850</a>
+        <a class="mgdb-chip" href="/fusarium/structures?id=FGSG_09786">FGSG_09786</a>
+        <a class="mgdb-chip" href="/fusarium/structures?id=FGRRES_15678_M">FGRRES_15678_M</a>
+        <a class="mgdb-chip" href="/fusarium/structures?id=TRI5">TRI5</a>
+        <a class="mgdb-chip" href="/fusarium/structures?id=FFUJ_00038">FFUJ_00038</a>
+      </div>
+    </form>
+  </section>
+
+  <!-- ====================================================================
+       2. Tools
+       ==================================================================== -->
+  <section id="fpt-tools" aria-labelledby="fpt-tools-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fpt-tools-title">Tools</h2></div>
+    </div>
+
+    <div class="fpt-tool-grid">
+      <article class="fpt-tool">
+        <h3><a href="/fusarium/foldseek">Foldseek</a></h3>
+        <p class="fpt-tool-kind">Structural matches</p>
+        <p>The AlphaFold model of every <i>F. graminearum</i> and <i>F. verticillioides</i> protein, searched with Foldseek against five Fusarium proteomes, Arabidopsis, human and two yeasts. Up to 25 matches from each, with where they align and a 3D superposition scored by TM-score.</p>
+        <p class="fpt-tool-stat"><b>$(count_query)</b> proteins searched</p>
+        <p class="fpt-tool-actions"><a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/fusarium/foldseek">Search structural matches</a></p>
+      </article>
+      <article class="fpt-tool">
+        <h3><a href="/fusarium/structures">Structures</a></h3>
+        <p class="fpt-tool-kind">AlphaFold and ESMFold models</p>
+        <p>The AlphaFold model of any protein of the six species, colored by per-residue confidence, and for <i>F. graminearum</i> and <i>F. verticillioides</i> its ESMFold model too, with the two superposed to show where the predictors agree.</p>
+        <p class="fpt-tool-stat"><b>$(count_af)</b> AlphaFold and <b>$(count_esm)</b> ESMFold models to view</p>
+        <p class="fpt-tool-actions"><a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/fusarium/structures">View structures</a></p>
+      </article>
+      <article class="fpt-tool">
+        <h3><a href="/fusarium/effectors">Effectors</a></h3>
+        <p class="fpt-tool-kind">Predicted effector proteins</p>
+        <p>Candidate effectors in six species from EffectorP, kept when SecretSanta predicts them secreted, with LOCALIZER's localization signals and OmicsBox's functional annotation, and links into every other tool.</p>
+        <p class="fpt-tool-stat"><b>$(count_effectors)</b> effectors</p>
+        <p class="fpt-tool-actions"><a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/fusarium/effectors">Browse effectors</a></p>
+      </article>
+      <article class="fpt-tool fpt-tool-new">
+        <h3><a href="$(snptools_url)">SNPTools</a></h3>
+        <p class="fpt-tool-kind">Variant diversity and effects</p>
+        <p>Variants across Fusarium genomes in one application: choose strains, rank variants by predicted impact, compare accessions and build trees. SNPTools will replace PanEffect.</p>
+        <p class="fpt-tool-stat">The successor to PanEffect</p>
+        <p class="fpt-tool-actions"><a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="$(snptools_url)">Open SNPTools</a></p>
+      </article>
+      <article class="fpt-tool">
+        <h3><a href="$(paneffect_url)">PanEffect</a></h3>
+        <p class="fpt-tool-kind">Variant effect heatmaps</p>
+        <p>The predicted effect of every possible amino acid substitution in <i>F. graminearum</i> and <i>F. verticillioides</i> proteins, and of the natural variation across the 22-species Fusarium pan-genome. Being replaced by SNPTools.</p>
+        <p class="fpt-tool-stat"><i>F. graminearum</i> and <i>F. verticillioides</i></p>
+        <p class="fpt-tool-actions"><a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="$(paneffect_url)">Open PanEffect</a></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. Species
+       ==================================================================== -->
+  <section id="fpt-species" aria-labelledby="fpt-species-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fpt-species-title">Species</h2></div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table fpt-species-table">
+        <caption class="mgdb-visually-hidden">What the toolkit has for each of its six reference species</caption>
+        <thead>
+          <tr>
+            <th scope="col">Species</th>
+            <th scope="col" class="mgdb-numeric">AlphaFold models</th>
+            <th scope="col" class="mgdb-numeric">ESMFold models</th>
+            <th scope="col">Foldseek</th>
+            <th scope="col" class="mgdb-numeric">Effectors</th>
+            <th scope="col">PanEffect</th>
+            <th scope="col">UniProt proteome</th>
+          </tr>
+        </thead>
+        <tbody>
+          $(species_rows)
+        </tbody>
+      </table>
+    </div>
+    <p class="fpt-note fpt-table-note"><span class="fpt-ref-star" aria-hidden="true">&#9733;</span> Reference genome: its proteins can be searched in Foldseek and PanEffect. Proteins of all six species can be looked up in Structures and Effectors.</p>
+    <p class="fpt-note">Sixteen more species make up the 22-species pan-genome behind PanEffect's natural-variation view and SNPTools; <a href="/fusarium/help#fpt-help-genomes">the help page lists all of them</a>.</p>
+  </section>
+
+  <!-- ====================================================================
+       4. Downloads
+       ==================================================================== -->
+  <section id="fpt-downloads" aria-labelledby="fpt-downloads-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fpt-downloads-title">Downloads</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list fpt-download-list">
+        <a href="https\://ars-usda.app.box.com/v/maizegdb-public/folder/227029737169">
+          <strong>Protein structures</strong>
+          <span>AlphaFold and ESMFold models for each species, one archive per species and tool</span>
+        </a>
+        <a href="https\://ars-usda.app.box.com/v/maizegdb-public/folder/256736183490">
+          <strong>Protein sequences</strong>
+          <span>The proteomes, one FASTA file per species of the pan-genome</span>
+        </a>
+        <a href="https\://ars-usda.app.box.com/v/maizegdb-public/folder/256953771990">
+          <strong>Variant effect scores</strong>
+          <span>ESM1b scores for every possible substitution, one file per species</span>
+        </a>
+        <a href="https\://ars-usda.app.box.com/v/maizegdb-public/folder/230213965242">
+          <strong>Pan-genome files</strong>
+          <span>OrthoFinder orthogroups and the multiple sequence alignments built from them</span>
+        </a>
+        <a href="$(xlsx_url)">
+          <strong>Effector table</strong>
+          <span>All $(count_effectors) predicted effectors, one sheet per species, as an Excel workbook</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. References
+       ==================================================================== -->
+  <section id="fpt-references" aria-labelledby="fpt-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fpt-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       6. Metrics
+       ==================================================================== -->
+  <section id="fpt-metrics" aria-labelledby="fpt-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fpt-metrics-title">Metrics</h2></div>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9670;</span>
+        <div><strong class="mgdb-metric-value">$(count_af)</strong><h3>AlphaFold models</h3><p>Every model on the toolkit's host, over six species.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9671;</span>
+        <div><strong class="mgdb-metric-value">$(count_esm)</strong><h3>ESMFold models</h3><p>To view, for <i>F. graminearum</i> and <i>F. verticillioides</i>; all six species are in the download.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#8644;</span>
+        <div><strong class="mgdb-metric-value">$(count_query)</strong><h3>Searched with Foldseek</h3><p><i>F. graminearum</i> and <i>F. verticillioides</i> proteins.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9673;</span>
+        <div><strong class="mgdb-metric-value">$(count_effectors)</strong><h3>Predicted effectors</h3><p>Across the six species.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       7. Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="fpt-related" aria-labelledby="fpt-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="fpt-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/foldseek">
+          <strong>MaizeGDB Foldseek</strong>
+          <span>The same structural search for maize proteins, against maize, sorghum, rice, soybean and four more proteomes</span>
+        </a>
+        <a href="/data_center/protein_structure">
+          <strong>Protein Structure Hub</strong>
+          <span>AlphaFold monomers and complexes for maize gene models</span>
+        </a>
+        <a href="/snpversity">
+          <strong>SNPversity</strong>
+          <span>Maize SNP genotypes for any region across four datasets, read as a colored grid</span>
+        </a>
+        <a href="https\://fungidb.org/">
+          <strong>FungiDB</strong>
+          <span>Genomes, gene records and functional data for fungi and oomycetes, Fusarium included</span>
+        </a>
+        <a href="https\://alphafold.ebi.ac.uk/">
+          <strong>AlphaFold Protein Structure Database</strong>
+          <span>EMBL-EBI's archive of AlphaFold predictions, where the toolkit's models were first published</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

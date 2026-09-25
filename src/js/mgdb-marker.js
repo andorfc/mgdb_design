@@ -270,7 +270,14 @@
   /* ── Search Fetcher ─────────────────────────────────────────────────────── */
 
   function executeSearch(scrollToResults) {
-    if (state.loading) return;
+    /* A search asked for while one is running runs after it rather than
+       being dropped, and the older answer is not drawn: the results are
+       always the answer to what was asked for last. */
+    if (state.loading) {
+      state.pending = true;
+      state.pendingScroll = state.pendingScroll || !!scrollToResults;
+      return;
+    }
     state.loading = true;
 
     var section = byId('marker-results-section');
@@ -301,6 +308,7 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         state.loading = false;
+        if (runPending()) { return; }
         state.currentData = data;
 
         if (!data || !data.ok) {
@@ -319,8 +327,18 @@
       })
       .catch(function (err) {
         state.loading = false;
+        if (runPending()) { return; }
         if (status) status.textContent = 'An error occurred while fetching markers.';
       });
+  }
+
+  function runPending() {
+    if (!state.pending) { return false; }
+    var scroll = state.pendingScroll;
+    state.pending = false;
+    state.pendingScroll = false;
+    executeSearch(scroll);
+    return true;
   }
 
   /* ── Render Results (Card or Table) ─────────────────────────────────────── */
@@ -855,7 +873,7 @@
       hovertemplate: '%{y}<br>%{x:,} markers<extra></extra>'
     };
 
-    window.MGDB.chart({
+    var whenDrawn = window.MGDB.chart({
       target: 'marker-type-chart',
       traces: [trace],
       layout: {
@@ -874,8 +892,11 @@
 
     /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which rescales
        the figure but keeps the margins it was drawn with. Crossing the
-       breakpoint has to relayout. */
-    if (el && window.Plotly && window.Plotly.relayout) {
+       breakpoint has to relayout.
+       Installed once the figure is drawn: Plotly is fetched when the figure
+       comes into view, so it is not on the page when this runs. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
       var lastNarrow = m.narrow;
       var timer = null;
       window.addEventListener('resize', function () {
@@ -888,7 +909,7 @@
           window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
         }, 180);
       });
-    }
+    });
 
     if (!el || !window.MutationObserver) { return; }
 

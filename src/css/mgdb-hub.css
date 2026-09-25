@@ -264,6 +264,36 @@
   flex-direction: column;
 }
 
+/* A flex column does not collapse margins, so a card heading's own bottom
+   margin ADDS to the 12px rhythm .mgdb-card sets between siblings: 22 + 12 =
+   34px between a card's title and its first line, against 12px everywhere the
+   card is a block. The rhythm owns the spacing, so the heading gives its
+   bottom margin back -- the same bargain .mgdb-card makes with its first
+   child's top margin (Carson, 2026-09-19, on the pan-gene Downloads cards).
+
+   The download arrow goes with the title for the same reason: appended to the
+   card link's own ::after it is blockified into a row of its own under the
+   description, which is where the stray arrow under those cards came from.
+   Resource-list cards have marked their titles this way since 2026-09-03. */
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > h2,
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > h3,
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > h4 { margin-bottom: 0; }
+
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[download]::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="//download.maizegdb.org"]::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="box.com"]::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="format=tsv"]::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="format=csv"]::after { content: none; }
+
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[download] > h3::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="//download.maizegdb.org"] > h3::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="box.com"] > h3::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="format=tsv"] > h3::after,
+.mgdb-hub-page .mgdb-card-grid > a.mgdb-card[href*="format=csv"] > h3::after {
+  content: " \2193";
+  font-size: .85em;
+}
+
 .mgdb-hub-page .mgdb-card-grid > .mgdb-card > .mgdb-pill { align-self: flex-start; }
 .mgdb-hub-page .mgdb-card-grid > .mgdb-card > p { flex: 1 1 auto; }
 

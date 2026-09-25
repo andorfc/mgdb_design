@@ -36,8 +36,6 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 // The archive search still runs through the legacy AJAX helper.
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/js/search.js');
-// Plotly must be parsed before mgdb-bac.js runs initFigure().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-bac.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-bac.js'));
 $bauplan->head('<meta name="description" content="Search the archived MaizeGDB BAC clone collection by clone name, synonym, or GenBank accession and explore the historical B73 physical-map libraries.">');
 

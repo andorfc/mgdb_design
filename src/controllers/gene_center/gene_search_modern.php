@@ -81,7 +81,6 @@ $bauplan->includeCss('/css/mgdb-gene.css?v=' . $v_css);
    loaded, not copied. It declares functions and binds nothing at load time, so
    it does not need to follow jQuery -- on /BLAST itself it is loaded first. */
 $bauplan->includeCss('/css/mgdb-blast.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-blast.css'));
-$bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-gene.js?v=' . $v_js);

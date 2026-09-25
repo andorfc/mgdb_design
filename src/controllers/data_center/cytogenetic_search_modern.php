@@ -50,8 +50,6 @@ $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jqu
 $bauplan->includeScript('/js/search.js');
 $bauplan->includeScript('/js/stock.js');
 $bauplan->includeScript('/js/cytogenetics.js');
-// Plotly must be parsed before mgdb-cytogenetic.js runs initFigure().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-cytogenetic.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Explore maize cytogenetic chromosome maps, recombination resources, karyotype images, chromosome landmark loci, structural-variant stocks, and historical cytogenetics references at MaizeGDB.">');
 

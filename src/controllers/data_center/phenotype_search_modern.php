@@ -47,8 +47,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-phenotype.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-// Plotly must be parsed before mgdb-phenotype.js runs initFigure().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-phenotype.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Search 1,190 curated maize mutant phenotypes at MaizeGDB by name, synonym, trait category, or affected plant structure, with links to the seed stocks that carry them.">');
 

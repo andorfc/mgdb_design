@@ -83,9 +83,6 @@ $bauplan->includeCss('/css/mgdb-megamenu.css');
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-record.css?v=' . $v_rec_css);
 $bauplan->includeCss('/css/mgdb-term-record.css?v=' . $v_css);
-/* Plotly before the page script, or MGDB.chart writes its fallback text and
-   the figures never draw with nothing else going wrong. */
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-record.js?v=' . $v_rec_js);

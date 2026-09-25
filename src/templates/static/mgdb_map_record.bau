@@ -10,7 +10,16 @@ $$SYNTAX-LEVEL 2
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/map">Map Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(map_name)</span>
   </nav>
 
-  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="map-record-title">
+  <!-- Record type bubble, on trial here first. It sits in the header's top
+       right corner and stays pinned at the top right of the window after the
+       header scrolls away, so a reader switching back to this browser tab
+       sees what kind of record it is wherever they left it. The zero-height
+       sticky wrapper is what pins it; see css/mgdb-record.css. -->
+  <div class="mgdb-rec-type-dock">
+    <a class="mgdb-rec-type" href="/data_center/map" title="Map Data Hub">Maps</a>
+  </div>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero mgdb-rec-hero-has-type" aria-labelledby="map-record-title">
     <div class="mgdb-hero-body">
       <h1 id="map-record-title">$(map_name)</h1>
       <p class="mgdb-rec-synonyms" id="map-record-synonyms" hidden></p>

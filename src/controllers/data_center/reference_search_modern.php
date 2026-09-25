@@ -49,7 +49,6 @@
      `mgdb-hub-page` on <main> opts in. */
   $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
   $bauplan->includeCss('/css/mgdb-reference.css?v=' . $v_css);
-  $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-reference.js?v=' . $v_js);

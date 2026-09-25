@@ -1,0 +1,9 @@
+# Every file here carries its version in its name (plotly-2.35.2.min.js), so a
+# browser never needs to ask about one again. Added 2026-09-25, when Plotly moved
+# here from cdn.plot.ly: that host sent no Cache-Control and browsers kept its
+# copy for months, while this site's default is 30 minutes, after which a reader
+# scrolling to a chart waited on a revalidation first. `Header set` applies to
+# 2xx responses only, so a missing file is never cached.
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>

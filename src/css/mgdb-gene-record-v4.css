@@ -429,38 +429,42 @@
    plain green text among the other green text it read as a footnote, which is
    the one thing it is not.
 
-   Wine rather than red because on this site red is not a colour, it is a
-   status. --mgdb-red-soft and --mgdb-status-error-soft are the same #fbeae8,
+   Gold rather than red because on this site red is not a colour, it is a
+   status: --mgdb-red-soft and --mgdb-status-error-soft are the same #fbeae8,
    so a pale red box here would be the error box, and six loci on one gene
-   model is a curatorial fact rather than a fault. --mgdb-burgundy-soft is a
-   separate token, and wine and burgundy are already the brand's own accents
-   (page eyebrows, metric spines, .mgdb-note strong) -- so it reads as "look at
-   this" rather than "something is wrong".
+   model is a curatorial fact rather than a fault. The gold is the homepage's
+   reference-assembly card (css/mgdb-home-alt.css): --mgdb-gold-soft for the
+   fill, its warm #ecdfc0 frame, and --mgdb-gold only as a rule, never as text
+   -- #f2a515 on the cream is 1.9:1. It was wine until 2026-09-18; Carson
+   asked for the homepage's light gold.
 
    The box holds the whole disclosure, open or closed, so the names stay
-   visibly part of the thing the reader opened. The links inside keep the
-   site's burgundy: 12.3:1 on this tint. */
+   visibly part of the thing the reader opened. The summary is
+   --mgdb-gold-dark, 5.49:1 on the cream; the links inside keep the site's
+   burgundy, 8.59:1. */
+
+.mgdb-gene-record-v4-page { --v4-gold-line: #ecdfc0; }
 
 .mgdb-gene-record-v4-page .v4-loci,
 .mgdb-gene-record-v4-page .v4-anno {
   margin-top: var(--mgdb-space-3);
   padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border: 1px solid rgba(122, 44, 67, .22);
+  border: 1px solid var(--v4-gold-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-burgundy-soft);
-  box-shadow: inset 3px 0 0 var(--mgdb-wine);
+  background: var(--mgdb-gold-soft);
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
   font-size: var(--mgdb-text-sm);
 }
 
 .mgdb-gene-record-v4-page .v4-loci > summary,
 .mgdb-gene-record-v4-page .v4-anno > summary {
   cursor: pointer;
-  color: var(--mgdb-wine);
+  color: var(--mgdb-gold-dark);
   font-weight: 700;
 }
 
 .mgdb-gene-record-v4-page .v4-loci > summary::marker,
-.mgdb-gene-record-v4-page .v4-anno > summary::marker { color: var(--mgdb-wine); }
+.mgdb-gene-record-v4-page .v4-anno > summary::marker { color: var(--mgdb-gold-dark); }
 .mgdb-gene-record-v4-page .v4-loci > summary:hover,
 .mgdb-gene-record-v4-page .v4-anno > summary:hover { text-decoration: underline; }
 
@@ -492,7 +496,7 @@
 
 .mgdb-gene-record-v4-page .v4-anno-table th {
   padding: 0 var(--mgdb-space-3) 4px 0;
-  border-bottom: 1px solid rgba(122, 44, 67, .22);
+  border-bottom: 1px solid var(--v4-gold-line);
   color: var(--mgdb-muted);
   font-weight: 700;
   letter-spacing: .03em;
@@ -503,7 +507,7 @@
 
 .mgdb-gene-record-v4-page .v4-anno-table td {
   padding: 4px var(--mgdb-space-3) 4px 0;
-  border-bottom: 1px solid rgba(122, 44, 67, .12);
+  border-bottom: 1px solid rgba(236, 223, 192, .7);
   line-height: var(--mgdb-leading-snug);
   vertical-align: top;
 }
@@ -514,7 +518,7 @@
 .mgdb-gene-record-v4-page .v4-anno-table td:last-child { padding-right: 0; color: var(--mgdb-ink-soft); }
 
 /* Which row is the one MaizeGDB treats as this gene's reference annotation.
-   Green, not wine: inside a wine box a second wine thing is just more box. */
+   Green, not gold: inside a gold box a second gold thing is just more box. */
 .mgdb-gene-record-v4-page .v4-anno-mark {
   display: inline-block;
   margin-left: var(--mgdb-space-2);

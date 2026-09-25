@@ -45,7 +45,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-map.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-map.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Explore and search over 2,100 curated maize genetic, cytogenetic, physical, and bin maps across chromosomes 1–10.">');
 

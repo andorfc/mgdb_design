@@ -78,11 +78,14 @@ def entries_for(sid, items):
 
 
 def item(name, url, desc, indent='        '):
+    # No arrow in the markup: the page is .mgdb-arrows-v2, whose CSS draws the
+    # off-site arrow itself, so an emitted &nearr; span showed two. The six it
+    # still produced were removed from the deployed partial by hand on
+    # 2026-09-14; this keeps a regeneration from putting them back.
     ext = is_external(url)
     attrs = ' target="_blank" rel="noopener"' if ext else ''
-    arrow = ' <span class="sitemap-item-ext" aria-hidden="true">&nearr;</span>' if ext else ''
     out = [f'{indent}<li class="sitemap-item">',
-           f'{indent}  <a class="sitemap-item-link" href="{bau(url)}"{attrs}>{esc(name)}{arrow}</a>']
+           f'{indent}  <a class="sitemap-item-link" href="{bau(url)}"{attrs}>{esc(name)}</a>']
     if desc:
         out.append(f'{indent}  <p class="sitemap-item-desc">{esc(desc)}</p>')
     out.append(f'{indent}</li>')

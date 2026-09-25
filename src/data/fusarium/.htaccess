@@ -1,0 +1,16 @@
+Options -Indexes
+
+# The Fusarium Protein Toolkit's data -- see include/fusarium_lib.php and
+# tools/fusarium_index.py, which writes all of it.
+#
+# proteins.sqlite is read by PHP only. The effector table is fetched by
+# js/mgdb-fusarium-effectors.js and, with the toolkit's own workbook, offered
+# for download, so those two are public.
+<FilesMatch ".*">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "^(effectors\.json|fusarium_effectors\.xlsx)$">
+  Require all granted
+  Header set Cache-Control "public, max-age=3600"
+</FilesMatch>

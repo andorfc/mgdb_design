@@ -25,7 +25,6 @@ $bauplan->includeCss('/css/mgdb-megamenu.css');
 // The Data Hub shell, before the page sheet so the page can override it.
 $bauplan->includeCss('/css/mgdb-hub.css');
 $bauplan->includeCss('/css/mgdb-maize-meeting.css');
-$bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-maize-meeting.js');

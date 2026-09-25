@@ -275,7 +275,6 @@
   $bauplan->includeCss('/css/mgdb-gene-paralogs.css?v=' . $v('/css/mgdb-gene-paralogs.css'));
   $bauplan->includeCss('/css/mgdb-gene-record-v2.css?v=' . $v('/css/mgdb-gene-record-v2.css'));
   $bauplan->includeCss('/css/mgdb-gene-record-v5.css?v=' . $v('/css/mgdb-gene-record-v5.css'));
-  $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-record.js?v=' . $v('/js/mgdb-record.js'));
@@ -284,6 +283,17 @@
   $bauplan->includeScript('/js/mgdb-gene-function.js?v=' . $v('/js/mgdb-gene-function.js'));
   $bauplan->includeScript('/js/mgdb-gene-paralogs.js?v=' . $v('/js/mgdb-gene-paralogs.js'));
   $bauplan->includeScript('/js/mgdb-gene-record-v5.js?v=' . $v('/js/mgdb-gene-record-v5.js'));
+  /* Fourteen stylesheets and eleven scripts, all render-blocking, served as
+     four files: the shell's own and this page's. Bauplan::bundle() builds
+     them on request and rebuilds when any member is deployed. */
+  $bauplan->bundle('gene-record');
+  /* The basket mockup, /gene_center/gene_basket/{id}: the same page with two
+     more assets and no indexing. Defined by the guard in gene_center.php. */
+  if (defined('MGDB_BASKET_MOCK')) {
+    $bauplan->includeCss('/css/mgdb-basket.css?v=' . $v('/css/mgdb-basket.css'));
+    $bauplan->includeScript('/js/mgdb-basket.js?v=' . $v('/js/mgdb-basket.js'));
+    $bauplan->head('<meta name="robots" content="noindex">');
+  }
   $bauplan->head('<meta name="description" content="' . $esc($panel['gene_summary']) . '">');
   /* No robots meta. As a mockup this page was noindex; as the live gene record
      -- the site's second most requested URL -- it has to be found. */

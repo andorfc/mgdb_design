@@ -1,0 +1,183 @@
+$$SYNTAX-LEVEL 2
+*(fpt-foldseek
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Fusarium Protein Toolkit Foldseek | Structural Matches for Fusarium Proteins in Nine Proteomes">
+<meta property="og:description" content="Foldseek matches for 33,267 F. graminearum and F. verticillioides AlphaFold models in five Fusarium proteomes, Arabidopsis, human and two yeasts, with a 3D superposition and TM-score for each.">
+
+;; The same page script and stylesheet as /foldseek. data-set="fusarium" is
+;; the only switch: js/mgdb-foldseek.js reads its wording and routes from it,
+;; and search/foldseek/foldseek_api.php its upstream host and species.
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-foldseek-page fpt-page fpt-foldseek-page" id="fs-main"
+      data-api="/search/foldseek/foldseek_api.php"
+      data-set="fusarium"
+      data-initial="$(initial_term)"
+      data-initial-hit="$(initial_hit)">
+
+  <section class="mgdb-hero fpt-hero" aria-labelledby="fs-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/data_center/protein_structure.png?v=20260915" alt="" class="fs-hero-icon" width="256" height="252" />
+      <strong>Foldseek</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fs-title">Structural matches for Fusarium proteins</h1>
+      <p class="mgdb-hero-description">The AlphaFold model of each of the $(count_graminearum) <i>F. graminearum</i> and $(count_verticillioides) <i>F. verticillioides</i> proteins was searched with Foldseek against the predicted proteomes of five Fusarium species, Arabidopsis, human, budding yeast and fission yeast. Look one up to see its closest structures in each, where on the protein they align, and any match superposed in 3D with its TM-score.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/fusarium/structures">Structures</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/fusarium/effectors">Effectors</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fs-search" class="is-current" aria-current="true">Search</a>
+    <a href="#fs-reading">Reading the results</a>
+    <a href="#fs-sources">Data sources</a>
+    <a href="#fs-references">References</a>
+    <a href="#fs-related">Related resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Search
+       ==================================================================== -->
+  <section id="fs-search" aria-labelledby="fs-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fs-search-title">Search</h2></div>
+    </div>
+
+    ;; name="uniprot" is the parameter fusarium.maizegdb.org's own search used,
+    ;; so its links still land on the right protein here.
+    <form id="fs-form" class="fs-search-form" role="search" autocomplete="off" action="/fusarium/foldseek" method="get">
+      <div class="mgdb-hub-field fs-field-term">
+        <label for="fs-term">Gene id or UniProt accession</label>
+        <input id="fs-term" name="uniprot" type="search" value="$(initial_term)" spellcheck="false"
+               aria-describedby="fs-term-hint"
+               placeholder="FGSG_09786, FVEG_13850, FGRRES_15678_M, A0A139YB70&hellip;" />
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Find matches</button>
+      </div>
+      <p class="mgdb-hint fs-hint" id="fs-term-hint"><i>F. graminearum</i> <code>FGSG_</code> and <code>FGRRES_</code> ids, <i>F. verticillioides</i> <code>FVEG_</code> ids, gene symbols such as <code>TRI5</code>, and UniProt accessions. Proteins of the other four species were not searched &mdash; they appear here as matches.</p>
+      <div class="fs-example-row" aria-label="Example searches">
+        <span>Examples</span>
+        <button class="mgdb-chip" type="button" data-fs-example="FVEG_13850">FVEG_13850</button>
+        <button class="mgdb-chip" type="button" data-fs-example="FGSG_09786">FGSG_09786</button>
+        <button class="mgdb-chip" type="button" data-fs-example="FGRRES_15678_M">FGRRES_15678_M</button>
+        <button class="mgdb-chip" type="button" data-fs-example="TRI5">TRI5</button>
+      </div>
+    </form>
+
+    <div class="fs-status" id="fs-status" role="status" aria-live="polite"></div>
+
+    <noscript>
+      <p class="mgdb-message mgdb-message-info">The results and the 3D viewers need JavaScript. The same analysis is available at <a href="$(upstream_url)">fusarium.maizegdb.org</a>.</p>
+    </noscript>
+  </section>
+
+  ;; Hidden until a search runs, and not a tab, as on every hub.
+  <section id="fs-results" aria-labelledby="fs-results-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><h2 id="fs-results-title">Results</h2></div>
+    </div>
+    <div id="fs-results-body"></div>
+  </section>
+
+  <!-- ====================================================================
+       2. Reading the results
+       ==================================================================== -->
+  <section id="fs-reading" aria-labelledby="fs-reading-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fs-reading-title">Reading the results</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid fs-reading-grid">
+      <article class="mgdb-card">
+        <h3>Score and E-value</h3>
+        <p>Foldseek writes each structure as a sequence in a structural alphabet, 3Di, whose letters describe how each residue sits against its nearest neighbor in space, and aligns those sequences together with the amino acids, scoring the alignment in bits. The E-value is how many matches that good would be expected by chance; lower is stronger. Matches are listed by E-value, strongest first.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Identity and coverage</h3>
+        <p>Identity is the share of aligned positions with the same amino acid. Proteins can share a fold at 15 or 20 percent identity, which is the case a structure search is for. Coverage is how much of the searched protein a match spans: a strong match over one domain covers only that domain, and the figure above the table shows which part.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>TM-score</h3>
+        <p>Opening a match superposes the two structures on their aligned residues and scores the fit from 0 to 1. Above 0.5, two structures generally share a fold; unrelated structures average about 0.17. The score is TM-align's, normalized by the length of the matched protein's aligned region, with the score normalized by the searched protein shown beside it.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Model confidence</h3>
+        <p>Every structure here is a prediction. Where either model has low confidence &mdash; pLDDT below 70 &mdash; a poor superposition says more about the predictions than about the proteins. The structure panel colors the searched model by pLDDT; check it before reading a region that does not superpose as a real difference.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. Data sources
+       ==================================================================== -->
+  <section id="fs-sources" aria-labelledby="fs-sources-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fs-sources-title">Data sources</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid fs-source-grid">
+      <article class="mgdb-card">
+        <h3>The search</h3>
+        <p>The AlphaFold models of the <i>F. graminearum</i> and <i>F. verticillioides</i> proteomes in version 4 of the AlphaFold Protein Structure Database, released January 2023, were each searched with Foldseek. Up to 25 matches from each proteome were kept for each protein, with their UniProt annotations. It is a fixed analysis, not a live search.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>The nine proteomes</h3>
+        <p>Five Fusarium species &mdash; <i>F. graminearum</i>, <i>F. fujikuroi</i>, <i>F. oxysporum</i>, <i>F. proliferatum</i> and <i>F. solani</i> &mdash; and four well-annotated outgroups: <i>Arabidopsis thaliana</i>, <i>Homo sapiens</i>, <i>Saccharomyces cerevisiae</i> and <i>Schizosaccharomyces pombe</i>. <i>F. verticillioides</i> is not among them, so its proteins appear only as the proteins searched.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Structures and identifiers</h3>
+        <p>The superposition uses the C&alpha; coordinates Foldseek itself aligned, so it matches the alignment residue for residue. The model in the structure panel is the toolkit's copy of the very file that was searched. Gene ids for Fusarium matches come from the toolkit's protein index; UniProt has since deleted the <i>F. oxysporum</i> 4287 entries, so their models live on only here.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Where it runs</h3>
+        <p>The analysis is served by <a href="$(upstream_url)">fusarium.maizegdb.org</a>. This page reads each protein's results from it once and keeps them for 30 days, so a protein anyone has looked up in that time still opens when that service is unavailable.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. References
+       ==================================================================== -->
+  <section id="fs-references" aria-labelledby="fs-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fs-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="fs-related" aria-labelledby="fs-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="fs-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/fusarium/structures">
+          <strong>Structures</strong>
+          <span>AlphaFold and ESMFold models for the six Fusarium species, superposed</span>
+        </a>
+        <a href="/fusarium/effectors">
+          <strong>Effectors</strong>
+          <span>Predicted effector proteins in six species, each linked to its structure and matches</span>
+        </a>
+        <a href="$(snptools_url)">
+          <strong>SNPTools</strong>
+          <span>Variant diversity and predicted variant effects across Fusarium genomes</span>
+        </a>
+        <a href="/foldseek">
+          <strong>MaizeGDB Foldseek</strong>
+          <span>The same structural search for maize proteins, against eight proteomes</span>
+        </a>
+        <a href="/data_center/protein_structure">
+          <strong>Protein Structure Hub</strong>
+          <span>AlphaFold monomers and complexes for maize gene models</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

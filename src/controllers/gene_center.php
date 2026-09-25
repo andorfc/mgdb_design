@@ -162,6 +162,22 @@
     }
   }
 
+  /* Basket mockup (2026-09-24): the live gene record with the site-wide
+     basket laid over it -- a Basket button in the header, an add control in
+     each half of the hero, "Add shown rows" on the stock and phenotype
+     tables, and the drawer. The live route does not change: the two assets
+     load only when this constant is defined, and the page is noindex with
+     its canonical on the live record.
+
+     Rollback: delete this block and the `MGDB_BASKET_MOCK` branch in
+     gene_record_v5.php. */
+  if (PAGE == 'gene_basket' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    define('MGDB_BASKET_MOCK', true);
+    if (include('controllers/gene_center/gene_record_v5.php')) {
+      return;
+    }
+  }
+
   /* Gene record mockup, version 5: the v4 header with the page's navigation
      under it -- the four view tabs of the openai mockup, and the bubble bar of
      v2 beneath them. The sections themselves are placeholders. Same

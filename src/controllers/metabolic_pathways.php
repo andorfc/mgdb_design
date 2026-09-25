@@ -104,9 +104,6 @@ $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 
 if ($sub === '') {
-    /* Plotly before the page script: without it MGDB.chart writes its fallback
-       text and nothing else looks wrong. */
-    $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
     $bauplan->includeScript('/js/mgdb-metabolic-pathways.js?v=' . $v_js);
     $bauplan->head('<meta name="description" content="Search 549 CornCyc metabolic pathways assigned to B73 gene models at MaizeGDB, and the maintained pathway and enzyme databases maize metabolism is curated in.">');
 } else {

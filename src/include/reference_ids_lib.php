@@ -4,9 +4,11 @@
  * purpose: the DOI and the PubMed ID of a reference, as SQL -- one definition
  *          for every page that prints one.
  *
- * Used by the reference hub (search/reference/reference_search_lib.php, whose
- * referenceDoiSql() is this) and by every record page's references section
- * (include/api/v1/records/*.php). Before 2026-09-18 the record pages had a
+ * Used by everything that prints a reference's DOI: the reference hub
+ * (search/reference/reference_search_lib.php, whose referenceDoiSql() is
+ * this), every record page's references section and the reference record
+ * itself (include/api/v1/records/*.php), Hot New Papers, and the all-data
+ * search and its header suggestions. Before 2026-09-18 the record pages had a
  * definition of their own, copied into thirteen files: the column, then the
  * citation text. It never looked in mgdb.ext_db_key, so wx1 showed a DOI on 52
  * of its 274 references where the database holds one for 97.
@@ -43,19 +45,26 @@
  */
 
 function mgdbReferenceDoiSql($alias = 'r') {
-    return "NULLIF(regexp_replace(COALESCE(
-              substring(btrim($alias.doi) from '10[.][0-9]{4,9}/[^[:space:]]+'),
-              (SELECT substring(xk.clean from '10[.][0-9]{4,9}/[^[:space:]]+')
+    return "COALESCE(
+              " . mgdbDoiFromTextSql("$alias.doi") . ",
+              (SELECT xk.doi
                  FROM mgdb.ext_db_key xd
-                   CROSS JOIN LATERAL (
-                     SELECT regexp_replace(regexp_replace(replace(xd.key, '&#8203;', ''),
-                                                          '%2[Ff]', '/', 'g'),
-                                           '[\\u00BF\\u200B-\\u200D\\uFEFF]', '', 'g') AS clean) xk
+                   CROSS JOIN LATERAL (SELECT " . mgdbDoiFromTextSql('xd.key') . " AS doi) xk
                  WHERE xd.id = $alias.id AND xd.db_person = 2738676
-                   AND xk.clean ~ '10[.][0-9]{4,9}/'
+                   AND xk.doi IS NOT NULL
                  ORDER BY xd.auto_num LIMIT 1),
-              substring($alias.name from '10[.][0-9]{4,9}/[^[:space:]]+')
-            ), '[.,;}]+$', ''), '')";
+              " . mgdbDoiFromTextSql("$alias.name") . ")";
+}
+
+/* The DOI inside one free-text value, or NULL: pasting artifacts removed,
+   then the pattern, then trailing punctuation. The one place that decides
+   what counts as a DOI, for a whole reference above and for a single stored
+   key where a page lists each one (include/api/v1/records/reference.php). */
+function mgdbDoiFromTextSql($expr) {
+    return "NULLIF(regexp_replace(substring(
+              regexp_replace(regexp_replace(replace($expr, '&#8203;', ''), '%2[Ff]', '/', 'g'),
+                             '[\\u00BF\\u200B-\\u200D\\uFEFF]', '', 'g')
+              from '10[.][0-9]{4,9}/[^[:space:]]+'), '[.,;}]+$', ''), '')";
 }
 
 /* mgdb.ext_db_key under db_person 134209, "Medline -- PubMed": 9,054 rows, one

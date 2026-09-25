@@ -6,7 +6,6 @@
 (function () {
   'use strict';
 
-  var searchTimer = null;
   var suggestionTimer = null;
   var searchController = null;
   var suggestionController = null;
@@ -213,22 +212,17 @@
       executeSearch();
     });
 
+    /* Typing offers suggestions and does not search: results change when
+       the reader submits, so the list never shows the answer to text that is
+       no longer in the box. (A search 380 ms after each keystroke also
+       closed the suggestions it raced.) */
     input.addEventListener('input', function () {
       updateClearButton();
-      clearTimeout(searchTimer);
       clearTimeout(suggestionTimer);
-
-      var val = getQuery();
-      if (val.length >= 2) {
+      if (getQuery().length >= 2) {
         suggestionTimer = setTimeout(fetchSuggestions, 120);
-        searchTimer = setTimeout(function () {
-          executeSearch();
-        }, 380);
       } else {
         closeSuggestions();
-        if (!val.length) {
-          executeSearch();
-        }
       }
     });
 
@@ -260,8 +254,11 @@
       });
     }
 
+    /* .person-query-control holds the field and its list; the class this
+       tested before exists nowhere, so every click -- in the field included
+       -- closed the list. */
     document.addEventListener('click', function (e) {
-      if (!e.target.closest('.person-search-input-wrap')) {
+      if (!e.target.closest('.person-query-control')) {
         closeSuggestions();
       }
     });

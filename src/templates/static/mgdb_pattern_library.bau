@@ -26,6 +26,7 @@ $$SYNTAX-LEVEL 2
     <a href="#pattern-hub">Data hub shell</a>
     <a href="#pattern-headers">Header variants</a>
     <a href="#pattern-search">Search interface</a>
+    <a href="#pattern-suggest">Search suggestions</a>
     <a href="#pattern-table">Data table</a>
     <a href="#pattern-citations">Citations</a>
     <a href="#pattern-charts">Charts</a>
@@ -179,6 +180,7 @@ $$SYNTAX-LEVEL 2
         <li><strong><code>includeScript</code> emits into <code>&lt;head&gt;</code>.</strong> Page scripts run while the document is still parsing, so every query returns nothing. Wrap the entry point in a <code>DOMContentLoaded</code> check.</li>
         <li><strong><code>filterList</code> reads <code>data-search</code> and <code>data-filter</code>.</strong> If rows carry the group under a different attribute, pass <code>filterOn</code>. Without it every chip except &ldquo;All&rdquo; silently matches nothing.</li>
         <li><strong>Reset through <code>filterList</code>, not by hand.</strong> Clearing the input value leaves the internal query state and the <code>?q=</code> parameter stale, and the list stays filtered to nothing. Pass the button as the <code>reset</code> option.</li>
+        <li><strong>Plotly is not on the page until a figure needs it.</strong> Do not include it from a controller. <code>MGDB.chart</code> fetches it when the figure comes within reach of the viewport &mdash; it is 4.6&nbsp;MB, and loading it in <code>&lt;head&gt;</code> held up the first paint of every chart page &mdash; and returns a promise for the drawn element. Anything that needs the drawn figure, a relayout on resize or a click handler, goes in that promise&#39;s <code>then</code>&#59; after the call, Plotly is usually not there yet. A page that draws with Plotly directly gets it from <code>MGDB.loadPlotly&#40;&#41;</code>, which fetches the same copy once.</li>
         <li><strong><code>IntersectionObserver</code> does not fire everywhere.</strong> Some embedded and backgrounded browsers deliver no entries, no <code>scroll</code> events, and no <code>requestAnimationFrame</code> callbacks. Anything a reader would notice missing &mdash; scrollspy, lazy charts &mdash; needs a fallback.</li>
         <li><strong><code>.cartesianlayer</code> is not the plot rectangle.</strong> It is a <code>&lt;g&gt;</code> whose bounding box spans the whole Plotly SVG, so anything measured against it reports overlaps that do not exist. A check written that way grew a chart's top margin every pass, to 1809px on a 472px figure. <code>rect.nsewdrag</code> is the real plot rect.</li>
         <li><strong>Outside bar labels need <code>&#92;u00A0</code>, not a space.</strong> SVG collapses leading whitespace, so a plain space is no padding at all and the number reads as touching the bar.</li>
@@ -460,6 +462,28 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  <section id="pattern-suggest" aria-labelledby="pattern-suggest-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="pattern-suggest-title">Search suggestions</h2>
+      </div>
+      <p>Every hub search field suggests as the reader types. Typing only suggests; the results change when the reader submits.</p>
+    </div>
+    <p class="mgdb-section-intro">Add <code>data-suggest="stock"</code> to a search input and <code>js/mgdb-modern.js</code> does the rest. Picking a suggestion puts its value in the field and submits the form, so the hub runs its own search. Suggestions come from the index built by <code>tools/suggest_index.php</code>; each one is a record that hub&rsquo;s search returns. This field uses the stock index and runs no search.</p>
+
+    <form class="mgdb-search" id="pattern-suggest-form" role="search">
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="pattern-suggest-query">Search stocks</label>
+          <p class="mgdb-hint" id="pattern-suggest-hint">Try <code>b7</code>, <code>mo17</code> or <code>ames 2</code>.</p>
+          <input class="mgdb-input" id="pattern-suggest-query" data-suggest="stock" name="q" type="search" aria-describedby="pattern-suggest-hint" autocomplete="off" placeholder="B73" />
+        </div>
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search</button>
+      </div>
+      <p class="mgdb-results-status" id="pattern-suggest-status" aria-live="polite"></p>
+    </form>
+  </section>
+
   <section id="pattern-table" aria-labelledby="pattern-table-title">
     <div class="mgdb-section-heading">
       <div>
@@ -597,7 +621,7 @@ $$SYNTAX-LEVEL 2
       <div>
         <h2 id="pattern-chart-title">Interactive charts</h2>
       </div>
-      <p>Plotly figures load lazily, resize with the container, use a color-blind-safe palette, and vary marker shape so color is never the only encoding.</p>
+      <p>Plotly figures, and Plotly itself, load as they come into view, resize with the container, use a color-blind-safe palette, and vary marker shape so color is never the only encoding.</p>
     </div>
     <div class="mgdb-chart-grid">
       <figure class="mgdb-figure">

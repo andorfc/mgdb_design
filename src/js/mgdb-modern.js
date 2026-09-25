@@ -15,8 +15,13 @@
      MGDB.request(url, options)   — fetch wrapper that cancels stale requests
      MGDB.filterList(config)      — client-side search + filter + live count
      MGDB.sortTable(table)        — accessible column sorting
-     MGDB.chart(config)           — lazy, responsive, accessible Plotly charts
+     MGDB.chart(config)           — lazy, responsive, accessible Plotly charts;
+                                    returns a promise for the drawn element
+     MGDB.loadPlotly()            — Plotly on demand; a promise for window.Plotly
+     MGDB.whenNear(el, fn)        — fn once el is within 200px of the viewport
      MGDB.CHART_COLORS            — colour-blind-safe qualitative palette
+     MGDB.typeahead(input, opts)  — suggestions under a search field; also
+                                    any input or textarea[data-suggest] on load
    ========================================================================== */
 
 (function (window, document) {
@@ -509,6 +514,165 @@
     return layout;
   }
 
+  /* ------------------------------------------------------------------------
+     Plotly, fetched when a figure is about to be drawn
+
+     Plotly is 4.6 MB -- 1.3 MB compressed -- and every chart page used to
+     load it in <head>, where it held up the first paint of forty-odd pages,
+     the gene record among them, whether or not the reader ever reached a
+     chart. On the gene record the one figure sits at the foot of Metrics.
+
+     Nothing loads it up front now. MGDB.chart() asks for it when its figure
+     comes within reach of the viewport, every figure on the page shares the
+     one download, and a figure within a screen and a half of view starts the
+     download early, so a reader scrolling down meets a drawn chart rather
+     than a loading line.
+
+     A page that draws with Plotly itself, outside MGDB.chart(), asks the
+     same way and gets the same copy:
+
+       MGDB.loadPlotly().then(function (Plotly) { Plotly.react(el, ...); });
+
+     A page that still includes Plotly in its <head> is not affected: the
+     promise resolves at once with the copy already there.
+
+     The copy is served from this site rather than cdn.plot.ly. Fetched from
+     the CDN, the moment a reader scrolled to a chart was also the moment the
+     browser opened a connection to a third host, and the CDN sends it gzipped
+     with no Cache-Control at all; from here it rides the connection the page
+     already has, brotli-compressed. The file is byte-identical to
+     plotly.min.js in the npm release plotly.js-dist-min@2.35.2. Its name
+     carries the version, so a new release is a new file and a new path here.
+     ------------------------------------------------------------------------ */
+
+  var PLOTLY_SRC = '/js/lib/plotly/plotly-2.35.2.min.js';
+  var plotlyPromise = null;
+
+  function loadPlotly() {
+    if (window.Plotly) { return Promise.resolve(window.Plotly); }
+    if (plotlyPromise) { return plotlyPromise; }
+
+    plotlyPromise = new Promise(function (resolve, reject) {
+      var script = document.createElement('script');
+
+      function failed() {
+        // Forgotten, so the next figure to come into view tries again: one
+        // dropped connection on a phone should not blank every chart on the
+        // page for good.
+        plotlyPromise = null;
+        if (script.parentNode) { script.parentNode.removeChild(script); }
+        reject(new Error('Plotly could not be loaded from ' + PLOTLY_SRC));
+      }
+
+      script.src = PLOTLY_SRC;
+      script.async = true;
+      script.onload = function () {
+        if (window.Plotly) { resolve(window.Plotly); } else { failed(); }
+      };
+      script.onerror = failed;
+      document.head.appendChild(script);
+    });
+    return plotlyPromise;
+  }
+
+  /* One observer per page starts the download a screen and a half ahead of
+     the first figure, then stands down. A figure with no box -- in a hidden
+     section -- never intersects, so it starts nothing. */
+  var prefetchObserver = null;
+
+  function prefetchPlotly(target) {
+    if (window.Plotly || plotlyPromise || !window.IntersectionObserver) { return; }
+    if (!prefetchObserver) {
+      prefetchObserver = new window.IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) {
+            prefetchObserver.disconnect();
+            loadPlotly().catch(function () { /* the figure says so when it draws */ });
+            return;
+          }
+        }
+      }, { rootMargin: '150% 0px' });
+    }
+    prefetchObserver.observe(target);
+  }
+
+  /* A box of zero size means the element is not rendered: display: none, a
+     hidden section, a closed <details>. */
+  function hasBox(el) {
+    var rect = el.getBoundingClientRect();
+    return rect.width > 0 || rect.height > 0;
+  }
+
+  /* Calls fn once, when target comes within NEAR pixels of the viewport.
+
+     An element with no box is near nothing, so a figure in a hidden tab
+     waits until the tab is shown -- which is also when it can be drawn at its
+     real width. Plotly measures its container as it draws, and a figure drawn
+     while hidden took Plotly's own 700px default and overflowed its column.
+
+     IntersectionObserver does the watching and a scroll listener backs it up.
+     The observer does not report in every environment -- some headless and
+     embedded browsers never deliver an entry -- so if it has said nothing at
+     all after three seconds, fn runs anyway: a figure that silently never
+     appears is worse than one drawn early. A working observer reports every
+     target once as soon as it starts watching, in view or not, so silence is
+     the signal. In an ordinary browser this fallback never fires, and that is
+     what keeps Plotly from being fetched for a figure nobody scrolls to. The
+     old fallback drew every figure after three seconds regardless, which
+     would have fetched Plotly on every chart page three seconds in. */
+  var NEAR = 200;
+
+  function whenNear(target, fn) {
+    var done = false;
+    var heard = false;
+    var observer = null;
+
+    function near() {
+      if (!hasBox(target)) { return false; }
+      var rect = target.getBoundingClientRect();
+      var height = window.innerHeight || document.documentElement.clientHeight;
+      return rect.top < height + NEAR && rect.bottom > -NEAR;
+    }
+
+    function onScroll() { if (near()) { finish(); } }
+
+    function finish() {
+      if (done) { return; }
+      done = true;
+      window.removeEventListener('scroll', onScroll);
+      if (observer) { observer.disconnect(); }
+      fn();
+    }
+
+    // Figures already on screen are drawn at once; deferring them only delays
+    // what the reader came for.
+    if (near() || !window.IntersectionObserver) { finish(); return; }
+
+    observer = new window.IntersectionObserver(function (entries) {
+      heard = true;
+      entries.forEach(function (entry) { if (entry.isIntersecting) { finish(); } });
+    }, { rootMargin: NEAR + 'px' });
+    observer.observe(target);
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    (function fallback() {
+      window.setTimeout(function () {
+        if (done || heard) { return; }
+        // A background tab is not rendered, so its observer cannot report
+        // yet. Wait for the tab to be shown rather than draw unseen.
+        if (document.visibilityState === 'hidden') {
+          document.addEventListener('visibilitychange', function shown() {
+            if (document.visibilityState === 'hidden') { return; }
+            document.removeEventListener('visibilitychange', shown);
+            fallback();
+          });
+          return;
+        }
+        finish();
+      }, 3000);
+    })();
+  }
+
   /* Renders a Plotly figure into config.target, lazily.
 
      config:
@@ -516,43 +680,47 @@
        traces      (required) array, or a function returning one
        layout      Plotly layout overrides, merged over BASE_LAYOUT
        config      Plotly config overrides
-       fallback    message shown if Plotly is unavailable
+       fallback    message shown if Plotly cannot be loaded
        legendManual  keep the layout's own legend position instead of the
                      shared one above the plot; the figure then owns the
                      margins too
+
+     Returns a promise for the drawn element, or for null if the figure could
+     not be drawn. It stays pending until the figure comes into view, so
+     anything that needs a drawn figure -- a relayout on resize, a click
+     handler -- belongs in its then(), not after the call: Plotly is not on the
+     page until the first figure is about to be drawn. Calling chart() again
+     on the same element supersedes a draw still waiting.
 
      The element is expected to already contain a .mgdb-chart-fallback child and
      to carry role="img" plus an aria-label describing the chart. The visible
      text interpretation and data table live in the surrounding <figure>, so an
      assistive-technology user never depends on the canvas. */
   function chart(config) {
-    if (!config || !config.target) { return; }
+    if (!config || !config.target) { return Promise.resolve(null); }
 
     var target = typeof config.target === 'string' ? document.getElementById(config.target) : config.target;
-    if (!target) { return; }
+    if (!target) { return Promise.resolve(null); }
+
+    var UNAVAILABLE = 'This chart could not be displayed. The underlying values are listed in the data table below.';
+    var generation = target.mgdbChartGeneration = (target.mgdbChartGeneration || 0) + 1;
 
     function fail(message) {
       var fallback = target.querySelector('.mgdb-chart-fallback');
       if (fallback) { fallback.textContent = message; }
+      return null;
     }
 
-    function render() {
-      if (!window.Plotly) {
-        fail(config.fallback || 'This chart could not be displayed. The underlying values are listed in the data table below.');
-        return;
-      }
-
+    function render(Plotly) {
       var traces;
       try {
         traces = typeof config.traces === 'function' ? config.traces() : config.traces;
       } catch (error) {
-        fail('This chart could not be displayed. The underlying values are listed in the data table below.');
-        return;
+        return fail(UNAVAILABLE);
       }
 
       if (!traces || !traces.length) {
-        fail('No data is available for this chart.');
-        return;
+        return fail('No data is available for this chart.');
       }
 
       var layout = placeLegend(mergeLayout(config.layout), traces, config.legendManual);
@@ -561,78 +729,47 @@
 
       target.textContent = '';
 
-      window.Plotly.newPlot(target, traces, layout, plotConfig).then(function () {
+      return Plotly.newPlot(target, traces, layout, plotConfig).then(function () {
         // Plotly's generated SVG is decorative here; role="img" plus the
         // aria-label on the container is what assistive technology reads.
         var svg = target.querySelector('.main-svg');
         if (svg) { svg.setAttribute('aria-hidden', 'true'); }
         fitLegend(target, layout, 0);
-        if (window.Plotly.Plots && window.Plotly.Plots.resize) {
+        if (Plotly.Plots && Plotly.Plots.resize) {
           window.addEventListener('resize', debounce(function () {
-            window.Plotly.Plots.resize(target);
+            Plotly.Plots.resize(target);
             // A narrower figure wraps the legend onto more rows.
             fitLegend(target, layout, 0);
           }, 150));
         }
-      }).catch(function () {
-        fail('This chart could not be displayed. The underlying values are listed in the data table below.');
+        return target;
+      }, function () {
+        return fail(UNAVAILABLE);
       });
     }
 
-    // Render exactly once, whichever trigger gets there first.
-    var rendered = false;
-    function renderOnce() {
-      if (rendered) { return; }
-      rendered = true;
-      render();
-    }
-
-    function nearViewport() {
-      var rect = target.getBoundingClientRect();
-      var height = window.innerHeight || document.documentElement.clientHeight;
-      return rect.top < height + 200 && rect.bottom > -200;
-    }
-
-    // Charts already on screen are drawn immediately; deferring them only
-    // delays the content the reader came for.
-    if (nearViewport()) {
-      renderOnce();
-      return;
-    }
-
-    if (!window.IntersectionObserver) {
-      renderOnce();
-      return;
-    }
-
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          observer.disconnect();
-          renderOnce();
+    var drawn = new Promise(function (resolve) {
+      function draw(Plotly) {
+        if (target.mgdbChartGeneration !== generation) { resolve(null); return; }
+        // Hidden while Plotly was on its way -- a tab changed, a panel
+        // closed. Wait until it can be seen, or it is drawn 700px wide.
+        // Without an observer whenNear() cannot wait, so draw as before.
+        if (!hasBox(target) && window.IntersectionObserver) {
+          whenNear(target, function () { draw(Plotly); });
+          return;
         }
-      });
-    }, { rootMargin: '200px' });
-    observer.observe(target);
-
-    // Safety net. IntersectionObserver does not fire in every environment
-    // (some headless and embedded browsers never deliver entries), and a chart
-    // that silently never renders is worse than one drawn slightly early.
-    // A scroll listener plus a bounded timeout both fall back to rendering.
-    var onScroll = function () {
-      if (nearViewport()) {
-        window.removeEventListener('scroll', onScroll);
-        observer.disconnect();
-        renderOnce();
+        resolve(render(Plotly));
       }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
 
-    window.setTimeout(function () {
-      window.removeEventListener('scroll', onScroll);
-      observer.disconnect();
-      renderOnce();
-    }, 3000);
+      whenNear(target, function () {
+        loadPlotly().then(draw, function () {
+          resolve(target.mgdbChartGeneration === generation ? fail(config.fallback || UNAVAILABLE) : null);
+        });
+      });
+    });
+
+    prefetchPlotly(target);
+    return drawn;
   }
 
   /* ------------------------------------------------------------------------
@@ -735,6 +872,560 @@
     }
   }
 
+  /* ------------------------------------------------------------------------
+     Typeahead
+
+     Suggestions under a search field as the reader types, in the Expression
+     Tools style (geneInput in js/mgdb-exptools-core.js): a plain list under
+     the field, an identifier in mono, a name in bold, one muted line of
+     context.
+
+     Opt in with one attribute; the rest are optional:
+
+       <input data-suggest="stock">         a scope of the suggestion index
+         data-suggest-pick="navigate"       open the record instead of searching
+         data-suggest-submit="#button"      what to press when there is no form
+         data-suggest-anchor=".control"     align to this ancestor, not the field
+         data-suggest-paused                no suggestions while present
+         data-suggest-list                  a list box (a textarea of ids): suggest
+                                            for the entry under the caret, and a
+                                            pick replaces that entry and starts a
+                                            new line instead of submitting
+
+     or from a page script:
+
+       MGDB.typeahead(input, { scope: 'gene', onPick: function (item, input) { … } });
+       MGDB.typeahead(input, { source: function (qn) { return items; }, min: 1 });
+
+     `source` answers from data the page already holds (a function of the
+     normalised text, returning items or a promise of them) instead of the
+     index; items have the index's shape: {v, id?, name?, text?, meta?, url?}.
+
+     A pick puts the suggestion's value in the field and submits the form, so
+     the page's own search runs exactly as though the reader had typed it. The
+     index only suggests what that search finds (include/suggest_lib.php), which
+     is what makes filling the field safe.
+
+     Speed: an answer the page already holds is shown with no request -- the
+     same text again, or longer text when the list for a shorter one was
+     complete, narrowed here with the server's own rank (taKey). Anything else
+     is asked for TA_DELAY after the last keystroke, cancels whatever is still
+     in flight, and keeps the previous list up, dimmed, until it lands.
+     ------------------------------------------------------------------------ */
+
+  var TA_ENDPOINT = '/search/suggest/suggest_api.php';
+  var TA_DELAY = 40;
+  var TA_LIMIT = 10;
+  var TA_MIN = 2;
+  var TA_CACHE_MAX = 300;
+  var taCache = {};
+  var taCacheOrder = [];
+  var taCount = 0;
+
+  function taNorm(value) {
+    return String(value == null ? '' : value).toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  /* Words of two or more characters, the first eight -- what suggestSearch()
+     asks the full-text table for. Only used on ASCII text. */
+  function taWords(qn) {
+    var seen = {};
+    var out = [];
+    qn.split(/[^a-z0-9]+/).forEach(function (w) {
+      if (w && !seen[w]) { seen[w] = true; out.push(w); }
+    });
+    return out.filter(function (w) { return w.length >= 2; }).slice(0, 8);
+  }
+
+  /* UTF-8 length, which is what PHP's strlen() gives the server's rank. */
+  function taBytes(text) {
+    var n = 0;
+    for (var i = 0; i < text.length; i++) {
+      var c = text.charCodeAt(i);
+      n += c < 0x80 ? 1 : c < 0x800 ? 2 : (c >= 0xd800 && c <= 0xdbff) ? 2 : (c >= 0xdc00 && c <= 0xdfff) ? 2 : 3;
+    }
+    return n;
+  }
+
+  /* The rank, exactly as suggestKey() in include/suggest_lib.php. */
+  function taKey(tier, kind, cls, len, rec) {
+    var group = tier === 2 ? 2 : (kind >= 2 ? 1 : 0);
+    var k = (group * 4 + tier) * 4 + kind;
+    k = k * 16 + (15 - Math.max(0, Math.min(15, cls)));
+    k = k * 1024 + Math.max(0, Math.min(1023, len));
+    return k * 134217728 + rec;
+  }
+
+  function taStartsWith(text, prefix) {
+    return text.lastIndexOf(prefix, 0) === 0;
+  }
+
+  /* The list for `qn`, from the complete list for a shorter text `entry.q`,
+     or null when that cannot be done exactly. Every record `qn` matches is
+     then among the entry's items: a term that starts with qn starts with the
+     shorter text, and a record holding every word of qn holds every word of
+     the shorter text -- provided each of those words is the start of one of
+     qn's, which is checked. */
+  function taNarrow(entry, qn, limit) {
+    var words = entry.words ? taWords(qn) : [];
+    if (words.length) {
+      var before = taWords(entry.q);
+      var covered = before.length && before.every(function (w) {
+        return words.some(function (x) { return taStartsWith(x, w); });
+      });
+      if (!covered) { return null; }
+    }
+    var ranked = [];
+    for (var i = 0; i < entry.items.length; i++) {
+      var item = entry.items[i];
+      if (item.x || !item.k) { return null; }
+      var best = Infinity;
+      var bestTerm = null;
+      var bestKind = 3;
+      for (var j = 0; j < item.k.length; j++) {
+        var term = item.k[j][0];
+        if (taStartsWith(term, qn)) {
+          var key = taKey(term === qn ? 0 : 1, item.k[j][1], item.c, taBytes(term), item.n);
+          if (key < best) { best = key; bestTerm = term; bestKind = item.k[j][1]; }
+        }
+      }
+      if (words.length && item.w) {
+        var have = item.w.split(' ');
+        var all = words.every(function (w) {
+          return have.some(function (h) { return taStartsWith(h, w); });
+        });
+        var wordKey = taKey(2, 3, 0, 1023, item.n);
+        if (all && wordKey < best) { best = wordKey; bestTerm = null; bestKind = 3; }
+      }
+      if (best < Infinity) {
+        /* Name the synonym it now matches on, as the server would. */
+        var copy = {};
+        Object.keys(item).forEach(function (key) { copy[key] = item[key]; });
+        delete copy.match;
+        if (bestTerm !== null && bestKind > 0 && bestTerm !== taNorm(item.v)) {
+          copy.match = item.match && taNorm(item.match) === bestTerm ? item.match : bestTerm;
+        }
+        ranked.push({ key: best, item: copy });
+      }
+    }
+    ranked.sort(function (a, b) { return a.key - b.key; });
+    return ranked.slice(0, limit).map(function (r) { return r.item; });
+  }
+
+  /* The muted line: the synonym a record was matched on when the reader
+     would not otherwise see it, the record's context, and how many records
+     one value stands for. */
+  function taMetaLine(item) {
+    var parts = [];
+    /* A merged list (scope=all) says what kind of record each row is. */
+    if (item.type) { parts.push(item.type); }
+    if (item.match) {
+      var seen = [item.v, item.name, item.text, item.meta].join(' ').toLowerCase();
+      if (seen.indexOf(String(item.match).toLowerCase()) === -1) { parts.push(item.match); }
+    }
+    if (item.meta) { parts.push(item.meta); }
+    if (item.dups > 1) { parts.push(item.dups + ' records'); }
+    return parts.join(' \u00b7 ');
+  }
+
+  /* What the reader sees as the search box. Several hubs draw the border on
+     a wrapper that also holds a magnifier or a clear button, with a bare
+     input inside it; the list lines up with that wrapper, not the input. */
+  function taBox(input) {
+    function bordered(el) {
+      var style = window.getComputedStyle(el);
+      return parseFloat(style.borderTopWidth) > 0 && style.borderTopStyle !== 'none' &&
+             parseFloat(style.borderLeftWidth) > 0;
+    }
+    if (bordered(input)) { return null; }
+    var el = input.parentElement;
+    for (var depth = 0; el && depth < 2; depth++, el = el.parentElement) {
+      /* A single-line control: an input can be 19px of text inside a 44px box.
+         A textarea's box is as tall as the textarea, give or take padding. */
+      var fits = input.tagName === 'TEXTAREA' ? el.offsetHeight <= input.offsetHeight + 32
+                                              : el.offsetHeight <= Math.max(input.offsetHeight + 16, 72);
+      if (bordered(el) && fits) { return el; }
+    }
+    return null;
+  }
+
+  function taCacheGet(key) {
+    return Object.prototype.hasOwnProperty.call(taCache, key) ? taCache[key] : null;
+  }
+
+  function taCachePut(key, entry) {
+    if (!Object.prototype.hasOwnProperty.call(taCache, key)) {
+      taCacheOrder.push(key);
+      if (taCacheOrder.length > TA_CACHE_MAX) { delete taCache[taCacheOrder.shift()]; }
+    }
+    taCache[key] = entry;
+  }
+
+  function typeahead(input, options) {
+    options = options || {};
+    if (!input || input.getAttribute('data-typeahead') === 'on') { return null; }
+    var scope = options.scope || input.getAttribute('data-suggest');
+    var source = typeof options.source === 'function' ? options.source : null;
+    if (!source && (!scope || !window.fetch)) { return null; }
+    input.setAttribute('data-typeahead', 'on');
+
+    var limit = options.limit || TA_LIMIT;
+    var minChars = options.min || TA_MIN;
+    var listMode = !!options.list || input.hasAttribute('data-suggest-list');
+    /* The separators a list box splits entries on (insSplitList()). */
+    var ENTRY_END = /[^\s,;|]*$/;
+    var mode = options.pick || input.getAttribute('data-suggest-pick') || 'submit';
+    var submitSelector = options.submit || input.getAttribute('data-suggest-submit');
+    var anchorSelector = options.anchor || input.getAttribute('data-suggest-anchor');
+    var anchor = anchorSelector && input.closest ? input.closest(anchorSelector) : taBox(input);
+
+    var id = 'mgdb-typeahead-' + (++taCount);
+    var list = document.createElement('ul');
+    list.id = id;
+    list.className = 'mgdb-typeahead-list';
+    list.setAttribute('role', 'listbox');
+    list.hidden = true;
+    var labelText = input.getAttribute('aria-label') ||
+      (input.labels && input.labels[0] ? input.labels[0].textContent.replace(/\s+/g, ' ').trim() : '');
+    list.setAttribute('aria-label', labelText ? 'Suggestions: ' + labelText : 'Suggestions');
+    document.body.appendChild(list);
+
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-expanded', 'false');
+    input.setAttribute('aria-controls', id);
+    input.setAttribute('autocomplete', 'off');
+
+    var items = [];
+    var shownFor = null;
+    var active = -1;
+    var timer = null;
+    var controller = null;
+    var serial = 0;
+    /* Text the reader closed the list on, by Escape, Enter, a pick or leaving
+       the field. An answer for it that lands later must not reopen the list;
+       typing anything clears it. */
+    var dismissed = null;
+    var listening = false;
+
+    /* A pick that fills the field and searches makes rows with the same value
+       one choice, so the server keeps one per value. */
+    var distinct = mode !== 'navigate' && !options.onPick;
+
+    function cacheKey(qn) { return scope + '|' + limit + '|' + (distinct ? 'd' : '') + '|' + qn; }
+
+    /* What is being completed: the whole field, or in a list box the entry
+       from the last separator up to the caret. */
+    function currentText() {
+      if (!listMode) { return input.value; }
+      var caret = typeof input.selectionStart === 'number' ? input.selectionStart : input.value.length;
+      var match = input.value.slice(0, caret).match(ENTRY_END);
+      return match ? match[0] : '';
+    }
+
+    function abort() {
+      window.clearTimeout(timer);
+      serial++;
+      if (controller) { controller.abort(); controller = null; }
+      input.removeAttribute('aria-busy');
+    }
+
+    /* As wide as the search box -- but never narrower than 20rem where the
+       screen allows it, since on a phone a box beside its button can be 120px
+       and every row would wrap to three lines. Kept 16px inside the viewport. */
+    function place() {
+      var box = (anchor || input).getBoundingClientRect();
+      var viewport = document.documentElement.clientWidth || window.innerWidth;
+      var width = Math.max(box.width, Math.min(320, viewport - 32));
+      var left = Math.max(16, Math.min(box.left, viewport - 16 - width));
+      if (width >= viewport - 32) { left = 16; width = viewport - 32; }
+      if (box.width >= width) { left = box.left; width = box.width; }
+      list.style.left = (left + window.pageXOffset) + 'px';
+      list.style.top = (box.bottom + window.pageYOffset + 4) + 'px';
+      list.style.width = width + 'px';
+    }
+
+    function onMove() { if (!list.hidden) { place(); } }
+
+    function listen(on) {
+      if (on === listening) { return; }
+      listening = on;
+      var method = on ? 'addEventListener' : 'removeEventListener';
+      window[method]('resize', onMove);
+      window[method]('scroll', onMove, true);
+    }
+
+    function close() {
+      list.hidden = true;
+      list.classList.remove('is-stale');
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+      active = -1;
+      listen(false);
+    }
+
+    function setActive(index) {
+      active = index;
+      Array.prototype.forEach.call(list.children, function (li, i) {
+        var on = i === index;
+        li.classList.toggle('is-active', on);
+        li.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      if (index >= 0 && list.children[index]) {
+        input.setAttribute('aria-activedescendant', list.children[index].id);
+        var li = list.children[index];
+        if (li.offsetTop < list.scrollTop) { list.scrollTop = li.offsetTop; }
+        else if (li.offsetTop + li.offsetHeight > list.scrollTop + list.clientHeight) {
+          list.scrollTop = li.offsetTop + li.offsetHeight - list.clientHeight;
+        }
+      } else {
+        input.removeAttribute('aria-activedescendant');
+      }
+    }
+
+    function render(newItems, qn) {
+      /* Keep the reader's place when a list is replaced under the arrow keys. */
+      var keep = active >= 0 && items[active] && items[active].n != null ? items[active].n : null;
+      items = newItems;
+      shownFor = qn;
+      list.classList.remove('is-stale');
+      list.innerHTML = '';
+      if (!items.length) { close(); return; }
+      var restore = -1;
+      items.forEach(function (item, i) {
+        var li = document.createElement('li');
+        li.id = id + '-' + i;
+        li.className = 'mgdb-typeahead-item';
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', 'false');
+        var metaLine = taMetaLine(item);
+        /* Joined by spaces: the flex row ignores them, but the option's
+           accessible name is its text, and "Ki11Ames 27124" is one word. */
+        li.innerHTML = [
+          item.id ? '<span class="mgdb-typeahead-id">' + escapeHtml(item.id) + '</span>' : '',
+          item.name ? '<strong>' + escapeHtml(item.name) + '</strong>' : '',
+          item.text ? '<span class="mgdb-typeahead-text">' + escapeHtml(item.text) + '</span>' : '',
+          metaLine ? '<span class="mgdb-typeahead-meta">' + escapeHtml(metaLine) + '</span>' : ''
+        ].filter(Boolean).join(' ');
+        li.addEventListener('mousedown', function (e) { e.preventDefault(); pick(i); });
+        list.appendChild(li);
+        if (keep !== null && item.n === keep) { restore = i; }
+      });
+      list.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+      place();
+      listen(true);
+      setActive(restore);
+    }
+
+    function show(entry, qn) {
+      if (dismissed === qn) { list.classList.remove('is-stale'); return; }
+      render(entry.items, qn);
+    }
+
+    function fromCache(qn) {
+      var hit = taCacheGet(cacheKey(qn));
+      if (hit) { return hit; }
+      if (/[^\x20-\x7e]/.test(qn)) { return null; }
+      for (var n = qn.length - 1; n >= TA_MIN; n--) {
+        var entry = taCacheGet(cacheKey(qn.slice(0, n)));
+        if (entry && entry.complete) {
+          var narrowed = taNarrow(entry, qn, limit);
+          if (!narrowed) { return null; }
+          var made = { q: qn, items: narrowed, complete: true, words: entry.words };
+          taCachePut(cacheKey(qn), made);
+          return made;
+        }
+      }
+      return null;
+    }
+
+    function request(qn) {
+      abort();
+      var mine = serial;
+      controller = window.AbortController ? new window.AbortController() : null;
+      input.setAttribute('aria-busy', 'true');
+      var url = TA_ENDPOINT + '?scope=' + encodeURIComponent(scope) + '&q=' + encodeURIComponent(qn) +
+        (limit !== TA_LIMIT ? '&limit=' + limit : '') + (distinct ? '&distinct=1' : '');
+      window.fetch(url, {
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' },
+        signal: controller ? controller.signal : undefined
+      }).then(function (response) {
+        if (!response.ok) { throw new Error('status ' + response.status); }
+        return response.json();
+      }).then(function (data) {
+        if (!data || !data.ok) { throw new Error('no suggestions'); }
+        var entry = { q: qn, items: data.items || [], complete: !!data.complete, words: !!data.words };
+        taCachePut(cacheKey(qn), entry);
+        if (mine !== serial) { return; }
+        controller = null;
+        input.removeAttribute('aria-busy');
+        if (taNorm(currentText()) === qn) { show(entry, qn); }
+      }).catch(function (error) {
+        if (mine !== serial || (error && error.name === 'AbortError')) { return; }
+        /* Suggestions are a convenience: the search itself still works. */
+        controller = null;
+        input.removeAttribute('aria-busy');
+        close();
+      });
+    }
+
+    function update() {
+      var qn = taNorm(currentText());
+      window.clearTimeout(timer);
+      /* data-suggest-paused: the field is taking something the index does not
+         hold right now -- a DNA sequence, say. */
+      if (qn.length < minChars || input.hasAttribute('data-suggest-paused')) {
+        abort(); close(); items = []; shownFor = null; return;
+      }
+      if (source) {
+        abort();
+        var mine = serial;
+        Promise.resolve(source(qn, input.value)).then(function (list) {
+          if (mine !== serial || taNorm(currentText()) !== qn) { return; }
+          /* Rows with one value are one choice when a pick fills the field,
+             exactly as the index sends them. */
+          var seen = {};
+          var rows = [];
+          (list || []).forEach(function (item) {
+            var key = taNorm(item.v);
+            if (distinct && Object.prototype.hasOwnProperty.call(seen, key)) {
+              rows[seen[key]].dups = (rows[seen[key]].dups || 1) + 1;
+              return;
+            }
+            seen[key] = rows.length;
+            rows.push(Object.assign({}, item));
+          });
+          show({ items: rows.slice(0, limit) }, qn);
+        }, function () { close(); });
+        return;
+      }
+      var hit = fromCache(qn);
+      if (hit) { abort(); show(hit, qn); return; }
+      if (!list.hidden) { list.classList.add('is-stale'); }
+      timer = window.setTimeout(function () { request(qn); }, TA_DELAY);
+    }
+
+    function submit() {
+      var button = submitSelector ? document.querySelector(submitSelector) : null;
+      if (button) { button.click(); return; }
+      var form = input.form;
+      if (!form) { return; }
+      if (typeof form.requestSubmit === 'function') { form.requestSubmit(); return; }
+      var event = document.createEvent('Event');
+      event.initEvent('submit', true, true);
+      if (form.dispatchEvent(event)) { form.submit(); }
+    }
+
+    function pick(index) {
+      var item = items[index];
+      if (!item) { return; }
+      abort();
+      close();
+      if (listMode) {
+        /* Replace the entry being typed, start the next one on a new line,
+           and leave the search to the reader: a list is rarely one entry. */
+        var caret = typeof input.selectionStart === 'number' ? input.selectionStart : input.value.length;
+        var before = input.value.slice(0, caret);
+        var after = input.value.slice(caret).replace(/^[^\s,;|]*/, '');
+        before = before.slice(0, before.length - (before.match(ENTRY_END) || [''])[0].length) + item.v;
+        var joiner = /^[\s,;|]/.test(after) ? '' : '\n';
+        input.value = before + joiner + after;
+        var at = before.length + joiner.length;
+        if (input.setSelectionRange) { input.setSelectionRange(at, at); }
+        dismissed = null;
+        try { input.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { /* old browsers */ }
+        input.focus();
+        return;
+      }
+      input.value = item.v;
+      dismissed = taNorm(item.v);
+      try { input.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) { /* old browsers */ }
+      if (options.onPick) { options.onPick(item, input); return; }
+      if (mode === 'navigate' && item.url) { window.location.assign(item.url); return; }
+      submit();
+    }
+
+    input.addEventListener('input', function () {
+      dismissed = null;
+      update();
+    });
+
+    input.addEventListener('keydown', function (e) {
+      var open = !list.hidden && items.length > 0;
+      var key = e.key;
+      if (key === 'ArrowDown' || key === 'Down') {
+        if (!open) {
+          if (items.length && shownFor === taNorm(currentText())) {
+            dismissed = null;
+            render(items, shownFor);
+            setActive(0);
+          }
+          e.preventDefault();
+          return;
+        }
+        setActive(active + 1 >= items.length ? 0 : active + 1);
+        e.preventDefault();
+      } else if (key === 'ArrowUp' || key === 'Up') {
+        if (!open) { return; }
+        setActive(active <= 0 ? items.length - 1 : active - 1);
+        e.preventDefault();
+      } else if (key === 'Enter') {
+        if (open && active >= 0) {
+          /* The pick submits the search itself; a page's own Enter handler
+             must not run a second one on the same keystroke. */
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          pick(active);
+          return;
+        }
+        /* The reader's own text is being searched; the form does that. */
+        dismissed = taNorm(currentText());
+        abort();
+        close();
+      } else if (key === 'Escape' || key === 'Esc') {
+        if (open) {
+          /* Closes the list only: a search field's own Escape clears it. */
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          dismissed = taNorm(currentText());
+          abort();
+          close();
+        }
+      } else if (key === 'Tab') {
+        close();
+      }
+    });
+
+    input.addEventListener('blur', function () {
+      window.setTimeout(function () {
+        if (document.activeElement === input) { return; }
+        dismissed = taNorm(currentText());
+        abort();
+        close();
+      }, 150);
+    });
+
+    /* A form reset or a script clearing the field leaves no text to suggest for. */
+    if (input.form) {
+      input.form.addEventListener('reset', function () { abort(); close(); });
+    }
+
+    return {
+      input: input,
+      list: list,
+      close: function () { abort(); close(); },
+      refresh: function () { dismissed = null; update(); }
+    };
+  }
+
+  function initTypeaheads(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll('input[data-suggest], textarea[data-suggest]'), function (input) {
+      typeahead(input);
+    });
+  }
+
   function init() {
     // Wide tables scroll in their own container; make that container reachable
     // by keyboard, as a scrollable region needs to be focusable.
@@ -756,6 +1447,8 @@
     watchTabOffset();
 
     initCopyButtons();
+
+    initTypeaheads();
   }
 
   /* Copy citation / Copy DOI on a reference card. Bound here rather than in each
@@ -947,12 +1640,16 @@
   MGDB.watchTabOffset = watchTabOffset;
   MGDB.syncTabOffset = syncTabOffset;
   MGDB.chart = chart;
+  MGDB.loadPlotly = loadPlotly;
+  MGDB.whenNear = whenNear;
   MGDB.mergeLayout = mergeLayout;
   MGDB.CHART_COLORS = CHART_COLORS;
   MGDB.CHART_SYMBOLS = CHART_SYMBOLS;
   MGDB.CHART_DASHES = CHART_DASHES;
   MGDB.prefersReducedMotion = prefersReducedMotion;
   MGDB.initCopyButtons = initCopyButtons;
+  MGDB.typeahead = typeahead;
+  MGDB.initTypeaheads = initTypeaheads;
 
   window.MGDB = MGDB;
 })(window, document);

@@ -11,7 +11,6 @@
   var currentPage = 1;
   var currentData = null;
   var currentRequest = null;
-  var searchTimer = null;
   var selectedIds = {};
 
   /* The endpoint caps page_size at 100, so "All results" asks for that. */
@@ -404,8 +403,34 @@
     };
   }
 
+  /* Plotly is fetched when the figures come into view rather than with the
+     page. Every search redraws them, so a search that lands while Plotly is
+     still on its way only replaces the facets waiting to be drawn: the figures
+     are drawn once, from the latest. */
+  var chartFacets = null;
+  var chartsWaiting = false;
+
   function renderCharts(facets) {
-    if (!window.Plotly) return;
+    chartFacets = facets;
+    if (window.Plotly) { drawCharts(window.Plotly); return; }
+    if (chartsWaiting || !window.MGDB || !window.MGDB.loadPlotly) return;
+    var first = byId('reference-year-chart');
+    if (!first) return;
+    chartsWaiting = true;
+    window.MGDB.whenNear(first, function () {
+      window.MGDB.loadPlotly().then(function (Plotly) {
+        chartsWaiting = false;
+        drawCharts(Plotly);
+      }, function () {
+        // The next search tries again; the counts above the figures stand.
+        chartsWaiting = false;
+      });
+    });
+  }
+
+  function drawCharts(Plotly) {
+    var facets = chartFacets;
+    if (!facets) return;
     var config = {displayModeBar: false, responsive: true};
     var years = facets.year.slice().sort(function (a, b) { return Number(a.value) - Number(b.value); });
     var yearLayout = baseChartLayout();
@@ -425,11 +450,11 @@
       y: journals.map(function (r) { return r.value; }), x: journals.map(function (r) { return r.count; }),
       marker: {color: '#3c6583'}, hovertemplate: '%{y}: %{x:,}<extra></extra>'}], journalLayout, config);
 
-    renderYearCollectionChart('reference-meeting-chart', facets.meeting_year || [], '#6d8fa8', 'abstracts');
-    renderYearCollectionChart('reference-mnl-chart', facets.mnl_year || [], '#7aa34d', 'articles');
+    renderYearCollectionChart(Plotly, 'reference-meeting-chart', facets.meeting_year || [], '#6d8fa8', 'abstracts');
+    renderYearCollectionChart(Plotly, 'reference-mnl-chart', facets.mnl_year || [], '#7aa34d', 'articles');
   }
 
-  function renderYearCollectionChart(elementId, rows, color, label) {
+  function renderYearCollectionChart(Plotly, elementId, rows, color, label) {
     var years = rows.slice().sort(function (a, b) { return Number(a.value) - Number(b.value); });
     var layout = baseChartLayout();
     layout.margin = {l: 45, r: 12, t: 8, b: 34};
@@ -949,12 +974,11 @@
       });
     }
 
+    /* Typing offers suggestions (data-suggest, MGDB.typeahead) and does not
+       search: results change when the reader submits, so the list never
+       shows the answer to text that is no longer in the box. */
     byId('reference-query').addEventListener('input', function () {
       byId('reference-query-clear').hidden = !byId('reference-query').value;
-      window.clearTimeout(searchTimer);
-      if (byId('reference-query').value.length === 0 || byId('reference-query').value.length >= 3) {
-        searchTimer = window.setTimeout(function () { refresh(1, false); }, 500);
-      }
     });
 
     byId('reference-query-clear').addEventListener('click', function () {

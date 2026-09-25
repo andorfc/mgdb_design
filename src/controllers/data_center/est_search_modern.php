@@ -37,8 +37,6 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 // The collection search still runs through the legacy AJAX helper.
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/js/search.js');
-// Plotly must be parsed before mgdb-est.js runs initFigure().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-est.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-est.js'));
 $bauplan->head('<meta name="description" content="Search MaizeGDB expressed sequence tag records by name, accession, or wildcard pattern and access mapped EST collections by chromosome.">');
 

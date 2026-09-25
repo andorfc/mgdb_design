@@ -90,7 +90,7 @@ $$SYNTAX-LEVEL 2
     <form class="ps-search ps-search-compact" id="ps-esm-form" autocomplete="off" role="search">
       <label class="mgdb-label" for="ps-esm-input">Gene model or protein isoform</label>
       <div class="ps-search-row">
-        <input class="mgdb-input" id="ps-esm-input" type="search" name="term"
+        <input class="mgdb-input" id="ps-esm-input" data-suggest="gene_v5" autocomplete="off" type="search" name="term"
                placeholder="Zm00001eb057920 or Zm00001eb057920_P002" />
         <button class="mgdb-button mgdb-button-secondary" type="submit">Load model</button>
       </div>
@@ -123,7 +123,7 @@ $$SYNTAX-LEVEL 2
         <p>Align a maize protein structure against Arabidopsis, soybean, rice, maize, human, yeast, fission yeast and sorghum proteomes. Structure search finds relatives that sequence search misses.</p>
         <form class="ps-search-row" action="/foldseek" method="get">
           <label class="mgdb-visually-hidden" for="ps-foldseek">Identifier for Foldseek search</label>
-          <input class="mgdb-input" id="ps-foldseek" name="uniprot" type="search" placeholder="Zm00001eb374230" />
+          <input class="mgdb-input" id="ps-foldseek" data-suggest="gene_v5" autocomplete="off" name="uniprot" type="search" placeholder="Zm00001eb374230" />
           <button class="mgdb-button mgdb-button-secondary" type="submit">Search</button>
         </form>
       </article>
@@ -134,7 +134,7 @@ $$SYNTAX-LEVEL 2
         <p>Compare the top ortholog candidates from DIAMOND, Foldseek and FATCAT across four plant proteomes. Where three independent methods agree, the relationship is confident.</p>
         <form class="ps-search-row" action="/fatcat" method="get">
           <label class="mgdb-visually-hidden" for="ps-fatcat">Identifier for FATCAT comparison</label>
-          <input class="mgdb-input" id="ps-fatcat" name="uniprot" type="search" placeholder="Zm00001eb374230" />
+          <input class="mgdb-input" id="ps-fatcat" data-suggest="gene_v5" autocomplete="off" name="uniprot" type="search" placeholder="Zm00001eb374230" />
           <button class="mgdb-button mgdb-button-secondary" type="submit">Compare</button>
         </form>
       </article>
@@ -145,7 +145,7 @@ $$SYNTAX-LEVEL 2
         <p>A structure without a ligand is only half the picture. AlphaFill copies cofactors, substrates and metal ions from homologous PDB entries onto these models &mdash; 624,456 transplants across 16,933 maize genes, each with its donor and confidence.</p>
         <form class="ps-search-row" action="/data_center/alphafill" method="get">
           <label class="mgdb-visually-hidden" for="ps-alphafill">Gene model for predicted ligands</label>
-          <input class="mgdb-input" id="ps-alphafill" name="gene" type="search" placeholder="Zm00001eb086870" />
+          <input class="mgdb-input" id="ps-alphafill" data-suggest="gene_v5" autocomplete="off" name="gene" type="search" placeholder="Zm00001eb086870" />
           <button class="mgdb-button mgdb-button-secondary" type="submit">Ligands</button>
         </form>
       </article>
@@ -181,7 +181,7 @@ $$SYNTAX-LEVEL 2
         <p>See how every possible amino-acid substitution is predicted to affect a maize protein. PanEffect maps ESM language-model effect scores onto the sequence and the AlphaFold structure, with a heatmap across all positions and substitutions.</p>
         <form class="ps-search-row" action="https\://www.maizegdb.org/effect/maize_v2/index.html" method="get" target="_blank" rel="noopener">
           <label class="mgdb-visually-hidden" for="ps-paneffect">Gene model for PanEffect</label>
-          <input class="mgdb-input" id="ps-paneffect" name="id" type="search" placeholder="Zm00001eb260000" />
+          <input class="mgdb-input" id="ps-paneffect" data-suggest="gene_v5" autocomplete="off" name="id" type="search" placeholder="Zm00001eb260000" />
           <input type="hidden" name="option" value="both" />
           <input type="hidden" name="esm" value="ESM2" />
           <button class="mgdb-button mgdb-button-secondary" type="submit">Open PanEffect</button>

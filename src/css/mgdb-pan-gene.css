@@ -956,3 +956,15 @@
   letter-spacing: .06em;
   text-transform: uppercase;
 }
+
+/* The lead-in under a section heading runs the width of its card here, not
+   the site's 68ch reading measure: these cards are wide, and a paragraph
+   stopping two thirds of the way across looked like a broken line rather
+   than a measure (Carson, 2026-09-19). */
+.mgdb-pan-gene-page .mgdb-section-intro { max-width: none; }
+
+.mgdb-pan-gene-page .pan-gene-export-links { display: inline-flex; gap: 6px; }
+.mgdb-pan-gene-page .pan-gene-results-export .mgdb-button[aria-disabled="true"] { opacity: .55; pointer-events: none; }
+
+/* The Downloads cards' spacing and their download arrow are handled for every
+   hub card grid in css/mgdb-hub.css (2026-09-19). */

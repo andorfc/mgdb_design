@@ -45,8 +45,6 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
    getSearchData(). */
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/js/search.js');
-// Plotly must be parsed before mgdb-overgo.js runs initFigure().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-overgo.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-overgo.js'));
 $bauplan->head('<meta name="description" content="Search the archived MaizeGDB Overgo probe collection by probe name or exact nucleotide sequence, and see how the Overgo and Unigene-Overgo libraries break down by name family.">');
 

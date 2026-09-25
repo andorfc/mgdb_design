@@ -9,6 +9,18 @@
    /expression/, so /expression/anything rendered the Expression hub and
    answered 200 -- a bogus sub-path looked like a real page. PAGE is empty for
    /expression itself. */
+/* /expression/tools is Expression Tools, the analysis application beside the
+   hub; nothing below it is a page. */
+if (defined('PAGE') && PAGE === 'tools') {
+  if (defined('ID') && ID !== null && ID !== '') {
+    http_response_code(404);
+    include('controllers/not_found.php');
+    exit;
+  }
+  include_once('./controllers/expression/expression_tools_modern.php');
+  return;
+}
+
 /* PAGE is null for /expression itself -- controller.php defines it as null when
    there is no sub-path -- so null and '' both mean "the hub". */
 if (defined('PAGE') && PAGE !== null && PAGE !== '' && PAGE !== 'expression') {

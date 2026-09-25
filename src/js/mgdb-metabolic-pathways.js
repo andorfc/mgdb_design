@@ -490,7 +490,7 @@
     var short  = chartRows.map(function (r) { return r.short; });
     var m = chartMetrics(el);
 
-    MGDB.chart({
+    var whenDrawn = MGDB.chart({
       target: el,
       traces: [
         { type: 'bar', orientation: 'h', name: 'Gene models',
@@ -514,20 +514,23 @@
     });
 
     /* Relayout only when the breakpoint is actually crossed, so an ordinary
-       resize does not redraw. */
-    var wasNarrow = m.narrow;
-    window.addEventListener('resize', function () {
-      var next = chartMetrics(el);
-      if (next.narrow === wasNarrow) { return; }
-      wasNarrow = next.narrow;
-      if (window.Plotly) {
-        Plotly.relayout(el, {
+       resize does not redraw. Installed once the figure is drawn: Plotly is
+       fetched when the figure comes into view, so it is not on the page when
+       this runs, and a relayout before the draw would have nothing to act on. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
+      var wasNarrow = m.narrow;
+      window.addEventListener('resize', function () {
+        var next = chartMetrics(el);
+        if (next.narrow === wasNarrow) { return; }
+        wasNarrow = next.narrow;
+        window.Plotly.relayout(el, {
           margin: next.margin,
           'xaxis.tickformat': next.tickformat,
           'xaxis.nticks': next.nticks,
           'yaxis.ticktext': next.narrow ? short : labels
         });
-      }
+      });
     });
   }
 
@@ -600,10 +603,12 @@
       });
     }
 
+    /* Typing offers suggestions (data-suggest, MGDB.typeahead) and changes
+       nothing else: the matching external resources are listed with the
+       results, when the reader submits -- submit() renders both. */
     if (termInput) {
       termInput.addEventListener('input', function () {
         updateClearBtn();
-        renderResourceHits(this.value.trim());
       });
     }
 

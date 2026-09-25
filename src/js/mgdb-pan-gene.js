@@ -610,35 +610,64 @@
     });
   }
 
-  function updateExportTsv(results) {
-    var btn = byId('pan-gene-export-tsv');
+  /* The results table as a file. TSV strips the delimiters from each value;
+     CSV quotes instead, so a locus list with commas survives. The object URLs
+     are revoked when they are replaced -- a search that runs on every
+     keystroke would otherwise leak one blob per keystroke. */
+  var EXPORT_HEADERS = ['Exemplar', 'Pan-Gene ID', 'Analysis', 'Loci', 'Proteins', 'Traits',
+                        'Member Count', 'Annotation Count', 'Annotation Total', 'Matched On'];
+  var exportUrls = {};
+
+  function exportValues(row) {
+    return [
+      row.exemplar || '',
+      row.pan_gene_name || '',
+      row.analysis || '',
+      (row.loci || []).join('; '),
+      (row.proteins || []).join('; '),
+      (row.traits || []).join('; '),
+      row.member_count || 0,
+      row.annotation_count || 0,
+      row.annotation_total || '',
+      (row.matched_as || []).join(', ')
+    ].map(function (val) { return String(val); });
+  }
+
+  function setExportHref(id, text, type, name) {
+    var btn = byId(id);
     if (!btn) return;
-    if (!results || !results.length) {
+    if (exportUrls[id]) {
+      URL.revokeObjectURL(exportUrls[id]);
+      exportUrls[id] = null;
+    }
+    if (text === null) {
       btn.href = '#';
+      btn.setAttribute('aria-disabled', 'true');
       return;
     }
-    var headers = ['Exemplar', 'Pan-Gene ID', 'Analysis', 'Loci', 'Proteins', 'Traits', 'Member Count', 'Annotation Count', 'Annotation Total', 'Matched On'];
-    var lines = [headers.join('\t')];
+    btn.removeAttribute('aria-disabled');
+    exportUrls[id] = URL.createObjectURL(new Blob([text], { type: type }));
+    btn.href = exportUrls[id];
+    btn.download = name;
+  }
+
+  function updateExportTsv(results) {
+    if (!results || !results.length) {
+      setExportHref('pan-gene-export-tsv', null);
+      setExportHref('pan-gene-export-csv', null);
+      return;
+    }
+    var tsv = [EXPORT_HEADERS.join('\t')];
+    var csv = [EXPORT_HEADERS.join(',')];
     results.forEach(function (row) {
-      var line = [
-        row.exemplar || '',
-        row.pan_gene_name || '',
-        row.analysis || '',
-        (row.loci || []).join('; '),
-        (row.proteins || []).join('; '),
-        (row.traits || []).join('; '),
-        row.member_count || 0,
-        row.annotation_count || 0,
-        row.annotation_total || '',
-        (row.matched_as || []).join(', ')
-      ].map(function (val) {
-        return String(val).replace(/[\t\r\n]+/g, ' ');
-      });
-      lines.push(line.join('\t'));
+      var values = exportValues(row);
+      tsv.push(values.map(function (val) { return val.replace(/[\t\r\n]+/g, ' '); }).join('\t'));
+      csv.push(values.map(function (val) {
+        return /[",\r\n]/.test(val) ? '"' + val.replace(/"/g, '""') + '"' : val;
+      }).join(','));
     });
-    var blob = new Blob([lines.join('\n')], { type: 'text/tab-separated-values;charset=utf-8;' });
-    btn.href = URL.createObjectURL(blob);
-    btn.download = 'pan_genes.tsv';
+    setExportHref('pan-gene-export-tsv', tsv.join('\n') + '\n', 'text/tab-separated-values;charset=utf-8;', 'pan_genes.tsv');
+    setExportHref('pan-gene-export-csv', csv.join('\r\n') + '\r\n', 'text/csv;charset=utf-8;', 'pan_genes.csv');
   }
 
   function syncAdvancedBadge() {

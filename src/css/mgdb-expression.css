@@ -644,11 +644,10 @@
   align-items: stretch;
 }
 
-
-@media (max-width: 900px) {
-  .mgdb-expression-page .expression-tools-grid,
-  .mgdb-expression-page .expression-downloads-grid,
-  }
+/* Expression Tools, MaizeGDB's own application over these releases, takes
+   the whole first row. */
+.mgdb-expression-page .expression-tool-card-wide { grid-column: 1 / -1; }
+.mgdb-expression-page .expression-tool-title a { color: inherit; }
 
 .mgdb-expression-page .expression-tool-header {
   display: flex;

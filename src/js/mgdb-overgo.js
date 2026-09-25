@@ -63,9 +63,16 @@
     if (input) {
       input.placeholder = spec.placeholder;
       input.removeAttribute('aria-invalid');
-      /* maxlength only belongs on the sequence search; a name can be longer. */
-      if (mode === 'overgo_seq') { input.setAttribute('maxlength', '25'); }
-      else { input.removeAttribute('maxlength'); }
+      /* maxlength only belongs on the sequence search; a name can be longer.
+         Suggestions are overgo names, so they pause while the field takes a
+         sequence. */
+      if (mode === 'overgo_seq') {
+        input.setAttribute('maxlength', '25');
+        input.setAttribute('data-suggest-paused', '');
+      } else {
+        input.removeAttribute('maxlength');
+        input.removeAttribute('data-suggest-paused');
+      }
     }
     if (error) { error.hidden = true; }
     if (panel) { panel.classList.toggle('overgo-sequence-mode', mode === 'overgo_seq'); }
@@ -360,7 +367,7 @@
        legend the five short labels do not need. */
     var COLORS = { 'Unigene-Overgo': '#285d46', 'Overgo': '#a96919' };
 
-    window.MGDB.chart({
+    var whenDrawn = window.MGDB.chart({
       target: el,
       traces: [{
         type: 'bar',
@@ -385,7 +392,11 @@
       }
     });
 
-    if (window.Plotly && window.Plotly.relayout) {
+    /* Relayout when the breakpoint is crossed. Installed once the figure is
+       drawn: Plotly is fetched when the figure comes into view, so it is not
+       on the page when this runs. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
       var lastNarrow = m.narrow;
       var timer = null;
       window.addEventListener('resize', function () {
@@ -398,7 +409,7 @@
           window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
         }, 180);
       });
-    }
+    });
   }
 
   document.addEventListener('DOMContentLoaded', function () {

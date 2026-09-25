@@ -262,23 +262,47 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/qtl_record_lib.php');
     $counts['maps'] = count($maps);
   }
 
+  /* The shape every other record's references section returns, so the page
+     draws them with the shared reference block (R.references) -- the DOI,
+     PubMed and Full text links, the abstract, the year histogram's table.
+     This section used to return only a name and a year, drawn as a plain
+     table with no way to the paper. And the name was wrong where the link
+     carried a relevance: it printed id_reference.contents, which is a term
+     id, so reference 111800 on this record read "50639". The relevance is
+     that term's name, as on every other record. */
   if (isset($want['references'])) {
     $references = array();
     $sth = make_query($DBConn, "
-      SELECT r.reference AS id, r.contents, ref.name, ref.year
-      FROM mgdb.id_reference r
-        INNER JOIN mgdb.id_num ri ON ri.id = r.reference AND ri.curation_lvl = 0
-        LEFT JOIN mgdb.reference ref ON ref.id = r.reference
-      WHERE r.id = :id
-      ORDER BY ref.year DESC NULLS LAST, r.contents", 1, array('id' => $id));
+      SELECT r.id, r.name, r.title, r.year, " . mgdbReferenceDoiSql('r') . " AS doi, " . mgdbReferencePubmedSql('r') . " AS pubmed, r.author_desc, t.name AS contents,
+             t_type.name AS pub_type,
+             (
+               SELECT substring(regexp_replace(string_agg(
+                 concat_ws(' ', rab.abstract_1, rab.abstract_2), ' '
+               ), '\s+', ' ', 'g') from 1 for 700)
+               FROM mgdb.reference_abstract rab WHERE rab.id = r.id
+             ) AS abstract
+      FROM mgdb.id_reference ir
+        INNER JOIN mgdb.reference r ON r.id = ir.reference
+        INNER JOIN mgdb.id_num i ON i.id = ir.reference AND i.curation_lvl = 0
+        LEFT JOIN mgdb.term t ON t.id = ir.contents
+        LEFT JOIN mgdb.term t_type ON t_type.id = r.type
+      WHERE ir.id = :id
+      ORDER BY r.year DESC NULLS LAST, LOWER(r.name)", 1, array('id' => $id));
     MgdbApi::countQuery();
     while ($row = retrieve_row($sth)) {
       $references[] = array(
-        'reference' => MgdbApi::ref('reference', $row['id'],
-                                    $row['contents'] !== null && trim((string) $row['contents']) !== ''
-                                      ? $row['contents'] : $row['name'],
-                                    '/data_center/reference?id='),
-        'year' => $row['year'] === null ? null : (int) $row['year']
+        'type' => 'reference',
+        'id' => MgdbApi::int($row['id']),
+        'citation' => MgdbApi::text($row['name']),
+        'title' => MgdbApi::text($row['title']),
+        'authors' => MgdbApi::text($row['author_desc']),
+        'year' => MgdbApi::int($row['year']),
+        'doi' => MgdbApi::text($row['doi']),
+        'pubmed' => MgdbApi::text($row['pubmed']),
+        'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
+        'relevance' => MgdbApi::text($row['contents']),
+        'abstract' => MgdbApi::text($row['abstract']),
+        'html' => '/data_center/reference?id=' . (int) $row['id']
       );
     }
     list($references, $cut) = MgdbApi::cap($references, $max_items);

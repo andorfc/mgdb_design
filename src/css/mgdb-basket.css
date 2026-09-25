@@ -1,0 +1,597 @@
+/* ==========================================================================
+   MaizeGDB Modern -- the basket (mockup)
+   --------------------------------------------------------------------------
+   Three pieces, all laid over a page that does not otherwise change:
+
+     1. A Basket button in the site header, beside Bulk downloads, with a
+        count. Hidden count at zero.
+     2. An add control in each half of the gene record hero, beside the
+        corner badge. Pressed state means "in the basket"; pressing again
+        removes it.
+     3. The drawer: a fixed right-hand card with one tab per record type
+        that holds something, the actions that type can go to, the items,
+        and a foot.
+
+   Loaded only by /gene_center/gene_basket/{id} while this is a mockup. The
+   tokens are the shared ones from mgdb-modern.css; nothing here adds a colour.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Header button
+   -------------------------------------------------------------------------- */
+
+/* The bulk-download link and the basket button share one row at the top of
+   the header's right-hand column, which is a column with its items flushed
+   right. The row wraps the two so the column still sees one child there. */
+.mgdb-basket-headrow {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Same box as .mgdb-bulk-download: white on the green field, the search
+   shell's ring and radius, green text, gold icon. A <button>, so it resets
+   the UA's font and border itself. */
+.mgdb-basket-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: 0;
+  padding: var(--mgdb-space-2) var(--mgdb-space-4);
+  border: 0;
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 6px 16px rgba(9, 30, 14, .28);
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  cursor: pointer;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+.mgdb-basket-button:hover,
+.mgdb-basket-button[aria-expanded="true"] {
+  background: var(--mgdb-green-soft);
+  box-shadow: 0 0 0 2px #fff, 0 6px 16px rgba(9, 30, 14, .32);
+}
+.mgdb-basket-button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.mgdb-basket-button-icon { flex: 0 0 auto; color: var(--mgdb-gold-dark); }
+
+/* The count: a dark green pill, the same one Expression Tools uses. Hidden
+   at zero rather than showing a 0 -- an empty basket has nothing to say. */
+.mgdb-basket-count {
+  display: inline-flex;
+  min-width: 1.5em;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.mgdb-basket-count[data-zero] { display: none; }
+
+@media (max-width: 767px) {
+  .mgdb-basket-button { min-height: var(--mgdb-tap-target); }
+}
+
+/* --------------------------------------------------------------------------
+   2. Hero add controls
+   --------------------------------------------------------------------------
+   The corner badge ("Gene/locus", "Gene model") is absolutely positioned at
+   the top right of its half. The add control joins it in a row there, so the
+   badge keeps its place and the button sits to its left. The name's
+   padding-right grows to clear both.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-v4-page .mgdb-basket-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+.mgdb-gene-record-v4-page .mgdb-basket-corner .v4-badge { position: static; }
+.mgdb-hub-page > section.v4-hero .v4-side .v4-name { padding-right: 13rem; }
+
+/* Shaped like the badge beside it, so the pair reads as one corner: same
+   pill, same border, same type size. Unpressed it is an outline; pressed it
+   takes the dark green fill and a check. */
+.mgdb-basket-add {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin: 0;
+  padding: 2px 10px 2px 8px;
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .85);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: var(--mgdb-leading-snug);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.mgdb-basket-add:hover { background: var(--mgdb-green-soft); }
+.mgdb-basket-add:focus-visible { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+.mgdb-basket-add[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+.mgdb-basket-add[aria-pressed="true"] .mgdb-basket-add-plus { display: none; }
+.mgdb-basket-add[aria-pressed="true"]::before { content: "\2713"; }
+.mgdb-basket-add:disabled { opacity: .55; cursor: default; }
+.mgdb-basket-add-plus { font-size: 1.1em; line-height: 1; }
+
+/* A pointer floor for the pill on touch screens; it is 24px on its own. */
+@media (pointer: coarse) {
+  .mgdb-basket-add { min-height: 36px; }
+}
+
+/* Below the width where a model name fits beside two pills, the corner row
+   drops into the flow above the name. Both halves take the same row, so the
+   two names still line up. */
+@media (max-width: 1100px) {
+  .mgdb-gene-record-v4-page .mgdb-basket-corner {
+    position: static;
+    justify-content: flex-end;
+    margin-bottom: var(--mgdb-space-2);
+  }
+  .mgdb-hub-page > section.v4-hero .v4-side .v4-name { padding-right: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   3. Collection toolbar control
+   --------------------------------------------------------------------------
+   "Add shown rows" in the toolbar of a table the basket knows how to read.
+   Sized like the Download TSV control beside it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-toolbar .mgdb-basket-add-rows {
+  box-sizing: border-box;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mgdb-rec-toolbar .mgdb-basket-add-rows:hover { background: var(--mgdb-green-soft); }
+.mgdb-rec-toolbar .mgdb-basket-add-rows:focus-visible { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+
+/* --------------------------------------------------------------------------
+   4. The drawer
+   --------------------------------------------------------------------------
+   Fixed to the right edge, full height, above the header (which sits at
+   z-index 99000 so the megamenu cannot paint over the search suggestions).
+   No backdrop: the page stays usable behind it, so a reader can add from the
+   hero and watch the item arrive.
+   -------------------------------------------------------------------------- */
+
+.mgdb-basket-drawer {
+  position: fixed;
+  z-index: 99500;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(28rem, 100vw);
+  padding: var(--mgdb-space-5);
+  overflow: hidden;
+  border-left: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface);
+  box-shadow: -12px 0 32px rgba(16, 30, 54, .18);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+  transform: translateX(0);
+}
+.mgdb-basket-drawer[hidden] { display: none; }
+.mgdb-basket-drawer * { box-sizing: border-box; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .mgdb-basket-drawer { animation: mgdb-basket-in .18s ease-out; }
+  @keyframes mgdb-basket-in {
+    from { transform: translateX(24px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+}
+
+/* Head: the title with the total, and Close. */
+.mgdb-basket-head {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-2);
+}
+.mgdb-basket-head h2 {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-tight);
+}
+.mgdb-basket-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.mgdb-basket-close:hover { background: var(--mgdb-surface-alt); }
+.mgdb-basket-close:focus-visible { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+
+/* The one sentence under the title: where the basket lives and when it was
+   last touched. Muted, small. */
+.mgdb-basket-note {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Tabs: one per type with something in it. The current one takes the
+   section-tab treatment -- dark green, white text, a gold bar on the left. */
+.mgdb-basket-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: 0 0 var(--mgdb-space-4);
+  padding: 0;
+  list-style: none;
+}
+.mgdb-basket-tab {
+  display: inline-flex;
+  min-height: 36px;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: 0;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.mgdb-basket-tab:hover { background: var(--mgdb-green-soft); border-color: #bcd9c6; }
+.mgdb-basket-tab:focus-visible { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+.mgdb-basket-tab[aria-selected="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+.mgdb-basket-tab-count {
+  display: inline-flex;
+  min-width: 1.4rem;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+.mgdb-basket-tab[aria-selected="true"] .mgdb-basket-tab-count {
+  background: rgba(255, 255, 255, .2);
+  color: #fff;
+}
+
+/* The panel for the open tab: the actions this type can go to, a note when
+   one of them has to leave something behind, then the items. The list is
+   the part that scrolls; head, tabs and foot stay put. */
+.mgdb-basket-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+.mgdb-basket-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-2);
+}
+.mgdb-basket-actions-label {
+  width: 100%;
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.mgdb-basket-actions .mgdb-button { min-height: 36px; padding: var(--mgdb-space-1) var(--mgdb-space-3); font-size: var(--mgdb-text-sm); }
+/* An action that is planned but not wired in this mockup: dashed, so a
+   reviewer can tell it from one that works today. */
+.mgdb-basket-actions .mgdb-button[data-planned] { border-style: dashed; }
+.mgdb-basket-hint {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-basket-list {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+.mgdb-basket-item {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+.mgdb-basket-item-main { min-width: 0; flex: 1 1 auto; }
+.mgdb-basket-item-id {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
+.mgdb-basket-item-id:hover { text-decoration: underline; }
+.mgdb-basket-item-id.is-mono { font-family: var(--mgdb-font-mono); font-size: .95em; }
+.mgdb-basket-item-sub {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-basket-item-sub .mgdb-pill { margin-left: 4px; vertical-align: 1px; }
+.mgdb-basket-remove {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--mgdb-radius-sm);
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.mgdb-basket-remove:hover { border-color: var(--mgdb-line); background: var(--mgdb-surface-alt); color: var(--mgdb-red); }
+.mgdb-basket-remove:focus-visible { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+
+.mgdb-basket-empty {
+  margin: var(--mgdb-space-4) 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Per-tab foot: what this tab's items can be taken away as. */
+.mgdb-basket-tabfoot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding-top: var(--mgdb-space-3);
+}
+.mgdb-basket-tabfoot .mgdb-button { min-height: 36px; padding: var(--mgdb-space-1) var(--mgdb-space-3); font-size: var(--mgdb-text-sm); }
+
+/* Drawer foot: whole-basket actions and Close. */
+.mgdb-basket-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line);
+}
+.mgdb-basket-foot .mgdb-button { min-height: 36px; padding: var(--mgdb-space-1) var(--mgdb-space-3); font-size: var(--mgdb-text-sm); }
+.mgdb-basket-foot .mgdb-button-primary { margin-left: auto; }
+
+/* --------------------------------------------------------------------------
+   5. Toast
+   -------------------------------------------------------------------------- */
+
+.mgdb-basket-toasts {
+  position: fixed;
+  z-index: 99600;
+  left: 50%;
+  bottom: var(--mgdb-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.mgdb-basket-toast {
+  max-width: min(36rem, calc(100vw - 32px));
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  box-shadow: var(--mgdb-shadow-lg);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.mgdb-basket-toast.is-in { opacity: 1; transform: translateY(0); }
+
+/* --------------------------------------------------------------------------
+   6. Checkbox column and card checkbox
+   --------------------------------------------------------------------------
+   The first column of a table the basket reads: one box per row, one in the
+   head for all rows on screen. A ticked row takes the soft green so the
+   selection can be seen at a glance. Publications' cards carry the same box
+   in their action row.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-table .mgdb-basket-selcol {
+  width: 2.25rem;
+  padding-right: 0;
+  padding-left: var(--mgdb-space-3);
+  overflow-wrap: normal;
+}
+.mgdb-rec-table .mgdb-basket-selcol input {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--mgdb-green-dark);
+  cursor: pointer;
+}
+.mgdb-rec-table thead .mgdb-basket-selcol input { margin-top: 2px; }
+.mgdb-rec-table tbody tr:has(.mgdb-basket-selcol input:checked) > th,
+.mgdb-rec-table tbody tr:has(.mgdb-basket-selcol input:checked) > td { background: var(--mgdb-green-soft); }
+
+.mgdb-basket-cardsel {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, var(--mgdb-line));
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.mgdb-basket-cardsel input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--mgdb-green-dark);
+  cursor: pointer;
+}
+.mgdb-basket-cardsel:hover { border-color: var(--mgdb-green-dark); color: var(--mgdb-green-dark); }
+.mgdb-basket-cardsel:has(input:checked) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+.mgdb-basket-cardsel:has(input:focus-visible) { outline: 2px solid var(--mgdb-focus); outline-offset: 2px; }
+
+/* Add selected carries its count; disabled at none. */
+.mgdb-rec-toolbar .mgdb-basket-add-rows:disabled { opacity: .55; cursor: not-allowed; }
+.mgdb-rec-toolbar .mgdb-basket-add-rows:disabled:hover { background: var(--mgdb-surface); }
+.mgdb-basket-selcount {
+  display: inline-flex;
+  min-width: 1.4rem;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   7. Ways back to the basket from the middle of a long page
+   --------------------------------------------------------------------------
+   The toast that reports an add can be pressed to open the drawer on what
+   was just added. And once the header has scrolled away, a small pill at the
+   bottom right stands in for the header button -- only while the basket
+   holds something, and never while the drawer is open.
+   -------------------------------------------------------------------------- */
+
+.mgdb-basket-toast { pointer-events: auto; }
+.mgdb-basket-toast.is-action {
+  display: inline-flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  border: 0;
+  font-family: var(--mgdb-font);
+  text-align: left;
+  cursor: pointer;
+}
+.mgdb-basket-toast.is-action:hover { background: #0f3325; }
+.mgdb-basket-toast.is-action:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.mgdb-basket-toast-cta {
+  flex: 0 0 auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mgdb-basket-toast-cta::after { content: " \203A"; }
+
+.mgdb-basket-fab {
+  position: fixed;
+  z-index: 99400;
+  right: var(--mgdb-space-5);
+  bottom: var(--mgdb-space-5);
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 var(--mgdb-space-4) 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  box-shadow: var(--mgdb-shadow-lg);
+  cursor: pointer;
+}
+.mgdb-basket-fab[hidden] { display: none; }
+.mgdb-basket-fab:hover { background: #0f3325; }
+.mgdb-basket-fab:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 3px; }
+.mgdb-basket-fab .mgdb-basket-button-icon { color: var(--mgdb-gold); }
+.mgdb-basket-fab .mgdb-basket-count { background: #fff; color: var(--mgdb-green-dark); }
+@media (prefers-reduced-motion: no-preference) {
+  .mgdb-basket-fab { animation: mgdb-basket-in .18s ease-out; }
+}
+/* On a phone the toast spans the width, so it sits above the pill. */
+@media (max-width: 640px) {
+  .mgdb-basket-toasts { bottom: 88px; }
+  .mgdb-basket-fab-label { display: none; }
+  .mgdb-basket-fab { padding: 0 14px; }
+}

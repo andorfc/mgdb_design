@@ -583,13 +583,36 @@
 
     // Wiring event listeners
 
-    // Hero search input
+    /* Hero search input. Typing offers suggestions and does not filter: the
+       table changes when the reader submits, as every hub's search does.
+       Suggestions come from the rows already on the page, matched exactly as
+       the filter matches them -- every word inside the row's search text --
+       so each one is a row the filter will keep. */
     if (input) {
-      input.addEventListener('input', debounce(function () {
-        state.q = input.value.trim();
-        state.page = 1;
-        render();
-      }, 150));
+      input.addEventListener('input', function () {
+        if (clearBtn) { clearBtn.hidden = !input.value.trim(); }
+      });
+      if (window.MGDB && MGDB.typeahead) {
+        MGDB.typeahead(input, {
+          source: function (qn) {
+            var tokens = qn.split(/\s+/).filter(Boolean);
+            var hits = [];
+            allRows.forEach(function (item) {
+              if (!tokens.every(function (tok) { return item.search.indexOf(tok) !== -1; })) { return; }
+              var name = item.assembly.toLowerCase();
+              var rank = name === qn ? 0 : name.indexOf(qn) === 0 ? 1 : name.indexOf(qn) !== -1 ? 2 : 3;
+              hits.push({ rank: rank, index: item.index, item: {
+                v: item.assembly,
+                id: item.assembly,
+                name: item.cultivar && item.assembly.indexOf(item.cultivar) === -1 ? item.cultivar : '',
+                meta: [item.species, item.accession, item.quality].filter(Boolean).join(' \u00b7 ')
+              } });
+            });
+            hits.sort(function (a, b) { return a.rank - b.rank || a.index - b.index; });
+            return hits.map(function (h) { return h.item; });
+          }
+        });
+      }
     }
 
     // Clear button

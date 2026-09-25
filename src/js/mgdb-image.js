@@ -189,7 +189,14 @@
   /* ── Search Fetcher ─────────────────────────────────────────────────────── */
 
   function executeSearch(scrollToResults) {
-    if (state.loading) return;
+    /* A search asked for while one is running runs after it rather than
+       being dropped, and the older answer is not drawn: the results are
+       always the answer to what was asked for last. */
+    if (state.loading) {
+      state.pending = true;
+      state.pendingScroll = state.pendingScroll || !!scrollToResults;
+      return;
+    }
     state.loading = true;
 
     var status = byId('image-results-status');
@@ -220,6 +227,7 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         state.loading = false;
+        if (runPending()) { return; }
         state.currentData = data;
 
         if (!data || !data.ok) {
@@ -240,8 +248,18 @@
       })
       .catch(function (err) {
         state.loading = false;
+        if (runPending()) { return; }
         if (status) status.textContent = 'An error occurred while fetching images.';
       });
+  }
+
+  function runPending() {
+    if (!state.pending) { return false; }
+    var scroll = state.pendingScroll;
+    state.pending = false;
+    state.pendingScroll = false;
+    executeSearch(scroll);
+    return true;
   }
 
   /* ── Render Gallery Cards & Table ────────────────────────────────────────── */

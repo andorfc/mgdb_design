@@ -1,95 +1,653 @@
 /* file: css/mgdb-foldseek.css
  *
- * /foldseek. The page is a wrapper around an embedded application, so almost
- * everything here is about giving that frame room without letting it dictate
- * the page.
+ * /foldseek, on the Data Hub shell. The shell (mgdb-hub.css, loaded first)
+ * owns the ground, the white section cards, their top edges, the table zebra,
+ * the hub-field form row and the Related resources panel; this sheet describes
+ * only this page's own furniture: the results blocks, the two dark 3D viewers,
+ * the coverage figure, the match table's extra columns and the open match.
  *
- * The page it replaces had no stylesheet of its own. It sized the frame at a
- * fixed 1050px and then widened the whole legacy shell to 1700px in JavaScript
- * to fit it, which is why it needed to rewrite #wrapper, #logo, #content,
- * #whitecurve and #footer inline on every load. The modern shell is fluid, so
- * none of that is needed: the frame takes the width it is given.
+ * The viewers use the dark palette the Protein Structure Hub, FATCAT and
+ * AlphaFill viewers share, declared on .fs-viewer so it cannot leak.
  */
 
-/* ── The embedded application ────────────────────────────────────────────── */
+/* ── Search ──────────────────────────────────────────────────────────────── */
 
-/* Tall enough for the tool's own results table and 3D viewer without the reader
-   scrolling the frame inside the page, but bounded so it does not run past a
-   short laptop screen. The floor matters more than the ceiling: below about
-   700px the tool's own layout starts scrolling internally, which is the thing
-   a fixed 1050px was reaching for and overshooting. */
-.mgdb-foldseek-page .fs-frame-wrap {
-  margin-top: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line-soft);
-  border-radius: var(--mgdb-radius-lg);
-  background: var(--hub-surface);
-  /* The frame's own corners are square; without this the page's rounded
-     corners show a sliver of the frame's white outside the border. */
-  overflow: hidden;
+.mgdb-foldseek-page .fs-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: end;
 }
 
-.mgdb-foldseek-page .fs-frame {
-  display: block;
-  width: 100%;
-  height: clamp(720px, 82vh, 1200px);
-  border: 0;
+.mgdb-foldseek-page .fs-search-form > .fs-hint,
+.mgdb-foldseek-page .fs-search-form > .fs-example-row { grid-column: 1 / -1; }
+
+.mgdb-foldseek-page .fs-hint { margin: 0; }
+
+.mgdb-foldseek-page .fs-example-row,
+.mgdb-foldseek-page .fs-suggest-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: var(--mgdb-space-1) 0 0;
 }
 
-/* A phone cannot usefully show the tool's three-pane layout at any height, and
-   a tall frame there just buries the rest of the page under a region the
-   reader has to scroll past. It keeps a usable height and the full-screen
-   button above it becomes the real way in. */
+.mgdb-foldseek-page .fs-example-row > span,
+.mgdb-foldseek-page .fs-suggest-row > span {
+  margin-right: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-foldseek-page .fs-status:not(:empty) { margin-top: var(--mgdb-space-4); }
+
 @media (max-width: 640px) {
-  .mgdb-foldseek-page .fs-frame { height: clamp(480px, 70vh, 720px); }
+  .mgdb-foldseek-page .fs-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-foldseek-page .fs-search-form .mgdb-hub-field-action .mgdb-button { width: 100%; justify-content: center; }
 }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
 
-/* 120px, matching the protein structure hub. The hero body runs to 223px, so
-   the emblem panel is that tall whatever the icon does and everything up to
-   120 is free. Sized by width with height: auto now that the PNG is cropped
-   to the model and no longer square. */
+/* 120px, matching the protein structure hub; sized by width now that the PNG
+   is cropped to the model and no longer square. */
 .mgdb-foldseek-page .fs-hero-icon {
   width: min(100%, 120px);
   height: auto;
   object-fit: contain;
 }
 
-/* ── Prose ───────────────────────────────────────────────────────────────── */
+/* ── Results blocks ──────────────────────────────────────────────────────── */
 
-/* Full page width, on Carson's call (2026-09-06). The default here would be a
-   measure near 70 characters; this section is four short paragraphs rather
-   than a long read, and holding them to a narrow column left the panel looking
-   half empty beside the full-width frame above it. */
-
-.mgdb-foldseek-page .fs-prose p {
-  margin: 0 0 var(--mgdb-space-3);
-  color: var(--mgdb-text);
-  line-height: 1.65;
+.mgdb-foldseek-page .fs-block {
+  min-width: 0;
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5) var(--mgdb-space-5);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
 }
 
-.mgdb-foldseek-page .fs-prose p:last-child {
-  margin-bottom: 0;
+.mgdb-foldseek-page .fs-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-3);
 }
 
-/* ── Section heading with an action ──────────────────────────────────────── */
+.mgdb-foldseek-page .fs-block-head h3 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+}
 
-/* The Search heading carries the full-screen button on its right. The shared
-   heading is a two-column grid already; this keeps the button from stretching
-   to the row height and sits it against the first line of the heading. */
-.mgdb-foldseek-page #fs-search .mgdb-section-heading {
+.mgdb-foldseek-page .fs-caption {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-foldseek-page .fs-mono,
+.mgdb-foldseek-page .fs-gene { font-family: var(--mgdb-font-mono); }
+
+/* The protein */
+.mgdb-foldseek-page .fs-protein {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4) var(--mgdb-space-6);
   align-items: start;
-  gap: var(--mgdb-space-4);
 }
 
-.mgdb-foldseek-page #fs-search .mgdb-section-heading > .mgdb-button {
+.mgdb-foldseek-page .fs-protein-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  margin: 0;
+  font-size: var(--mgdb-text-2xl);
+}
+
+.mgdb-foldseek-page .fs-protein-symbol { color: var(--mgdb-burgundy); font-style: italic; }
+.mgdb-foldseek-page .fs-protein-name { color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-lg); font-weight: 600; }
+
+.mgdb-foldseek-page .fs-protein-desc {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-foldseek-page .fs-facts { margin-top: var(--mgdb-space-3); }
+
+.mgdb-foldseek-page .fs-protein-counts {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-foldseek-page .fs-protein-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  align-items: stretch;
+  min-width: 12rem;
+}
+
+.mgdb-foldseek-page .fs-protein-actions .mgdb-button { justify-content: center; }
+
+@media (max-width: 767px) {
+  .mgdb-foldseek-page .fs-protein { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-foldseek-page .fs-protein-actions { flex-direction: row; flex-wrap: wrap; min-width: 0; }
+}
+
+/* Structure and genome context, side by side */
+.mgdb-foldseek-page .fs-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-foldseek-page .fs-overview > .fs-block { margin-top: 0; }
+.mgdb-foldseek-page .fs-overview-single { grid-template-columns: minmax(0, 1fr); }
+
+@media (max-width: 960px) {
+  .mgdb-foldseek-page .fs-overview { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-foldseek-page .fs-jbrowse {
+  display: block;
+  width: 100%;
+  height: 360px;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+/* Two-state toggles for the structure coloring */
+.mgdb-foldseek-page .fs-segmented {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-foldseek-page .fs-segmented button {
+  min-height: 34px;
+  padding: 0 var(--mgdb-space-3);
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-foldseek-page .fs-segmented button[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-foldseek-page .fs-segmented button:disabled { color: var(--mgdb-muted); cursor: not-allowed; opacity: .6; }
+
+/* ── The two viewers ─────────────────────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-viewer {
+  --fs-bg: #0d1117;
+  --fs-panel: #161b22;
+  --fs-line: #2d3748;
+  --fs-text: #e6edf3;
+  --fs-text-dim: #9aa7b8;
+  --fs-accent: #4dd0e1;
+
+  overflow: hidden;
+  border: 1px solid var(--fs-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--fs-bg);
+  color: var(--fs-text);
+}
+
+.mgdb-foldseek-page .fs-viewer-stage { position: relative; }
+
+/* 3Dmol appends an absolutely positioned canvas, so the stage needs a real
+   height and must be the containing block. */
+.mgdb-foldseek-page .fs-stage {
+  position: relative;
+  width: 100%;
+  height: 360px;
+}
+
+.mgdb-foldseek-page .fs-sup .fs-stage { height: 440px; }
+
+.mgdb-foldseek-page .fs-stage canvas { display: block; }
+
+@media (max-width: 640px) {
+  .mgdb-foldseek-page .fs-stage,
+  .mgdb-foldseek-page .fs-sup .fs-stage { height: 320px; }
+}
+
+.mgdb-foldseek-page .fs-viewer-status {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 2;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .72);
+  color: #d7e2ee;
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  pointer-events: none;
+}
+
+.mgdb-foldseek-page .fs-viewer-status[hidden] { display: none; }
+
+.mgdb-foldseek-page .fs-viewer-bar,
+.mgdb-foldseek-page .fs-viewer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  background: var(--fs-panel);
+}
+
+.mgdb-foldseek-page .fs-viewer-bar { justify-content: flex-start; border-bottom: 1px solid var(--fs-line); }
+.mgdb-foldseek-page .fs-viewer-foot { border-top: 1px solid var(--fs-line); }
+
+.mgdb-foldseek-page .fs-viewer-bar label {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--fs-text-dim);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-foldseek-page .fs-viewer-bar select {
+  min-height: 34px;
+  padding: 4px 8px;
+  border: 1px solid var(--fs-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--fs-bg);
+  color: var(--fs-text);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-foldseek-page .fs-check input { width: 16px; height: 16px; accent-color: var(--fs-accent); }
+
+.mgdb-foldseek-page .fs-viewer-actions { display: flex; gap: var(--mgdb-space-2); }
+
+.mgdb-foldseek-page .fs-viewer-actions button {
+  min-height: 34px;
+  padding: 4px 11px;
+  border: 1px solid var(--fs-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--fs-bg);
+  color: var(--fs-text);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.mgdb-foldseek-page .fs-viewer-actions button:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+
+.mgdb-foldseek-page .fs-viewer-actions button[aria-pressed="true"] {
+  border-color: var(--fs-accent);
+  background: var(--fs-accent);
+  color: #06232a;
+  font-weight: 700;
+}
+
+.mgdb-foldseek-page .fs-viewer button:focus-visible,
+.mgdb-foldseek-page .fs-viewer select:focus-visible,
+.mgdb-foldseek-page .fs-viewer input:focus-visible { outline: 3px solid #7cc4ff; outline-offset: 1px; }
+
+/* Legends, on the dark viewers and on the page */
+.mgdb-foldseek-page .fs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--mgdb-space-3);
+  align-items: center;
+  margin: 0;
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-foldseek-page .fs-viewer .fs-legend { color: var(--fs-text-dim); }
+
+.mgdb-foldseek-page .fs-legend span { display: inline-flex; gap: 5px; align-items: center; }
+
+.mgdb-foldseek-page .fs-legend i {
+  width: 12px;
+  height: 12px;
   flex: 0 0 auto;
-  white-space: nowrap;
+  border: 1px solid rgba(0, 0, 0, .35);
+  border-radius: 2px;
+}
+
+.mgdb-foldseek-page .fs-legend .fs-legend-title { font-weight: 700; }
+
+/* ── Closest match in each proteome ──────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-proteome b,
+.mgdb-foldseek-page .fs-proteome i { display: block; }
+.mgdb-foldseek-page .fs-proteome i { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); font-weight: 400; }
+
+.mgdb-foldseek-page .fs-best a:first-child { font-weight: 700; }
+
+/* Two lines at most: the full name is one click away in the table below, and
+   a three-line UniProt name made the human and yeast rows twice the height
+   of the rest. max-height rather than line-clamp, which Chrome resolves
+   through a different box model and clamps at a different line. */
+.mgdb-foldseek-page .fs-best .fs-annot {
+  display: block;
+  overflow: hidden;
+  max-width: 34rem;
+  max-height: calc(2 * 1.4em);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.4;
+}
+
+.mgdb-foldseek-page .fs-species-table td.mgdb-numeric,
+.mgdb-foldseek-page .fs-hits-table td.mgdb-numeric { white-space: nowrap; }
+
+.mgdb-foldseek-page .fs-gene { font-size: var(--mgdb-text-xs); }
+
+.mgdb-foldseek-page .fs-row-actions { white-space: nowrap; }
+.mgdb-foldseek-page .fs-row-actions .mgdb-button + .mgdb-button { margin-left: var(--mgdb-space-2); }
+
+.mgdb-foldseek-page .fs-species-table tr.is-empty th b { color: var(--mgdb-muted); }
+
+/* A span on the query, drawn to scale */
+.mgdb-foldseek-page .fs-col-cov { min-width: 9rem; }
+
+.mgdb-foldseek-page .fs-covbar {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 7rem;
+  height: 8px;
+  margin: 4px 0 3px;
+  border-radius: 4px;
+  background: var(--hub-line);
+}
+
+.mgdb-foldseek-page .fs-covbar > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background: var(--mgdb-green);
+}
+
+.mgdb-foldseek-page .fs-range {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Where the matches align ─────────────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-coverage-figure { width: 100%; min-height: 40px; }
+.mgdb-foldseek-page .fs-coverage-svg { display: block; max-width: none; font-family: var(--mgdb-font); }
+
+.mgdb-foldseek-page .fs-cov-axis,
+.mgdb-foldseek-page .fs-cov-tick { stroke: #9aa3ad; stroke-width: 1; }
+.mgdb-foldseek-page .fs-cov-ticklabel { fill: var(--mgdb-muted); font-size: 11px; }
+.mgdb-foldseek-page .fs-cov-label { fill: var(--mgdb-ink); font-size: 13px; font-weight: 600; }
+.mgdb-foldseek-page .fs-cov-count { fill: var(--mgdb-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+/* White with a gray edge: "no match here" has to read as absence, not as the
+   palest band of the identity ramp. */
+.mgdb-foldseek-page .fs-cov-track { fill: #ffffff; stroke: #c9d2de; stroke-width: 1; }
+.mgdb-foldseek-page .fs-cov-domain { fill: #1b1f24; font-size: 11px; font-weight: 700; pointer-events: none; }
+.mgdb-foldseek-page .fs-cov-hit { fill: transparent; }
+
+.mgdb-foldseek-page .fs-cov-row[data-fs-species] { cursor: pointer; }
+.mgdb-foldseek-page .fs-cov-row[data-fs-species]:hover .fs-cov-hit,
+.mgdb-foldseek-page .fs-cov-row[data-fs-species]:focus .fs-cov-hit { fill: rgba(40, 93, 70, .07); }
+.mgdb-foldseek-page .fs-cov-row:focus { outline: none; }
+.mgdb-foldseek-page .fs-cov-row:focus-visible .fs-cov-hit { stroke: var(--mgdb-focus); stroke-width: 2; }
+.mgdb-foldseek-page .fs-cov-row.is-empty .fs-cov-label { fill: var(--mgdb-muted); font-weight: 400; }
+
+.mgdb-foldseek-page .fs-coverage-legend { margin-top: var(--mgdb-space-3); color: var(--mgdb-ink-soft); }
+.mgdb-foldseek-page .fs-coverage-legend .fs-swatch-empty { background: #ffffff; border-color: #c9d2de; }
+
+.mgdb-foldseek-page .fs-domain-scroll { margin-top: var(--mgdb-space-4); }
+
+.mgdb-foldseek-page .fs-nomatch-text {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-foldseek-page .fs-domain-key {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+/* ── All matches ─────────────────────────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-hits .mgdb-results-header { margin-top: 0; }
+
+.mgdb-foldseek-page .fs-inline-field {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-foldseek-page .fs-inline-field input,
+.mgdb-foldseek-page .fs-inline-field select {
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-2);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.mgdb-foldseek-page .fs-inline-field input { width: 16rem; max-width: 100%; }
+
+.mgdb-foldseek-page .fs-chips { margin: 0 0 var(--mgdb-space-3); }
+.mgdb-foldseek-page .fs-chip-count { font-variant-numeric: tabular-nums; opacity: .8; }
+
+/* Nine columns, the upstream table's nine, have to fit a 1280px page without
+   the Superpose button scrolling out of view: tighter cell padding, the
+   annotation allowed to wrap, and the match's length on a line of its own. */
+.mgdb-foldseek-page .fs-hits-table th,
+.mgdb-foldseek-page .fs-hits-table td { padding-left: var(--mgdb-space-2); padding-right: var(--mgdb-space-2); }
+.mgdb-foldseek-page .fs-hits-table th[scope="row"] { font-weight: 400; }
+.mgdb-foldseek-page .fs-col-match a:first-child { font-weight: 700; }
+.mgdb-foldseek-page .fs-col-match .fs-gene { display: block; margin-top: 2px; }
+.mgdb-foldseek-page .fs-col-annotation { min-width: 11rem; max-width: 20rem; font-size: var(--mgdb-text-sm); }
+.mgdb-foldseek-page .fs-hits-table .fs-col-cov { min-width: 7.5rem; }
+.mgdb-foldseek-page .fs-col-e,
+.mgdb-foldseek-page .fs-col-trange { white-space: nowrap; }
+.mgdb-foldseek-page .fs-of { display: block; color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+.mgdb-foldseek-page .fs-col-action { text-align: right; white-space: nowrap; }
+
+.mgdb-foldseek-page .fs-hits-table tr.is-open > * { background: var(--mgdb-green-soft); }
+
+.mgdb-foldseek-page .fs-filter-empty { margin-top: var(--mgdb-space-4); }
+
+/* ── The open match ──────────────────────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-hits-table tr.fs-detail-row > td {
+  padding: 0;
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-foldseek-page .fs-hits-table tr.fs-detail-row:hover { background: transparent; }
+
+/* The panel lives in a colspan row of a table that scrolls sideways on a
+   narrow screen, so left alone it is as wide as the table -- 1,037px inside
+   a 257px scroll area on a phone, with the viewer off to one side. The
+   script sets its width to the scroll area's visible width and sticky pins
+   it there, so it stays in view however the table is scrolled. */
+.mgdb-foldseek-page .fs-detail {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+  max-width: none;
+  padding: var(--mgdb-space-4) var(--mgdb-space-4) var(--mgdb-space-5);
+  border-top: 2px solid var(--mgdb-green);
+  border-bottom: 2px solid var(--mgdb-green);
+  scroll-margin-top: 8.5rem;
+  white-space: normal;
 }
 
 @media (max-width: 640px) {
-  .mgdb-foldseek-page #fs-search .mgdb-section-heading > .mgdb-button {
-    width: 100%;
-    justify-content: center;
-  }
+  .mgdb-foldseek-page .fs-block { padding: var(--mgdb-space-3); }
+  .mgdb-foldseek-page .fs-detail { padding: var(--mgdb-space-3) var(--mgdb-space-2) var(--mgdb-space-4); }
 }
+
+.mgdb-foldseek-page .fs-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mgdb-foldseek-page .fs-detail-head h4 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-foldseek-page .fs-detail-head h4:focus { outline: none; }
+.mgdb-foldseek-page .fs-detail-head h4 span { color: var(--mgdb-muted); font-weight: 400; }
+
+.mgdb-foldseek-page .fs-detail-annot {
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-foldseek-page .fs-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  gap: var(--mgdb-space-4);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mgdb-foldseek-page .fs-detail-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-foldseek-page .fs-metrics {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .mgdb-foldseek-page .fs-metrics { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+}
+
+.mgdb-foldseek-page .fs-metrics > div {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+}
+
+.mgdb-foldseek-page .fs-metrics dt {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.mgdb-foldseek-page .fs-metrics dd {
+  margin: 2px 0 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-foldseek-page .fs-metrics p {
+  margin: 2px 0 0;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-foldseek-page .fs-pending { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-weight: 600; }
+
+.mgdb-foldseek-page .fs-aln-block { margin-top: var(--mgdb-space-4); }
+
+.mgdb-foldseek-page .fs-aln-block h5 {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.mgdb-foldseek-page .fs-aln {
+  overflow-x: auto;
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono);
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+.mgdb-foldseek-page .fs-aln-label { color: var(--mgdb-green-dark); font-weight: 700; }
+.mgdb-foldseek-page .fs-aln-mid { color: var(--mgdb-muted); }
+
+/* Aligned residues of the match, by distance to their partner once
+   superposed: the viewer's bins, as light tints so the letters stay legible. */
+.mgdb-foldseek-page .fs-d0 { background: #d6e8ff; }
+.mgdb-foldseek-page .fs-d1 { background: #dcf6ff; }
+.mgdb-foldseek-page .fs-d2 { background: #fff3bf; }
+.mgdb-foldseek-page .fs-d3 { background: #ffe0c2; }
+.mgdb-foldseek-page .fs-d4 { background: #ffd0d0; }
+
+.mgdb-foldseek-page .fs-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: var(--mgdb-space-4) 0 0;
+}
+
+/* ── Reading and sources cards ───────────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-reading-grid,
+.mgdb-foldseek-page .fs-source-grid { grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }

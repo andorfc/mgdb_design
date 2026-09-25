@@ -11,8 +11,8 @@
                   derived from data already in hand
 
    The viewer is ported from the Boltz-2 complex viewer: the pLDDT palettes and
-   binning, the colour-function approach to 3Dmol styling, the per-residue
-   confidence strip, the surface handling and the legend/colourbar. What is not
+   binning, the color-function approach to 3Dmol styling, the per-residue
+   confidence strip, the surface handling and the legend/colorbar. What is not
    carried over is everything that made sense for a single inlined dataset and
    not for a database page — the scripted camera tour, the movie recorder, the
    presentation mode, the draggable pane splitters, and the ligand affinity
@@ -81,7 +81,7 @@
   /* ------------------------------------------------------------------------
      Palettes — carried over from the Boltz-2 viewer
 
-     The pLDDT bins and their colours are AlphaFold's own. Keeping them exactly
+     The pLDDT bins and their colors are AlphaFold's own. Keeping them exactly
      means a reader who knows the AlphaFold database reads this viewer without
      relearning anything, and a screenshot from either sits beside the other.
      ------------------------------------------------------------------------ */
@@ -616,7 +616,7 @@
 
     /* Any non-protein atoms the file carries — ions, cofactors, waters kept by
        the depositor. Always drawn, always by element: they are not what the
-       colour scheme is describing. */
+       color scheme is describing. */
     state.viewer.addStyle({ hetflag: true }, {
       stick: { radius: 0.17, colorscheme: 'default' },
       sphere: { scale: 0.26, colorscheme: 'default' }
@@ -920,9 +920,9 @@
       +     '<span class="ps-rail-label">Thickness</span>'
       +     '<input class="ps-rail-range" type="range" data-ps-thickness min="20" max="180" value="100" aria-label="Representation thickness" />'
       +   '</div>'
-      +   '<div class="ps-rail-group"><h4>Colour</h4>'
+      +   '<div class="ps-rail-group"><h4>Color</h4>'
       +     '<span class="ps-rail-label">Scheme</span>'
-      +     '<select class="ps-rail-select" data-ps-color aria-label="Colour scheme">'
+      +     '<select class="ps-rail-select" data-ps-color aria-label="Color scheme">'
       +       '<option value="plddt5">pLDDT — AlphaFold bins</option>'
       +       '<option value="plddtc">pLDDT — continuous</option>'
       +       '<option value="chain">Chain</option>'
@@ -1119,7 +1119,7 @@
         }
         /* Shaped like a record so the same viewer renders it. ESMFold files
            carry pLDDT in the B-factor column exactly as AlphaFold's do, so the
-           confidence strip and colouring work unchanged. */
+           confidence strip and coloring work unchanged. */
         var record = {
           id: data.protein,
           pdb: data.pdb,
@@ -1301,12 +1301,12 @@
      The gene record shows the same protein and used to send readers here for
      the full view. Sending them away to look at the thing they were already
      looking at is a poor trade, so the whole viewer -- the representation and
-     colour rail, the surface, the per-residue pLDDT strip -- is offered as a
+     color rail, the surface, the per-residue pLDDT strip -- is offered as a
      function any page can mount.
 
      record needs { id, pdb } and uses { partners, tool, cif, entry } when they
      are there. type is 'monomer' | 'homodimer' | 'heterodimer' | 'esmfold'.
-     opts.background sets the canvas colour.
+     opts.background sets the canvas color.
 
      Returns false when 3Dmol is not on the page; the caller is responsible for
      loading it, because it is half a megabyte and most readers never open a

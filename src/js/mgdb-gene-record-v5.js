@@ -997,9 +997,9 @@
     if (s.better === 'high') { return v >= r.p50 ? 'good' : (v < r.p25 ? 'poor' : 'mid'); }
     return v <= r.p50 ? 'good' : (v > r.p75 ? 'poor' : 'mid');
   }
-  /* canonical is passed only when the scores span more than one isoform:
-     then each row names its transcript, and the canonical one is marked. */
-  function scoreRangeHtml(rows, canonical) {
+  /* One transcript's scores: the block shows one at a time (scoreGroups), so
+     the transcript is named once, above the cards, rather than on each. */
+  function scoreRangeHtml(rows) {
     var withRange = rows.filter(function (s) { return s.range && s.range.n; });
     var n = withRange.length ? withRange[0].range.n : 0;
     return '<div class="gene-score-ranges">' + rows.map(function (s) {
@@ -1023,9 +1023,6 @@
       }
       return '<div class="gene-score-row"><div class="gene-score-head"><span class="gene-score-label">' + R.escape(s.label || s.metric) + '</span>' +
         '<span class="gene-score-analysis">' + R.escape(s.analysis || '') + (s.version ? ' ' + R.escape(s.version) : '') + '</span>' +
-        (canonical !== undefined && s.feature
-          ? '<span class="gene-score-feature">' + R.escape(s.feature) + (s.feature === canonical ? ' <span class="mgdb-pill mgdb-pill-ok">Canonical</span>' : '') + '</span>'
-          : '') +
         '<span class="gene-score-value is-' + tone + '">' + fmtScore(s.value) + '</span></div>' + track +
         '<p class="gene-score-note">' + R.escape(s.interpretation || '') + (standing ? ' <span class="gene-score-standing">' + R.escape(standing) + '</span>' : '') + '</p></div>';
     }).join('') + '</div>' +
@@ -1036,18 +1033,12 @@
   function scoreColumns() {
     return [
       { key: 'label', label: 'Score', tile: true, get: function (s) { return s.label || s.metric; } },
-      /* Which isoform the score is of. The table now carries every transcript,
-         not just the canonical one, and a column of AED values means nothing
-         without it. The canonical row is marked, because that is the one the
-         rest of the page describes. */
-      { key: 'feature', label: 'Transcript',
-        get: function (s) { return s.feature || ''; },
-        html: function (s) {
-          if (!s.feature) { return '<span class="mgdb-muted">&mdash;</span>'; }
-          var canonical = canonicalTranscript();
-          return R.escape(s.feature) +
-            (s.feature === canonical ? ' <span class="mgdb-pill mgdb-pill-ok">Canonical</span>' : '');
-        } },
+      /* Which isoform the score is of -- in the TSV only. On screen the block
+         shows one transcript at a time and names it above the rows, so the
+         column would repeat one value down every row; the download carries
+         every transcript, and there a column of AED values means nothing
+         without it. */
+      { key: 'feature', label: 'Transcript', tsvOnly: true, get: function (s) { return s.feature || ''; } },
       { key: 'analysis', label: 'Analysis', get: function (s) { return (s.analysis || '') + (s.version ? ' ' + s.version : ''); } },
       { key: 'value', label: 'Value', sort: 'number', numeric: true, get: function (s) { return fmtScore(s.value); } },
       { key: 'range', label: 'Genome-wide', sort: false,
@@ -1055,34 +1046,51 @@
       { key: 'interpretation', label: 'What it means', get: function (s) { var st = scoreStanding(s); return (s.interpretation || '') + (st ? ' (' + st + ')' : ''); } }
     ];
   }
+  /* The scores come one transcript at a time, in place of pages of ten: every
+     score of the open transcript in every view, the transcripts in name order
+     (T001, T002, ...), opening on the canonical one -- which is not always
+     T001: sh1's is T004, adh1's T002. Buttons carry the short name when every
+     transcript shares the gene's prefix; the status line gives the full one. */
+  function scoreGroups(scores) {
+    var canonical = canonicalTranscript();
+    var ids = [];
+    scores.forEach(function (s) { if (s.feature && ids.indexOf(s.feature) === -1) { ids.push(s.feature); } });
+    ids.sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); });
+    var cut = ids.length ? ids[0].lastIndexOf('_') + 1 : 0;
+    var prefix = cut > 0 ? ids[0].slice(0, cut) : '';
+    var short = prefix !== '' && ids.every(function (id) { return id.indexOf(prefix) === 0 && id.length > cut; });
+    return {
+      label: 'Transcript',
+      noun: ['score', 'scores'],
+      key: function (s) { return s.feature; },
+      current: canonical,
+      sets: ids.map(function (id) {
+        return { id: id, label: short ? id.slice(cut) : id, name: id,
+                 note: id === canonical ? 'the canonical transcript' : '', marked: id === canonical };
+      })
+    };
+  }
   function renderProvenance(structure) {
     var scores = (structure && structure.scores) || [];
-    /* Range first, as it was before the block carried every isoform. The
-       canonical transcript's scores lead, so the first page is the scorecard
-       of the model the rest of the page describes; the payload orders by
-       transcript name, and T001 is not always the canonical one. The sort is
-       stable, so each transcript keeps its metric order. */
-    var canonical = canonicalTranscript();
-    var ordered = scores.map(function (s, i) { return { s: s, i: i }; }).sort(function (a, b) {
-      var ca = a.s.feature === canonical ? 0 : 1, cb = b.s.feature === canonical ? 0 : 1;
-      return ca - cb || a.i - b.i;
-    }).map(function (x) { return x.s; });
-    /* With more than one isoform a Range row has to say whose score it is. */
-    var features = {};
-    scores.forEach(function (s) { if (s.feature) { features[s.feature] = 1; } });
-    var multi = Object.keys(features).length > 1;
     return R.collection(body('gene-record-provenance'), {
-      title: 'Gene model scores', items: ordered, filename: 'gene-model-scores.tsv', view: 'range',
+      title: 'Gene model scores', items: scores, filename: 'gene-model-scores.tsv', view: 'range',
+      groups: scoreGroups(scores),
       views: [{ key: 'range', label: 'Range',
         icon: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><circle cx="10" cy="8" r="3.5" fill="currentColor"/></svg>',
-        render: function (rows) { return scoreRangeHtml(rows, multi ? canonical : undefined); } }],
+        render: scoreRangeHtml }],
       columns: scoreColumns()
     });
   }
 
   function canonicalTranscript() {
     var st = payload && payload.data && payload.data.sections && payload.data.sections.structure;
-    return (st && st.gene_model && st.gene_model.canonical_transcript) || null;
+    if (!st) { return null; }
+    if (st.gene_model && st.gene_model.canonical_transcript) { return st.gene_model.canonical_transcript; }
+    /* No gene-models release behind this annotation (B73 v4 and older), so no
+       gene_model block -- but the transcript list still flags the canonical
+       one, and without it the scores would open on T001 by default. */
+    var flagged = (st.transcripts || []).filter(function (t) { return t.canonical; })[0];
+    return flagged ? flagged.name : null;
   }
 
   /* Homeologs and tandem arrays: MGDB.geneParalogs draws it. A gene with a
@@ -1323,7 +1331,10 @@
       ]
     }) || rendered;
 
-    rendered = R.collection(out, { title: 'Gene model scores', items: structure.scores, filename: 'gene-model-scores.tsv', columns: scoreColumns() }) || rendered;
+    rendered = R.collection(out, {
+      title: 'Gene model scores', items: structure.scores, filename: 'gene-model-scores.tsv',
+      groups: scoreGroups(structure.scores || []), columns: scoreColumns()
+    }) || rendered;
 
     /* Gramene's Ensembl views, grouped the way the production record page
        groups them under Annotations & Scores: the gene, its orthologues and

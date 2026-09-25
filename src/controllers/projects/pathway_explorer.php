@@ -466,10 +466,6 @@ foreach ($downloads as $download) {
   $bauplan->includeCss('/css/mgdb-hub.css');
   $bauplan->includeCss('/css/mgdb-projects.css');
   $bauplan->includeCss('/css/mgdb-project-pathway-explorer.css');
-  /* Plotly must load before the page script; without it MGDB.chart() writes its
-     fallback text and nothing else goes visibly wrong. The CDN build is what 33
-     of the other modern controllers use. */
-  $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-project-pathway-explorer.js');

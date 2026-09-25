@@ -10,6 +10,26 @@ include_once('libbau/StringModifier.php');
 // @author: Bremen Braun
 //
 class Bauplan {
+	// Where bundle() writes, under the document root. temp/ is the one tree
+	// httpd may write to on the dev instance (its SELinux label is
+	// httpd_sys_rw_content_t by a standing fcontext rule, and Apache is in its
+	// group), so a subdirectory needs no administrator.
+	const BUNDLE_DIR = '/temp/bundles';
+
+	// The files every modern page opens with, bundled apart from the page's own.
+	const BUNDLE_SHELL = array('/css/static.css', '/css/mgdb-modern.css', '/css/mgdb-megamenu.css',
+	                           '/js/mgdb-modern.js', '/js/mgdb-chrome.js');
+
+	// Part of every bundle's name. Bump it to rebuild every bundle when the way
+	// they are put together changes.
+	const BUNDLE_FORMAT = 1;
+
+	// How long a superseded bundle is kept, in seconds, for pages written just
+	// before a deploy that have not fetched it yet.
+	const BUNDLE_KEEP = 3600;
+
+	const BUNDLE_HTACCESS = "# Written by lib/Bauplan.php. A bundle's name changes whenever anything in\n# it does, so a browser never needs to ask about one again.\n<IfModule mod_headers.c>\n  Header set Cache-Control \"public, max-age=31536000, immutable\"\n</IfModule>\n";
+
 	private $resourceManifest;
 	private $resourceIncrement;
 	private $preHTML;
@@ -20,6 +40,7 @@ class Bauplan {
 	private $modern;
 	private $bodyClass;
 	private $lang;
+	private $bundle;
 
 	public function __construct($title="") {
 		$this->resourceManifest  = new ResourceManifest();
@@ -30,6 +51,7 @@ class Bauplan {
 		$this->modern    = false;
 		$this->bodyClass = "";
 		$this->lang      = "en";
+		$this->bundle    = null;
 
 		$rootTemplate = new Template(null); # prevent naming conflicts by not giving this template a name
 		$rootTemplate->_root($this); # root the template tree here
@@ -112,6 +134,42 @@ class Bauplan {
 		}
 
 		return $this->lang;
+	}
+
+	//
+	// Serve the page's own stylesheets as one file and its scripts as one file.
+	//
+	// The gene record shipped fourteen stylesheets and eleven scripts from this
+	// site, every one render-blocking in <head> and each its own request -- and,
+	// since the edge caches them for thirty minutes, its own revalidation on
+	// every visit after that. bundle() joins them as the page is written:
+	// consecutive local stylesheets become one file and consecutive local
+	// scripts another, in the order the controller and templates asked for them.
+	//
+	// The files every modern page opens with (BUNDLE_SHELL) go in a bundle of
+	// their own, so a reader moving between bundled pages downloads them once
+	// rather than once per page. Anything that is not a plain local file -- a
+	// CDN script, an inline <style>, a module -- keeps its place and ends the
+	// run it interrupts, so no file is moved past it.
+	//
+	// A bundle is built by the first request that needs it and named for what
+	// went in: each member's path, modification time and size. Deploying any
+	// member changes the name and the next request builds the new bundle, so
+	// there is no build step to forget and no stale bundle to serve. The name
+	// never outlives its content, so the directory's .htaccess lets browsers
+	// keep a bundle for a year without asking again.
+	//
+	// If a bundle cannot be written -- BUNDLE_DIR not writable by Apache, a
+	// member unreadable -- the page is written exactly as it would have been
+	// without bundle(), and an HTML comment in <head> says why.
+	//
+	public function bundle($name=null) {
+		if ($name !== null) {
+			$name = trim(preg_replace('/[^a-z0-9-]+/', '-', strtolower((string) $name)), '-');
+			$this->bundle = ($name === '') ? null : $name;
+		}
+
+		return $this->bundle;
 	}
 
 	public function publish() {
@@ -449,11 +507,205 @@ class Bauplan {
 	private function scriptsToString() {
 		$string = "";
 		$this->resourceManifest->merge($this->template->_resourceManifest());
+		$markup = array();
 		foreach ($this->resourceManifest->items() as $resource) {
-			$string .= $this->versionMarkup($resource->value()) . "\n";
+			$markup[] = $resource->value();
+		}
+		if ($this->bundle !== null) {
+			$markup = $this->bundleMarkup($markup);
+		}
+		foreach ($markup as $html) {
+			$string .= $this->versionMarkup($html) . "\n";
 		}
 
 		return $string;
+	}
+
+	//
+	// Replace each run of local stylesheets, and each run of local scripts,
+	// with one tag for their bundle. See bundle().
+	//
+	private function bundleMarkup($markup) {
+		$root = isset($_SERVER['DOCUMENT_ROOT']) ? realpath($_SERVER['DOCUMENT_ROOT']) : false;
+		if ($root === false || !is_dir($root)) {
+			return $markup;
+		}
+
+		$out = array();     // markup, with an int where a group's tag goes
+		$groups = array();
+		$open = array('css' => null, 'js' => null);
+		$pageSeen = array('css' => false, 'js' => false);
+
+		foreach ($markup as $html) {
+			$member = $this->bundleMember($html, $root);
+			if ($member === null) {
+				// Keeps its place, and a run of its own kind does not
+				// continue past it.
+				if (stripos($html, '<script') !== false) { $open['js'] = null; }
+				if (stripos($html, '<style') !== false || stripos($html, 'stylesheet') !== false) { $open['css'] = null; }
+				$out[] = $html;
+				continue;
+			}
+
+			$type = $member['type'];
+			$tier = (!$pageSeen[$type] && in_array($member['path'], self::BUNDLE_SHELL, true)) ? 'shell' : 'page';
+			if ($tier === 'page') { $pageSeen[$type] = true; }
+
+			$g = $open[$type];
+			if ($g === null || $groups[$g]['tier'] !== $tier) {
+				$g = count($groups);
+				$groups[] = array('type' => $type, 'tier' => $tier, 'members' => array());
+				$open[$type] = $g;
+				$out[] = $g;
+			}
+			$groups[$g]['members'][] = $member;
+		}
+
+		$result = array();
+		$used = array();
+		foreach ($out as $item) {
+			if (!is_int($item)) {
+				$result[] = $item;
+				continue;
+			}
+
+			$group = $groups[$item];
+			$members = $group['members'];
+			// One file gains nothing from being bundled.
+			if (count($members) < 2) {
+				$result[] = $members[0]['markup'];
+				continue;
+			}
+
+			$base = ($group['tier'] === 'shell') ? 'shell' : $this->bundle;
+			$key = $base . '.' . $group['type'];
+			$used[$key] = isset($used[$key]) ? $used[$key] + 1 : 1;
+			if ($used[$key] > 1) { $base .= '-' . $used[$key]; }
+
+			$why = '';
+			$url = $this->writeBundle($root, $base, $group['type'], $members, $why);
+			if ($url === null) {
+				$result[] = '<!-- bundle ' . $base . '.' . $group['type'] . ' not built: ' . $why . ' -->';
+				foreach ($members as $member) { $result[] = $member['markup']; }
+				continue;
+			}
+
+			$result[] = ($group['type'] === 'css')
+				? "<link rel='stylesheet' type='text/css' href='" . $url . "'/>"
+				: "<script type='text/javascript' src='" . $url . "'></script>";
+		}
+
+		return $result;
+	}
+
+	//
+	// A tag's local file, if it is a plain stylesheet or classic script served
+	// from under the document root; null for anything else. The two shapes are
+	// the ones includeCss()/includeScript() write and the ones a template's
+	// include-css:/include-js: write, which differ only in the closing slash.
+	//
+	private function bundleMember($html, $root) {
+		if (preg_match("~^<link rel='stylesheet' type='text/css' href='([^']+)'\\s*/?>$~", $html, $m)) {
+			$type = 'css';
+		}
+		elseif (preg_match("~^<script type='text/javascript' src='([^']+)'></script>$~", $html, $m)) {
+			$type = 'js';
+		}
+		else {
+			return null;
+		}
+
+		$path = $m[1];
+		$query = strpos($path, '?');
+		if ($query !== false) { $path = substr($path, 0, $query); }
+		if ($path === '' || $path[0] !== '/' || strpos($path, '//') !== false) { return null; }
+		if (substr($path, -strlen($type) - 1) !== '.' . $type) { return null; }
+
+		$file = realpath($root . $path);
+		if ($file === false || strpos($file, $root . '/') !== 0 || !is_file($file)) { return null; }
+
+		return array('type' => $type, 'path' => $path, 'file' => $file, 'markup' => $html);
+	}
+
+	//
+	// The URL of the bundle of $members, building it first if it does not
+	// exist yet. null, with the reason in $why, if it cannot be built.
+	//
+	private function writeBundle($root, $base, $type, $members, &$why) {
+		$list = '';
+		$signature = '';
+		foreach ($members as $member) {
+			$stat = @stat($member['file']);
+			if ($stat === false) { $why = 'a member could not be read'; return null; }
+			$list .= $member['path'] . "\n";
+			$signature .= $member['path'] . ' ' . $stat['mtime'] . ' ' . $stat['size'] . "\n";
+		}
+
+		// The stem names the set of files, the second part their versions, so
+		// clearing out superseded versions cannot touch another page's set.
+		$stem = $base . '-' . substr(sha1($list), 0, 6);
+		$name = $stem . '.' . substr(sha1(self::BUNDLE_FORMAT . "\n" . $signature), 0, 10) . '.' . $type;
+		$dir = $root . self::BUNDLE_DIR;
+		$url = self::BUNDLE_DIR . '/' . $name;
+		if (is_file($dir . '/' . $name)) {
+			return $url;
+		}
+
+		if (!is_dir($dir) && !@mkdir($dir, 0775) && !is_dir($dir)) {
+			$why = 'the bundle directory could not be created';
+			return null;
+		}
+		if (!is_file($dir . '/.htaccess')) {
+			@file_put_contents($dir . '/.htaccess', self::BUNDLE_HTACCESS);
+		}
+
+		$body = '';
+		foreach ($members as $member) {
+			$text = @file_get_contents($member['file']);
+			if ($text === false) { $why = 'a member could not be read'; return null; }
+			// The semicolon keeps a file that ends without one from running
+			// into the next, which opens with a parenthesis.
+			$body .= '/* ' . $member['path'] . " */\n" . $text . (($type === 'js') ? "\n;\n" : "\n");
+		}
+
+		// A member deployed while it was being read: publish nothing rather
+		// than a mixture. The next request builds it.
+		clearstatcache();
+		$check = '';
+		foreach ($members as $member) {
+			$stat = @stat($member['file']);
+			$check .= $member['path'] . ' ' . ($stat ? $stat['mtime'] . ' ' . $stat['size'] : '-') . "\n";
+		}
+		if ($check !== $signature) {
+			$why = 'a member changed while it was read';
+			return null;
+		}
+
+		// Written aside and renamed into place, so a request never reads half
+		// a bundle and two requests building at once cannot interleave.
+		$part = $dir . '/.' . $name . '.' . getmypid() . '.part';
+		if (@file_put_contents($part, $body) !== strlen($body)) {
+			@unlink($part);
+			$why = 'the bundle directory is not writable';
+			return null;
+		}
+		@chmod($part, 0644);
+		if (!@rename($part, $dir . '/' . $name)) {
+			@unlink($part);
+			$why = 'the bundle could not be put in place';
+			return null;
+		}
+
+		$older = glob($dir . '/' . $stem . '.*.' . $type);
+		if (is_array($older)) {
+			foreach ($older as $file) {
+				if ($file !== $dir . '/' . $name && @filemtime($file) < time() - self::BUNDLE_KEEP) {
+					@unlink($file);
+				}
+			}
+		}
+
+		return $url;
 	}
 }
 ?>

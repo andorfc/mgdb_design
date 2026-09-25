@@ -601,27 +601,11 @@
     });
   }
 
-  /* Plotly is 3.6 MB. The chart it draws does not exist until a reader has run
+  /* Plotly is 4.6 MB. The chart it draws does not exist until a reader has run
      a comparison, and most of the page — the tool, the method notes, the
-     citations — never needs it at all. So it is fetched on first use rather
-     than blocking every page view, and the figure states plainly if it never
-     arrives. */
-  var plotlyPromise = null;
-
-  function loadPlotly() {
-    if (window.Plotly) { return Promise.resolve(); }
-    if (plotlyPromise) { return plotlyPromise; }
-
-    plotlyPromise = new Promise(function (resolve, reject) {
-      var script = document.createElement('script');
-      script.src = '/js/lib/plotly/plotly-2.25.2.min.js';
-      script.async = true;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-    return plotlyPromise;
-  }
+     citations — never needs it at all. MGDB.chart() fetches it when the figure
+     is about to be drawn rather than with the page, as it does on every chart
+     page now, and the figure states plainly if it never arrives. */
 
   function drawChart(distribution) {
     var edges = distribution.histogram.edges;
@@ -640,16 +624,9 @@
       values.push(counts[i]);
     }
 
-    loadPlotly().then(function () { paint(); }).catch(function () {
-      var fallback = document.querySelector('#typ-chart .mgdb-chart-fallback');
-      if (fallback) {
-        fallback.textContent = 'The chart could not be loaded. The five numbers below summarize the same distribution.';
-      }
-    });
-
-    function paint() {
     window.MGDB.chart({
       target: 'typ-chart',
+      fallback: 'The chart could not be loaded. The five numbers below summarize the same distribution.',
       traces: [{
         type: 'bar',
         x: centres,
@@ -676,7 +653,6 @@
         }]
       }
     });
-    }
   }
 
   /* ------------------------------------------------------------------------

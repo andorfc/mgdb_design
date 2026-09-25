@@ -33,7 +33,7 @@ $$SYNTAX-LEVEL 2
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#pan-gene-search" class="is-current" aria-current="true">Search</a>
-    <a href="#pan-gene-analysis">The analysis</a>
+    <a href="#pan-gene-analysis">Analysis</a>
     <a href="#pan-gene-downloads">Downloads</a>
     <a href="#pan-gene-definitions">Definitions</a>
     <a href="#pan-gene-references">References</a>
@@ -58,7 +58,7 @@ $$SYNTAX-LEVEL 2
                 <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
               </svg>
             </span>
-            <input class="pan-gene-query-input" id="pan-gene-term" name="term" type="search" autocomplete="off" placeholder="Locus, gene model, transcript, or protein &mdash; e.g. lg1, Zm00001eb067740" aria-label="Search pan-genes" />
+            <input class="pan-gene-query-input" id="pan-gene-term" data-suggest="pan_gene" name="term" type="search" autocomplete="off" placeholder="Locus, gene model, transcript, or protein &mdash; e.g. lg1, Zm00001eb067740" aria-label="Search pan-genes" />
             <button class="pan-gene-query-clear" id="pan-gene-clear" type="button" aria-label="Clear query" hidden>
               <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
@@ -155,14 +155,14 @@ $$SYNTAX-LEVEL 2
                 <legend>Assembly membership</legend>
                 <div class="pan-gene-filter-grid">
                   <label class="mgdb-field">
-                    <span class="mgdb-label" id="pan-gene-appear-label">Must have members from all of</span>
+                    <span class="mgdb-label" id="pan-gene-appear-label">Include pan-genes which have members in</span>
                     <select class="mgdb-select pan-gene-multi" id="pan-gene-appear" name="appear" multiple size="8" aria-labelledby="pan-gene-appear-label">
                       $(annotation_options)
                     </select>
                     <span class="mgdb-hint">Hold Ctrl, or Command on a Mac, to select more than one.</span>
                   </label>
                   <label class="mgdb-field">
-                    <span class="mgdb-label" id="pan-gene-not-appear-label">Must have members from none of</span>
+                    <span class="mgdb-label" id="pan-gene-not-appear-label">Include pan-genes which have no members in</span>
                     <select class="mgdb-select pan-gene-multi" id="pan-gene-not-appear" name="not_appear" multiple size="8" aria-labelledby="pan-gene-not-appear-label">
                       $(annotation_options)
                     </select>
@@ -208,8 +208,15 @@ $$SYNTAX-LEVEL 2
         </select>
       </div>
 
+      ;; The results table as a file, in either of the two formats a
+      ;; spreadsheet or a script will take. Both are built from the rows the
+      ;; search returned, not from what the table is paging through.
       <div class="mgdb-hub-field mgdb-hub-field-action pan-gene-results-export">
-        <a class="mgdb-button mgdb-button-quiet" id="pan-gene-export-tsv" href="#" download="pan_genes.tsv">Export TSV</a>
+        <span class="mgdb-label">Download results</span>
+        <span class="pan-gene-export-links">
+          <a class="mgdb-button mgdb-button-quiet" id="pan-gene-export-tsv" href="#" download="pan_genes.tsv">TSV</a>
+          <a class="mgdb-button mgdb-button-quiet" id="pan-gene-export-csv" href="#" download="pan_genes.csv">CSV</a>
+        </span>
       </div>
 
       <div class="mgdb-hub-field mgdb-hub-field-action pan-gene-results-view">
@@ -269,7 +276,7 @@ $$SYNTAX-LEVEL 2
   <section id="pan-gene-analysis" aria-labelledby="pan-gene-analysis-title">
     <div class="mgdb-section-heading">
       <div>
-        <h2 id="pan-gene-analysis-title">The analysis</h2>
+        <h2 id="pan-gene-analysis-title">Analysis</h2>
       </div>
     </div>
 

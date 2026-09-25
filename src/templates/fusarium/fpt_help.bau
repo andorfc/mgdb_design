@@ -1,0 +1,189 @@
+$$SYNTAX-LEVEL 2
+*(fpt-help
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Fusarium Protein Toolkit Help | Tools, Data and Methods, and the 22 Genomes">
+<meta property="og:description" content="What each tool in the Fusarium Protein Toolkit does, the data and methods behind it, and the 22 Fusarium genomes of its pan-genome.">
+
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page fpt-page fpt-help-page" id="fhp-main" data-fpt-tabs>
+
+  <section class="mgdb-hero fpt-hero" aria-labelledby="fhp-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/fusarium/fpt-mark.png" alt="" class="fpt-hero-mark" width="240" height="115" />
+      <strong>Help</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fhp-title">Using the Fusarium Protein Toolkit</h1>
+      <p class="mgdb-hero-description">The Fusarium Protein Toolkit explores protein structures, variant effects and predicted effectors across the Fusarium genus. It is built on the pipelines and tools MaizeGDB developed for maize, so it can be used on its own or to compare pathogen proteins with those of their host.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/fusarium">Toolkit home</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/contact">Contact MaizeGDB</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fhp-tools" class="is-current" aria-current="true">The tools</a>
+    <a href="#fhp-methods">Data and methods</a>
+    <a href="#fpt-help-genomes">Genomes</a>
+    <a href="#fpt-help-cite">Citing the toolkit</a>
+    <a href="#fhp-related">Related resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. The tools
+       ==================================================================== -->
+  <section id="fhp-tools" aria-labelledby="fhp-tools-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fhp-tools-title">The tools</h2></div>
+    </div>
+    <dl class="fpt-deflist">
+      <div>
+        <dt><a href="/fusarium">Home</a></dt>
+        <dd>One search box for a protein of any of the six species, the tools, what the toolkit has for each species, and the downloads.</dd>
+      </div>
+      <div>
+        <dt><a href="/fusarium/foldseek">Foldseek</a></dt>
+        <dd>Structure search results for <i>F. graminearum</i> and <i>F. verticillioides</i> proteins: the closest structures in five Fusarium species and four outgroups, where on the protein they align, and any match superposed in 3D with its TM-score.</dd>
+      </div>
+      <div>
+        <dt><a href="/fusarium/structures">Structures</a></dt>
+        <dd>The AlphaFold and ESMFold models of any protein of the six species, colored by confidence, with the two superposed to show where the predictors agree. It is also the toolkit's page for one protein, with links to every tool that has it.</dd>
+      </div>
+      <div>
+        <dt><a href="/fusarium/effectors">Effectors</a></dt>
+        <dd>Annotated effector genes: genes whose proteins are secreted while the fungus interacts with its host plant. The table gives the confidence of each prediction, where in the plant cell the protein is likely to go, its predicted function, and links to its structures.</dd>
+      </div>
+      <div>
+        <dt><a href="$(snptools_url)">SNPTools</a></dt>
+        <dd>Variant diversity across Fusarium genomes: choose strains, rank variants by predicted impact, compare accessions and build trees. SNPTools will replace PanEffect.</dd>
+      </div>
+      <div>
+        <dt><a href="$(paneffect_url)">PanEffect</a></dt>
+        <dd>The potential impact of missense variants on Fusarium proteins: gene and protein annotation, heatmaps of the predicted effect of every possible amino acid substitution in the <i>F. graminearum</i> and <i>F. verticillioides</i> reference proteomes, and effect scores for the naturally occurring variation across the Fusarium pan-genome.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ====================================================================
+       2. Data and methods
+       ==================================================================== -->
+  <section id="fhp-methods" aria-labelledby="fhp-methods-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fhp-methods-title">Data and methods</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid fhp-method-grid">
+      <article class="mgdb-card">
+        <h3>Effector genes</h3>
+        <p>EffectorP identified putative effectors in six representative species. SecretSanta kept only the candidates likely to be secreted from the fungus into the plant cell. OrthoFinder determined how the putative secreted effectors are distributed among and within the species. LOCALIZER identified signals targeting the nucleus, chloroplast and mitochondria, and OmicsBox predicted each protein's function.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Protein structure models</h3>
+        <p>AlphaFold models for the six Fusarium species and four outgroups came from the AlphaFold Protein Structure Database; ESMFold models of each proteome were generated for the toolkit.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Structural alignments</h3>
+        <p>Foldseek aligned the <i>F. graminearum</i> and <i>F. verticillioides</i> models against the others. The top 25 matches from each species are kept, with UniProt's functional annotation for each.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Pan-genome</h3>
+        <p>OrthoFinder grouped the proteins of 22 diverse Fusarium species into orthogroups. Together the orthogroups are the Fusarium pan-genome, the genetic diversity of the genus in one set.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Variant effect scores</h3>
+        <p>The ESM1b protein language model, through the esm-variants tool, scored the functional impact of every possible amino acid substitution in the reference proteomes: above &minus;7 a change is likely benign, below &minus;7 it may disrupt function. The scores were then linked to the substitutions that occur naturally across the pan-genome.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Visualization</h3>
+        <p>The PanEffect framework draws the scores as heatmaps and sets natural variation against the reference proteomes. SNPTools, its successor, brings the same scores together with strain selection, variant ranking and phylogenies.</p>
+      </article>
+    </div>
+
+    <h3 class="fhp-subhead">Data types</h3>
+    <dl class="fpt-deflist fpt-deflist-compact">
+      <div><dt>Predicted effector genes</dt><dd>Genes potentially involved in the interaction between Fusarium and its hosts.</dd></div>
+      <div><dt>Protein sequences</dt><dd>The amino acid sequences of the proteins each Fusarium genome encodes.</dd></div>
+      <div><dt>Protein structure models</dt><dd>Three-dimensional structures predicted with AlphaFold and ESMFold.</dd></div>
+      <div><dt>Protein alignments</dt><dd>How the structures and sequences of proteins from different species compare.</dd></div>
+      <div><dt>Orthology groups</dt><dd>Clusters of similar proteins across species.</dd></div>
+      <div><dt>Variant effect scores</dt><dd>The predicted functional impact of amino acid changes.</dd></div>
+    </dl>
+  </section>
+
+  <!-- ====================================================================
+       3. Genomes
+       ==================================================================== -->
+  <section id="fpt-help-genomes" aria-labelledby="fhp-genomes-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fhp-genomes-title">Genomes</h2></div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table fhp-genomes">
+        <caption class="mgdb-visually-hidden">The 22 Fusarium genomes in the toolkit and the data it has for each</caption>
+        <thead>
+          <tr>
+            <th scope="col">Species</th>
+            <th scope="col">Taxon</th>
+            <th scope="col">UniProt proteome</th>
+            <th scope="col" class="mgdb-numeric">Proteins</th>
+            <th scope="col" class="fhp-mark">Reference</th>
+            <th scope="col" class="fhp-mark">Sequences</th>
+            <th scope="col" class="fhp-mark">Structures</th>
+            <th scope="col" class="fhp-mark">Effectors</th>
+            <th scope="col" class="fhp-mark">Variant effects</th>
+            <th scope="col" class="fhp-mark">Foldseek</th>
+            <th scope="col" class="fhp-mark">PanEffect</th>
+          </tr>
+        </thead>
+        <tbody>
+          $(genome_rows)
+        </tbody>
+      </table>
+    </div>
+    <p class="fpt-note">Reference marks the two species whose proteomes PanEffect's heatmaps are drawn on. $(genome_notes) The files themselves are listed under <a href="/fusarium#fpt-downloads">Downloads</a> on the toolkit's home page.</p>
+  </section>
+
+  <!-- ====================================================================
+       4. Citing the toolkit
+       ==================================================================== -->
+  <section id="fpt-help-cite" aria-labelledby="fhp-cite-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fhp-cite-title">Citing the toolkit</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="fhp-related" aria-labelledby="fhp-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="fhp-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="$(snptools_url)">
+          <strong>SNPTools</strong>
+          <span>Variant diversity and predicted variant effects across Fusarium genomes</span>
+        </a>
+        <a href="https\://github.com/Maize-Genetics-and-Genomics-Database/PanEffect">
+          <strong>PanEffect source code</strong>
+          <span>The framework behind the variant effect heatmaps, on GitHub</span>
+        </a>
+        <a href="https\://github.com/steineggerlab/foldseek">
+          <strong>Foldseek</strong>
+          <span>The structure search the toolkit's matches were computed with</span>
+        </a>
+        <a href="https\://fungidb.org/">
+          <strong>FungiDB</strong>
+          <span>Genomes, gene records and functional data for fungi and oomycetes</span>
+        </a>
+        <a href="/contact">
+          <strong>Contact MaizeGDB</strong>
+          <span>Questions, corrections and data to contribute</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

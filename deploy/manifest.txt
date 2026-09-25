@@ -17,9 +17,36 @@ src/js/mgdb-pattern-library.js                js/mgdb-pattern-library.js
 src/pages/pattern_library/index.php           pattern_library/index.php
 src/js/mgdb-chrome.js                          js/mgdb-chrome.js
 
-# Header search + autocomplete
+# Header search + autocomplete. The suggestions are include/autocomplete_lib.php;
+# their three slow parts are answered from data/suggest/header.sqlite, which
+# tools/header_index.php builds on the server -- the nightly job rebuilds it
+# after a database reload; by hand, rebuild then hold it to parity:
+#   cd <webroot> && php tools/header_index.php
+#   php tools/tests/header_index_parity.php --queries=<file> [--gen=two]
 src/controllers/search_engine/autocomplete.php  controllers/search_engine/autocomplete.php
+src/include/autocomplete_lib.php                include/autocomplete_lib.php
+src/include/header_index_lib.php                include/header_index_lib.php
+src/tools/header_index.php                      tools/header_index.php
+src/tools/tests/header_index_parity.php         tools/tests/header_index_parity.php
+src/tools/tests/header_parity_queries.json      tools/tests/header_parity_queries.json
+# Rebuilds the hub suggestions, the header index and the dashboard cache when
+# the database has changed, then checks the header index for parity. Run by
+# cron -- installing it on an instance: ADMIN_DEPENDENCIES.md AD-081.
+src/tools/nightly_rebuild.php                   tools/nightly_rebuild.php
 src/controllers/search_engine.php               controllers/search_engine.php
+
+# Typeahead on every hub's own search field (MGDB.typeahead in js/mgdb-modern.js).
+# Answers from one SQLite file per scope under data/suggest/, written on the
+# server by tools/suggest_index.php -- rebuilt after a database reload by the
+# nightly job (tools/nightly_rebuild.php, below), or by hand:
+#   cd <webroot> && php tools/suggest_index.php
+# The index files themselves are built there, not deployed from here.
+src/include/suggest_lib.php                     include/suggest_lib.php
+src/search/suggest/suggest_api.php              search/suggest/suggest_api.php
+src/tools/suggest_index.php                     tools/suggest_index.php
+# Every suggestion checked against its hub's own search, over HTTP at the
+# origin: php tools/tests/suggest_accuracy.php [--only=stock] [--sample=40]
+src/tools/tests/suggest_accuracy.php            tools/tests/suggest_accuracy.php
 
 # Modern shell, header search, and suggestions
 src/templates/maizegdb-main-modern.bau          templates/maizegdb-main-modern.bau
@@ -951,8 +978,14 @@ src/css/mgdb-compare-maps.css                             css/mgdb-compare-maps.
 src/js/mgdb-compare-maps.js                               js/mgdb-compare-maps.js
 src/controllers/compare_three_maps.php                    controllers/compare_three_maps.php
 
-# Foldseek structure search -- /foldseek. The search itself is unchanged and
-# still runs in an iframe at foldseek.maizegdb.org; everything around it is new.
+# Foldseek structural matches -- /foldseek. Rebuilt 2026-09-25 as a native page:
+# the results are the precomputed Foldseek analysis that lives only inside
+# foldseek.maizegdb.org, fetched once per protein by foldseek_lib.php, parsed
+# out of the upstream report's own render([...]) call, cached under
+# <search_cache_path>/foldseek, and drawn as MaizeGDB markup. No iframe.
+# mgdb-tmalign.js ports TM-align's -I scoring so each superposition shows the
+# TM-score the upstream viewer showed; tools/tests/foldseek_tmscore_check.js
+# checks it against that viewer's own numbers.
 # controller.php checks ./controllers/<CONTROLLER>.php before falling through to
 # redirect.php, so src/controllers/foldseek.php takes the route from
 # controllers/tools/foldseek.php without touching it; rollback is deleting it.
@@ -962,6 +995,55 @@ src/controllers/compare_three_maps.php                    controllers/compare_th
 src/controllers/foldseek.php                              controllers/foldseek.php
 src/templates/static/mgdb_foldseek.bau                    templates/static/mgdb_foldseek.bau
 src/css/mgdb-foldseek.css                                 css/mgdb-foldseek.css
+src/js/mgdb-foldseek.js                                   js/mgdb-foldseek.js
+src/js/mgdb-tmalign.js                                    js/mgdb-tmalign.js
+src/search/foldseek/foldseek_api.php                      search/foldseek/foldseek_api.php
+src/search/foldseek/foldseek_lib.php                      search/foldseek/foldseek_lib.php
+# The adapter against the live upstream page, bypassing the cache -- run it
+# after any change at foldseek.maizegdb.org, whose markup it parses:
+#   cd <webroot> && php tools/tests/foldseek_adapter_check.php
+src/tools/tests/foldseek_adapter_check.php                tools/tests/foldseek_adapter_check.php
+
+# Fusarium Protein Toolkit -- /fusarium, /fusarium/foldseek, /fusarium/structures,
+# /fusarium/effectors, /fusarium/help. Recreated 2026-09-25 from
+# fusarium.maizegdb.org on the design system, inside the toolkit's own shell
+# (templates/fusarium/fpt_shell.bau: its logo, navigation and footer).
+# controllers/fusarium.php is the router; each page is controllers/fusarium/<page>.php.
+# Foldseek is /foldseek's page, script and adapter with set=fusarium -- the
+# foldseek_lib/api/js lines above carry that change too. There is no fusarium/
+# directory in the web root on purpose; the data is under data/fusarium/.
+# data/fusarium/proteins.sqlite (~16 MB, every protein with a model) is deployed
+# out of band: tools/fusarium_index.py writes it and the three JSON files below.
+src/controllers/fusarium.php                              controllers/fusarium.php
+src/controllers/fusarium/home.php                         controllers/fusarium/home.php
+src/controllers/fusarium/foldseek.php                     controllers/fusarium/foldseek.php
+src/controllers/fusarium/structures.php                   controllers/fusarium/structures.php
+src/controllers/fusarium/effectors.php                    controllers/fusarium/effectors.php
+src/controllers/fusarium/help.php                         controllers/fusarium/help.php
+src/controllers/fusarium/notfound.php                     controllers/fusarium/notfound.php
+src/include/fusarium_lib.php                              include/fusarium_lib.php
+src/include/fusarium_page.php                             include/fusarium_page.php
+src/search/fusarium/fusarium_api.php                      search/fusarium/fusarium_api.php
+src/templates/fusarium/fpt_shell.bau                      templates/fusarium/fpt_shell.bau
+src/templates/fusarium/fpt_home.bau                       templates/fusarium/fpt_home.bau
+src/templates/fusarium/fpt_foldseek.bau                   templates/fusarium/fpt_foldseek.bau
+src/templates/fusarium/fpt_structures.bau                 templates/fusarium/fpt_structures.bau
+src/templates/fusarium/fpt_effectors.bau                  templates/fusarium/fpt_effectors.bau
+src/templates/fusarium/fpt_help.bau                       templates/fusarium/fpt_help.bau
+src/templates/fusarium/fpt_notfound.bau                   templates/fusarium/fpt_notfound.bau
+src/css/mgdb-fusarium.css                                 css/mgdb-fusarium.css
+src/js/mgdb-fusarium.js                                   js/mgdb-fusarium.js
+src/js/mgdb-fusarium-structures.js                        js/mgdb-fusarium-structures.js
+src/js/mgdb-fusarium-effectors.js                         js/mgdb-fusarium-effectors.js
+src/images/fusarium/fpt-logo.png                          images/fusarium/fpt-logo.png
+src/images/fusarium/fpt-mark.png                          images/fusarium/fpt-mark.png
+src/images/fusarium/fusarium-conidia.jpg                  images/fusarium/fusarium-conidia.jpg
+src/images/fusarium/conidia-emblem.jpg                    images/fusarium/conidia-emblem.jpg
+src/data/fusarium/.htaccess                               data/fusarium/.htaccess
+src/data/fusarium/effectors.json                          data/fusarium/effectors.json
+src/data/fusarium/genomes.json                            data/fusarium/genomes.json
+src/data/fusarium/summary.json                            data/fusarium/summary.json
+src/data/fusarium/fusarium_effectors.xlsx                 data/fusarium/fusarium_effectors.xlsx
 
 # FATCAT structural ortholog comparison — replaces /fatcat.
 #
@@ -2779,8 +2861,47 @@ src/js/mgdb-gene-record-v5.js  js/mgdb-gene-record-v5.js
 # finds it before redirect.php, which would otherwise load the legacy chrome).
 # Rollback is deleting it; /genome_figure then answers the site 404.
 src/include/genome_growth_lib.php                include/genome_growth_lib.php
-src/controllers/genome/genome_center_modern.php  controllers/genome/genome_center_modern.php
+# src/controllers/genome/genome_center_modern.php is part of this set too, but it
+# is listed above: a second line makes deploy.sh copy it twice, and the second
+# pass backs up the file it has just deployed over the real pre-deploy copy.
 src/controllers/genome_figure.php                controllers/genome_figure.php
 src/templates/static/mgdb_genome_figure.bau      templates/static/mgdb_genome_figure.bau
 src/css/mgdb-genome-figure.css                   css/mgdb-genome-figure.css
 src/js/mgdb-genome-figure.js                     js/mgdb-genome-figure.js
+
+# Expression Tools -- /expression/tools (2026-09-24), the ExpressionTools app
+# (github andorfc/rna_seq_tools) rebuilt inside MaizeGDB. It reads
+# data/expression_tools/, which tools/expression_tools_index.py builds on the
+# server from the expression releases (data/expression/), the gene-models,
+# gene-positions, paralogs and GO releases, and two database exports that
+# tools/expression_tools_export.php writes outside the docroot. The payload is
+# ~1.1 GB and is NOT in this manifest; see README "Expression Tools".
+src/tools/expression_tools_export.php                  tools/expression_tools_export.php
+src/tools/expression_tools_index.py                    tools/expression_tools_index.py
+src/search/expression_tools/expression_tools_lib.php   search/expression_tools/expression_tools_lib.php
+src/search/expression_tools/expression_tools_api.php   search/expression_tools/expression_tools_api.php
+# The page. controllers/expression.php routes /expression/tools here (PAGE
+# 'tools'); anything below it is the site 404. Rollback is restoring
+# controllers/expression.php from backups/, which returns /expression/tools to
+# the 404 every other sub-path of /expression gives.
+src/controllers/expression/expression_tools_modern.php controllers/expression/expression_tools_modern.php
+src/templates/static/mgdb_expression_tools.bau         templates/static/mgdb_expression_tools.bau
+src/css/mgdb-expression-tools.css                      css/mgdb-expression-tools.css
+src/js/mgdb-exptools-core.js                           js/mgdb-exptools-core.js
+src/js/mgdb-exptools-genes.js                          js/mgdb-exptools-genes.js
+src/js/mgdb-exptools-discover.js                       js/mgdb-exptools-discover.js
+src/js/mgdb-exptools-pangenome.js                      js/mgdb-exptools-pangenome.js
+
+# Basket mockup — /gene_center/gene_basket/{id}, the live gene record with the basket drawer laid over it
+src/css/mgdb-basket.css                          css/mgdb-basket.css
+src/js/mgdb-basket.js                            js/mgdb-basket.js
+
+# Plotly, self-hosted 2026-09-25: the one copy MGDB.loadPlotly() fetches
+# (PLOTLY_SRC in js/mgdb-modern.js), so a reader scrolling to a chart does not
+# open a connection to a third-party host first. Byte-identical to plotly.min.js
+# in the npm package plotly.js-dist-min@2.35.2 (SHA-256 6d21266ce1bd7d9e...
+# eba4d603, checked against jsDelivr's package metadata). The server's
+# plotly-2.25.2.min.js beside it is not repo-owned: the legacy pan-gene
+# templates still load it.
+src/js/lib/plotly/plotly-2.35.2.min.js         js/lib/plotly/plotly-2.35.2.min.js
+src/js/lib/plotly/.htaccess                    js/lib/plotly/.htaccess

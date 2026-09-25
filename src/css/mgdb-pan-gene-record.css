@@ -827,3 +827,146 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
   line-height: var(--mgdb-leading-snug);
 }
 .mgdb-pg-place-detail strong { color: var(--mgdb-ink); }
+
+/* ==========================================================================
+   The pan-gene alert (js/mgdb-pan-gene-record.js, renderAlert)
+
+   A closed disclosure at the top of the Overview. The site's warning
+   colours (--mgdb-status-warn on --mgdb-status-warn-soft, 5.49:1), a
+   gold frame, an orange spine and a warning mark, so it reads as "this
+   pan-gene has known problems" rather than as another note. The summary
+   is the whole message; the body is the evidence.
+   ========================================================================== */
+
+.mgdb-pan-gene-record-page .mgdb-pg-alert {
+  margin: 0 0 var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-status-warn-soft);
+  box-shadow: inset 5px 0 0 var(--mgdb-orange);
+}
+
+.mgdb-pan-gene-record-page .mgdb-pg-alert > summary {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4) var(--mgdb-space-3) calc(var(--mgdb-space-4) + 5px);
+  cursor: pointer;
+  list-style: none;
+  color: var(--mgdb-ink);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-pan-gene-record-page .mgdb-pg-alert > summary::-webkit-details-marker { display: none; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert > summary::marker { content: ''; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert > summary:focus-visible { outline: 3px solid var(--mgdb-gold); outline-offset: 2px; }
+
+.mgdb-pan-gene-record-page .mgdb-pg-alert-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  fill: var(--mgdb-gold);
+  stroke: var(--mgdb-status-warn);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mgdb-pan-gene-record-page .mgdb-pg-alert-text { flex: 1 1 auto; min-width: 0; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-text strong { margin-right: 6px; color: var(--mgdb-status-warn); }
+
+.mgdb-pan-gene-record-page .mgdb-pg-alert-counts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-counts span {
+  padding: 1px 9px;
+  border: 1px solid rgba(138, 90, 15, .28);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--mgdb-status-warn);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+/* The toggle says what a click will do, and follows the state. */
+.mgdb-pan-gene-record-page .mgdb-pg-alert-toggle {
+  flex: none;
+  align-self: center;
+  padding: 4px 12px;
+  border: 1px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+  color: var(--mgdb-status-warn);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mgdb-pan-gene-record-page .mgdb-pg-alert-toggle::after { content: "Show details \25BE"; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert[open] .mgdb-pg-alert-toggle::after { content: "Hide details \25B4"; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert > summary:hover .mgdb-pg-alert-toggle { background: var(--mgdb-status-warn-soft); }
+
+.mgdb-pan-gene-record-page .mgdb-pg-alert-body {
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4) calc(var(--mgdb-space-4) + 5px);
+  border-top: 1px solid rgba(138, 90, 15, .2);
+}
+.mgdb-pan-gene-record-page .mgdb-pg-alert-caveat { max-width: 90ch; margin: var(--mgdb-space-3) 0 0; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-part { margin-top: var(--mgdb-space-4); }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-part .mgdb-rec-block { margin-top: 0; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-lead { max-width: 90ch; margin: 0 0 var(--mgdb-space-2); font-size: var(--mgdb-text-sm); line-height: 1.55; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 var(--mgdb-space-2); font-size: var(--mgdb-text-sm); }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-pick:empty { display: none; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-pick label { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-pick select { min-height: 34px; padding: 3px 8px; border: 1px solid var(--mgdb-line); border-radius: var(--mgdb-radius-sm); background: #fff; font: inherit; font-weight: 400; }
+.mgdb-pan-gene-record-page .mgdb-pg-alert-pick span { color: var(--mgdb-ink-soft); }
+
+@media (max-width: 640px) {
+  .mgdb-pan-gene-record-page .mgdb-pg-alert > summary { flex-wrap: wrap; }
+  .mgdb-pan-gene-record-page .mgdb-pg-alert-toggle { margin-left: 36px; }
+}
+
+/* "Report a pan-gene error" sits in the page's 32px flex gap rather than
+   adding its own row of space to it: 8px above and below the one line,
+   instead of 20px above and 48px below. */
+.mgdb-record-page.mgdb-pan-gene-record-page .mgdb-rec-report {
+  margin: calc(var(--mgdb-space-2) - var(--mgdb-space-6)) 0 calc(var(--mgdb-space-2) - var(--mgdb-space-6));
+  line-height: 1.3;
+}
+
+/* What a pan-gene is, under the record's name (was the "About pan-genes"
+   note at the foot of the Overview). A reading measure, because it is
+   prose, and muted, because it is the same on every record. */
+.mgdb-pan-gene-record-page .mgdb-pg-about {
+  max-width: 88ch;
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+/* ==========================================================================
+   Associated data (js/mgdb-pan-gene-record.js, renderAssociated)
+
+   The member table, then the four full lists as closed disclosures -- one
+   line each until opened, so the section is short by default.
+   ========================================================================== */
+
+.mgdb-pan-gene-record-page .mgdb-pg-associated-lead { max-width: 90ch; margin: 0 0 var(--mgdb-space-2); font-size: var(--mgdb-text-sm); line-height: 1.55; }
+
+.mgdb-pan-gene-record-page .mgdb-pg-list {
+  margin-top: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+.mgdb-pan-gene-record-page .mgdb-pg-list > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  min-height: 44px;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  cursor: pointer;
+  font-weight: 700;
+}
+.mgdb-pan-gene-record-page .mgdb-pg-list > summary:hover { background: var(--mgdb-green-soft); }
+.mgdb-pan-gene-record-page .mgdb-pg-list[open] > summary { border-bottom: 1px solid var(--mgdb-line); }
+.mgdb-pan-gene-record-page .mgdb-pg-list > div { padding: 0 var(--mgdb-space-3) var(--mgdb-space-3); }
+.mgdb-pan-gene-record-page .mgdb-pg-list .mgdb-rec-block:first-child { margin-top: var(--mgdb-space-3); }
+.mgdb-pan-gene-record-page .mgdb-pg-list abbr[title] { text-decoration: underline dotted; cursor: help; }

@@ -696,13 +696,11 @@
     }
 
     if (query) {
+      /* Typing offers suggestions (data-suggest, MGDB.typeahead) and does
+         not search: results change when the reader submits, so the table
+         never shows the answer to text that is no longer in the box. */
       query.addEventListener('input', function () {
         updateClearButton();
-        // Before the first search, typing must not open the results section.
-        if (!state.searched) { return; }
-        readForm();
-        state.page = 1;
-        runSearch({});
       });
     }
 

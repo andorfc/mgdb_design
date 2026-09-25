@@ -70,7 +70,7 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-field">
           <label class="mgdb-label" for="um-gene">Gene model, transcript, or gene symbol</label>
           <p class="mgdb-hint" id="um-gene-hint">Any identifier a MaizeGDB gene page accepts. Insertions aligned to an older annotation of the same gene are included. Try <button class="um-example" type="button" data-fill="um-gene" data-value="Zm00001eb067740">Zm00001eb067740</button>, <button class="um-example" type="button" data-fill="um-gene" data-value="lg1">lg1</button>, or <button class="um-example" type="button" data-fill="um-gene" data-value="GRMZM2G002492">GRMZM2G002492</button></p>
-          <input class="mgdb-input" id="um-gene" name="gene" type="search" autocomplete="off" aria-describedby="um-gene-hint" placeholder="Zm00001eb067740" />
+          <input class="mgdb-input" id="um-gene" data-suggest="uniformmu_gene" name="gene" type="search" autocomplete="off" aria-describedby="um-gene-hint" placeholder="Zm00001eb067740" />
         </div>
         <div class="mgdb-form-actions">
           <button class="mgdb-button mgdb-button-primary" type="submit">Find insertions</button>
@@ -81,7 +81,7 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-field">
           <label class="mgdb-label" for="um-insertion">Insertion identifier</label>
           <p class="mgdb-hint" id="um-insertion-hint">A UniformMu insertion locus, as printed in the browser track and in papers. Try <button class="um-example" type="button" data-fill="um-insertion" data-value="mu1013469">mu1013469</button> or <button class="um-example" type="button" data-fill="um-insertion" data-value="mu1038042">mu1038042</button></p>
-          <input class="mgdb-input" id="um-insertion" name="insertion" type="search" autocomplete="off" aria-describedby="um-insertion-hint" placeholder="mu1013469" />
+          <input class="mgdb-input" id="um-insertion" data-suggest="uniformmu_insertion" name="insertion" type="search" autocomplete="off" aria-describedby="um-insertion-hint" placeholder="mu1013469" />
         </div>
         <div class="mgdb-form-actions">
           <button class="mgdb-button mgdb-button-primary" type="submit">Look up insertion</button>
@@ -92,7 +92,7 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-field">
           <label class="mgdb-label" for="um-stock">Seed stock</label>
           <p class="mgdb-hint" id="um-stock-hint">A UFMu line. The number on its own is enough. Try <button class="um-example" type="button" data-fill="um-stock" data-value="UFMu-01828">UFMu-01828</button> or <button class="um-example" type="button" data-fill="um-stock" data-value="UFMu-04038">UFMu-04038</button></p>
-          <input class="mgdb-input" id="um-stock" name="stock" type="search" autocomplete="off" aria-describedby="um-stock-hint" placeholder="UFMu-01828" />
+          <input class="mgdb-input" id="um-stock" data-suggest="uniformmu_stock" name="stock" type="search" autocomplete="off" aria-describedby="um-stock-hint" placeholder="UFMu-01828" />
         </div>
         <div class="mgdb-form-actions">
           <button class="mgdb-button mgdb-button-primary" type="submit">List the insertions in this line</button>

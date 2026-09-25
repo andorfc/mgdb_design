@@ -113,7 +113,6 @@ $bauplan->includeCss('/css/mgdb-pan-gene-record.css?v=' . $v_pg_css);
    time. Both are the versions the legacy pan-gene page loaded. */
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js');
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 /* d3-hierarchy 3.1.2, vendored rather than taken from a CDN: it is the leaf
    ordering behind the record's own phylogenetic tree and the page should not
    lose its tree when someone else's host is slow. It creates window.d3, which

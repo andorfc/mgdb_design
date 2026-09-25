@@ -1031,6 +1031,59 @@ body.mgdb-modern {
 .mgdb-suggestions-footer:hover { background: var(--mgdb-green-soft); }
 .mgdb-suggestions-footer[hidden] { display: none !important; }
 
+/* Typeahead: suggestions under a page's own search field (MGDB.typeahead in
+   js/mgdb-modern.js). The Expression Tools list, rule for rule -- see .et-ta in
+   css/mgdb-expression-tools.css: a plain list under the field, an identifier in
+   mono, a name in bold, one muted line of context.
+
+   The list is a child of <body>, placed from the field's box, so a card's
+   overflow cannot clip it and a sticky tab bar cannot paint over it. It is
+   therefore outside .mgdb-page and restates its own type, spacing and box
+   model rather than inheriting a page's. */
+.mgdb-typeahead-list {
+  position: absolute;
+  z-index: 1000;
+  box-sizing: border-box;
+  max-height: 22rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--mgdb-space-1) 0;
+  list-style: none;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  box-shadow: var(--mgdb-shadow-lg);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.4;
+  text-align: left;
+  transition: opacity 120ms ease;
+}
+.mgdb-typeahead-list[hidden] { display: none; }
+/* The list for text the reader has since changed, while its answer is on the
+   way. Still usable; just visibly not the latest. */
+.mgdb-typeahead-list.is-stale { opacity: .55; }
+.mgdb-typeahead-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--mgdb-space-2);
+  align-items: baseline;
+  margin: 0;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  cursor: pointer;
+}
+.mgdb-typeahead-item > * { min-width: 0; overflow-wrap: break-word; }
+.mgdb-typeahead-item.is-active,
+.mgdb-typeahead-item:hover { background: var(--mgdb-green-soft); }
+.mgdb-typeahead-id { font-family: var(--mgdb-font-mono); font-size: .92em; }
+.mgdb-typeahead-item strong { font-weight: 700; }
+.mgdb-typeahead-meta { flex-basis: 100%; color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-typeahead-list { transition: none; }
+}
+
 /* Modern site navigation -------------------------------------------------- */
 
 /* The nav wrapper is only a positioning band. The mega menu draws its own

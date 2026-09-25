@@ -20,7 +20,7 @@ an 11-million-row table:
 Why the wide table and not exp_table: qTeller's exp_table omits zero values
 (Zm00001eb000010 has 1 row there against 267 columns in gene_table), so the
 wide gene_table is the only complete matrix. Its column names are the
-sample stubs of data_sets, which is how the catalogue is joined.
+sample stubs of data_sets, which is how the catalog is joined.
 
 What it writes, per genome:
 
@@ -37,11 +37,11 @@ What it writes, per genome:
   index.json           the public copy
 
 The tissue column is a keyword reading of each sample's label so a profile
-can be summarised by organ; it is a convenience, not an ontology, and the
+can be summarized by organ; it is a convenience, not an ontology, and the
 label it was read from is always beside it.
 
 Rules the data forces, each recorded in manifest.disagreements rather than
-repaired silently: a catalogue row with no data column (qt5db has 14, all of
+repaired silently: a catalog row with no data column (qt5db has 14, all of
 one study whose columns were shifted at load); a gene listed twice for one
 genome (the NAM file has them); a value that is not a number.
 """
@@ -166,6 +166,9 @@ class Release(object):
         self.disagreements = []
         self.files = set()
         self.dupes = Counter()
+        self.zero_filled = []    # tables whose omitted zeros were filled in
+        self.dead_samples = []   # samples zero in every gene, stored as not measured
+        self.recovered = []      # dead samples recovered from exp_table
 
     def source(self, name, assay, link, description):
         key = (name, assay)
@@ -213,8 +216,12 @@ class Release(object):
             where = ' where filtered = ?'
             params = (only_genome,)
         seen = set()
+        quantified = []          # keys of rows with at least one value in this table
         n_rows = 0
         bad = 0
+        zeros = nulls = 0
+        col_pos = Counter()      # sample id -> values above zero
+        col_zero = Counter()     # sample id -> values equal to zero
         for row in con.execute('select gene_name, %s from "%s"%s' % (quoted, table, where), params):
             gene = row[0]
             if not gene:
@@ -230,15 +237,149 @@ class Release(object):
                 continue
             seen.add(key)
             vals = self.values[key]
+            any_value = False
             for sid, v in zip(sample_ids, row[1:]):
                 s = sig4(v)
                 if s == 'bad':
                     bad += 1
                     s = None
                 vals[sid] = s
+                if s is None:
+                    nulls += 1
+                else:
+                    any_value = True
+                    if s > 0:
+                        col_pos[sid] += 1
+                    elif s == 0:
+                        zeros += 1
+                        col_zero[sid] += 1
+            if any_value:
+                quantified.append(key)
         if bad:
             self.disagreements.append({'check': 'non_numeric_values', 'file': fname, 'table': table, 'count': bad})
-        log('  %s %s.%s%s: %d rows, %d samples -> %s' % (self.genome, fname, table, ' [%s]' % only_genome if only_genome else '', n_rows, len(sample_ids), assay))
+
+        # Zeros the source left out. qt5db and qt4db store their zeros (3.9 and
+        # 2.2 million of them) and no NULLs at all; gene_protein_qt5db,
+        # gene_protein_qt4db and qtnamdb store NO zero anywhere and hundreds of
+        # thousands of NULLs, and their genes with a NULL are the weakly
+        # expressed ones (qtnamdb B73: median maximum 2.2 against 22.7 for
+        # genes with no NULL). Those tables were built from a long table that
+        # omits zeros, so inside a gene the table quantified, a NULL is a zero.
+        # A gene with no value anywhere in such a table stays not measured: the
+        # table cannot tell an unexpressed gene from one it did not include.
+        # Only in samples the table measured for these genes at all: qtnamdb
+        # has no CML277 endosperm or 16 DAP embryo anywhere (every CML277 row is
+        # NULL there, and listed twice), and those stay not measured.
+        if zeros == 0 and nulls > 0:
+            filled = 0
+            measured = [sid for sid in sample_ids if col_pos[sid] > 0]
+            unmeasured = [sid for sid in sample_ids if col_pos[sid] == 0]
+            for key in quantified:
+                vals = self.values[key]
+                for sid in measured:
+                    if vals.get(sid) is None:
+                        vals[sid] = 0.0
+                        filled += 1
+                        col_zero[sid] += 1
+            label_of = {x['id']: x['label'] for x in self.samples}
+            self.zero_filled.append({'file': fname, 'table': table, 'genome_filter': only_genome,
+                                     'genes_quantified': len(quantified), 'genes_without_values': len(seen) - len(quantified),
+                                     'values_filled': filled,
+                                     'samples_without_values': [label_of[sid] for sid in unmeasured]})
+
+        # A sample that is zero in every gene is a failed load, not a
+        # measurement: qt5db has five (two Johnston 2014 samples that are zero
+        # in exp_table too, Li 2017 "Control" and two Ravazzolo 2021 samples
+        # whose exp_table rows do carry values), qt4db one. Recover it from
+        # exp_table where that table holds values for the same study and label
+        # that no other sample already carries; otherwise store it as not
+        # measured, so no reader counts it as a tissue where the gene is off.
+        dead = [(sid, stub) for sid, stub in zip(sample_ids, sample_cols) if col_pos[sid] == 0 and col_zero[sid] > 0]
+        if dead:
+            self.handle_dead(con, fname, table, assay, dead, sample_ids, catalog, quantified)
+        log('  %s %s.%s%s: %d rows, %d samples -> %s%s' % (
+            self.genome, fname, table, ' [%s]' % only_genome if only_genome else '', n_rows, len(sample_ids), assay,
+            ' (zeros filled)' if self.zero_filled and self.zero_filled[-1]['table'] == table and self.zero_filled[-1]['file'] == fname else ''))
+
+    def handle_dead(self, con, fname, table, assay, dead, sample_ids, catalog, quantified):
+        has_exp = con.execute("select 1 from sqlite_master where name = 'exp_table'").fetchone() is not None
+        exp_cols = [r[1] for r in con.execute('pragma table_info(exp_table)')] if has_exp else []
+        # Fingerprints of every live column of this table, to refuse a recovery
+        # that would only duplicate a sample already present.
+        genes = [k for k in quantified]
+        dead_ids = {d[0] for d in dead}
+        live = [sid for sid in sample_ids if sid not in dead_ids]
+        label_of = {s['id']: s for s in self.samples}
+
+        def duplicate_of(candidate):
+            """A live sample carrying the same values, compared where both
+            have one. qt5db writes an explicit 0 where exp_table has no row,
+            so a whole-column fingerprint never matches; the genes both carry
+            do."""
+            probe = [i for i, v in enumerate(candidate) if v is not None and v > 0][:400]
+            if not probe:
+                return None
+            for sid in live:
+                col = [self.values[genes[i]].get(sid) for i in probe]
+                if sum(1 for i, v in zip(probe, col) if v == candidate[i]) < 0.99 * len(probe):
+                    continue
+                both = same = 0
+                for i, key in enumerate(genes):
+                    a = candidate[i]
+                    b = self.values[key].get(sid)
+                    if a is None or b is None:
+                        continue
+                    both += 1
+                    if a == b:
+                        same += 1
+                if both >= 1000 and same >= 0.995 * both:
+                    return sid
+            return None
+
+        for sid, stub in dead:
+            label, source = catalog.get(stub, (stub, None, None, None, None))[:2]
+            recovered = None
+            reason = None
+            if has_exp and 'source_id' in exp_cols:
+                rows = con.execute('select gene, exp_val from exp_table where source_id = ? and experiment_id = ?',
+                                   (source, label)).fetchall()
+                vec = {}
+                for gene, v in rows:
+                    sv = sig4(v)
+                    if sv not in (None, 'bad'):
+                        vec[gene] = sv
+                candidate = [vec.get(k[0]) for k in genes]
+                if any(v is not None and v > 0 for v in candidate):
+                    twin = duplicate_of(candidate)
+                    if twin is not None:
+                        other = label_of[twin]
+                        reason = 'exp_table carries the values of another sample: %s (%s)' % (
+                            other['label'], self.sources[other['source_id'] - 1]['name'])
+                    else:
+                        recovered = vec
+                elif any(v > 0 for v in vec.values()):
+                    reason = 'exp_table has values for this study and label, but none for these genes'
+                elif rows:
+                    reason = 'exp_table is zero too'
+                else:
+                    reason = 'no exp_table rows for this study and label'
+            else:
+                reason = 'no exp_table with a source column'
+            entry = {'file': fname, 'table': table, 'stub': stub, 'label': label, 'source': source}
+            if recovered is not None:
+                n = 0
+                for key in quantified:
+                    v = recovered.get(key[0])
+                    self.values[key][sid] = v
+                    if v is not None:
+                        n += 1
+                entry['values_recovered'] = n
+                self.recovered.append(entry)
+            else:
+                for key in quantified:
+                    self.values[key][sid] = None
+                entry['reason'] = reason
+                self.dead_samples.append(entry)
 
     def classify_conditions(self):
         """Two passes over the labels. First, every sample gets its biotic or
@@ -335,6 +476,7 @@ class Release(object):
             'assays': sorted(by_assay),
             'detected_threshold': {'rna': 'value >= 1', 'protein': 'value > 0'},
             'units_note': 'Values are as published by each study (FPKM or TPM for RNA, normalized abundance for protein), biological replicates averaged by qTeller, rounded here to four significant digits. Compare samples within a study; across studies the units and pipelines differ.',
+            'missing_note': 'null means not measured. Where a source table leaves its zeros out (Walley 2019 and the NAM Consortium tables), a gene the table quantified carries 0 in the samples it omits; a gene the table does not list at all stays null. A sample that reads zero in every gene is a failed load and is null throughout.',
             'tissue_note': 'tissue is a keyword reading of the sample label, kept beside the label it was read from; it is a convenience for summaries, not an ontology term.',
             'condition_note': 'condition is a keyword reading of the sample label inside stress studies: abiotic stress, biotic stress, or control (a stress-study sample that reads as neither is kept as "stress study"); like tissue it is a convenience for summaries, not an ontology term.',
             'conditions': dict(conditions),
@@ -343,7 +485,12 @@ class Release(object):
                         'NAM': 'https://qteller.maizegdb.org/bar_chart_NAM.php?name={gene}'},
             'counts': dict(counts),
             'caps': {'batch_ids': 200},
-            'disagreements': self.disagreements,
+            'zeros_filled': self.zero_filled,
+            'samples_not_measured': self.dead_samples,
+            'samples_recovered': self.recovered,
+            'disagreements': self.disagreements + (
+                [{'check': 'sample_zero_in_every_gene_stored_as_not_measured', 'samples': self.dead_samples}] if self.dead_samples else []) + (
+                [{'check': 'sample_zero_in_every_gene_recovered_from_exp_table', 'samples': self.recovered}] if self.recovered else []),
             'build_seconds': round(time.time() - t0, 1)
         }
         con.executemany('insert into meta values (?,?)', [(k, json.dumps(v)) for k, v in meta.items() if k != 'disagreements'])

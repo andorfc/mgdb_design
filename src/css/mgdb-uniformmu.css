@@ -163,6 +163,13 @@
 
 .mgdb-uniformmu-page .um-chain h3 { margin-top: var(--mgdb-space-2); }
 
+/* Making the card a flex column also stopped its margins collapsing, so the
+   heading's own 22px bottom margin began ADDING to the 12px rhythm
+   .mgdb-card sets between siblings -- 34px under each step's title. The
+   rhythm owns that spacing; the same rule is in css/mgdb-hub.css for the hub
+   card grids (2026-09-19). */
+.mgdb-uniformmu-page .um-chain > li.mgdb-card > h3 { margin-bottom: 0; }
+
 .mgdb-uniformmu-page .um-chain-step {
   display: inline-flex;
   align-items: center;

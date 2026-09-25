@@ -203,24 +203,20 @@
   line-height: var(--mgdb-leading-tight);
 }
 
-/* Two rows of pills reserved, for the same reason the title reserves three
-   lines: a project carries two or three topics, three wrap to a second row at
-   this column width and two do not, and the difference would start the summary
-   34px lower in some cards than in others. 3.7rem is two pill rows (25.4px
-   each, from the pill's 13px/1.6 text, its .1em padding and its border) plus
-   the 8px row gap. Below 720px the grid is a single column, so the cards no
-   longer sit beside each other and nothing here has to match anything. */
-.mgdb-projects-page .projects-card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-content: flex-start;
-  min-height: 3.7rem;
-}
+/* The About paragraphs break with a blank line's worth of space (Carson,
+   2026-09-19). The shared prose stack sets 1rem between children, which at
+   this measure reads as one long column; 2rem is that plus a line of the
+   body text, so each paragraph reads as its own. Only the paragraphs, so the
+   heading keeps its own spacing. */
+.mgdb-projects-page #projects-about .mgdb-prose > p + p { margin-top: var(--mgdb-space-6); }
+
+/* The cards carried a row of topic pills between the title and the summary,
+   with two rows' height reserved so the bands below lined up across a row of
+   cards. Both are gone (Carson, 2026-09-19); the topics are still searchable,
+   they are just not printed. */
 
 @media (max-width: 720px) {
   .mgdb-projects-page .projects-card h3,
-  .mgdb-projects-page .projects-card-tags,
   .mgdb-projects-page .projects-card-facts dt { min-height: 0; }
 }
 

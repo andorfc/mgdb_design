@@ -173,6 +173,16 @@
   function initNamExample() {
     var example = document.querySelector('.launcher-example[data-gene]');
     var input = document.getElementById('alignment_gm');
+    /* The form has no action and no submit button, so Enter in the field --
+       or a picked suggestion, which submits the form -- sent a plain GET that
+       reloaded this page and launched nothing. Submitting launches. */
+    var form = document.getElementById('jbrowse2_nam_alignments_form');
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        window.launchJBrowse2NAMAlignments();
+      });
+    }
     if (!example || !input) { return; }
     example.addEventListener('click', function () {
       input.value = example.getAttribute('data-gene') || '';

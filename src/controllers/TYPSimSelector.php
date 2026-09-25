@@ -63,7 +63,7 @@
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
   $bauplan->includeCss('/css/mgdb-typsimselector.css?v=' . $v_css);
-  /* Plotly is deliberately fetched on first use in mgdb-typsimselector.js */
+  /* No Plotly here: MGDB.chart() fetches it when the figure is drawn. */
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-typsimselector.js?v=' . $v_js);

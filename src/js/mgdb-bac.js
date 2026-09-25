@@ -241,7 +241,7 @@
     }
     var m = metrics();
 
-    window.MGDB.chart({
+    var whenDrawn = window.MGDB.chart({
       target: el,
       traces: [{
         type: 'bar',
@@ -270,8 +270,11 @@
 
     /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which rescales
        the figure but keeps the margins it was drawn with. Crossing the
-       breakpoint has to relayout. */
-    if (window.Plotly && window.Plotly.relayout) {
+       breakpoint has to relayout.
+       Installed once the figure is drawn: Plotly is fetched when the figure
+       comes into view, so it is not on the page when this runs. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
       var lastNarrow = m.narrow;
       var timer = null;
       window.addEventListener('resize', function () {
@@ -287,7 +290,7 @@
           });
         }, 180);
       });
-    }
+    });
 
   }
 

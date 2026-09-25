@@ -11,6 +11,10 @@
      asks for that. */
   var MAX_PAGE = 200;
   var lastQuery = '';
+  /* Each search's number; an answer to anything but the latest is dropped,
+     so a quick second search cannot be overwritten by the first one's
+     slower answer. */
+  var searchSeq = 0;
 
   var state = {
     page: 1,
@@ -249,10 +253,12 @@
     statusEl.textContent = 'Searching…';
 
     lastQuery = params.toString();
+    var seq = ++searchSeq;
 
     fetch(API_URL + '?' + lastQuery)
       .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
       .then(function (wrap) {
+        if (seq !== searchSeq) { return; }
         if (!wrap.ok || !wrap.data.ok) {
           var msg = (wrap.data && (wrap.data.message || wrap.data.detail)) || 'The search could not be completed.';
           if (tableView) tableView.hidden = true;
@@ -264,6 +270,7 @@
         renderResults(wrap.data);
       })
       .catch(function (err) {
+        if (seq !== searchSeq) { return; }
         console.error('QTL search error:', err);
         if (tableView) tableView.hidden = true;
         if (cardsView) cardsView.hidden = true;
@@ -758,7 +765,7 @@
     }
     var m = metrics();
 
-    window.MGDB.chart({
+    var whenDrawn = window.MGDB.chart({
       target: el,
       traces: [{
         type: 'bar',
@@ -789,8 +796,11 @@
 
     /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which rescales
        the figure but keeps the margins it was drawn with. Crossing the
-       breakpoint has to relayout. */
-    if (window.Plotly && window.Plotly.relayout) {
+       breakpoint has to relayout.
+       Installed once the figure is drawn: Plotly is fetched when the figure
+       comes into view, so it is not on the page when this runs. */
+    whenDrawn.then(function (plot) {
+      if (!plot) { return; }
       var lastNarrow = m.narrow;
       var timer = null;
       window.addEventListener('resize', function () {
@@ -806,7 +816,7 @@
           });
         }, 180);
       });
-    }
+    });
 
     if (!window.MutationObserver) { return; }
 

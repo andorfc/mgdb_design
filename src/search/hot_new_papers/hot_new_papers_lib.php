@@ -39,7 +39,13 @@
    way to reach the rest. */
 define('HNP_MAX_RESULTS', 250);
 
-define('HNP_PUBMED_DB_PERSON', 134209);   /* mgdb.person "Medline -- PubMed" */
+/* The DOI and PubMed ID are read by the rule every record page and the
+   reference hub share. This page used to read mgdb.reference.doi alone, which
+   is filled for 478 references, so 201 of its 838 papers showed a DOI where
+   693 have one. The PubMed key is also only taken when it is a number: this
+   page strips it to its digits, which would turn the GenBank accession filed
+   under PubMed (AF450481) into a link to an unrelated paper. */
+include_once(__DIR__ . '/../../include/reference_ids_lib.php');
 define('HNP_COMMENT_TERMS', '1187419, 3530964');  /* Editorial Board Member Comment, CODIE Member Comment */
 
 function hnpValue($key, $default = '') {
@@ -307,9 +313,10 @@ function hnpSearch($DBConn, $filters) {
         SELECT ebp.auto_num, ebp.rec_month, ebp.rec_year, ebp.reference_id,
                ebp.person_id, ebp.person_id2,
                ebp.abstract_link, ebp.html_link, ebp.pdf_link,
-               r.name AS citation, r.title, r.doi,
+               r.name AS citation, r.title,
+               " . mgdbReferenceDoiSql('r') . " AS doi,
                ra.abstract_1 AS abstract,
-               x.key AS pubmed,
+               " . mgdbReferencePubmedSql('r') . " AS pubmed,
                p1.name_first AS rec1_first, p1.name_last AS rec1_last,
                p2.name_first AS rec2_first, p2.name_last AS rec2_last
         FROM mgdb.ed_board_papers ebp
@@ -317,8 +324,6 @@ function hnpSearch($DBConn, $filters) {
           LEFT JOIN mgdb.reference_abstract ra ON ra.id = r.id
           LEFT JOIN mgdb.person p1 ON p1.id = ebp.person_id
           LEFT JOIN mgdb.person p2 ON p2.id = ebp.person_id2
-          LEFT JOIN mgdb.ext_db_key x ON x.id = ebp.reference_id
-               AND x.db_person = " . HNP_PUBMED_DB_PERSON . "
         WHERE " . implode(' AND ', $where) . "
         ORDER BY " . $order;
 

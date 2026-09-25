@@ -44,8 +44,6 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
    getSearchData(). */
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
 $bauplan->includeScript('/js/search.js');
-// Plotly must be parsed before mgdb-ssr.js runs initFigure().
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-ssr.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-ssr.js'));
 $bauplan->head('<meta name="description" content="Search the archived MaizeGDB simple sequence repeat marker collection by marker name, synonym, or repeat motif, see how the repeat motifs break down by unit length, and download mapped SSR datasets by chromosome.">');
 

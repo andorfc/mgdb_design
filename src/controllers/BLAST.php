@@ -187,11 +187,6 @@ function blast_edit_search_fields($job_id, $system) {
   }
   if ($blast_is_results) {
     $bauplan->includeCss('/css/mgdb-blast-results.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-blast-results.css'));
-    /* MGDB.chart() is a Plotly wrapper and does nothing without Plotly itself,
-       leaving an empty panel rather than an error. Every other page with a
-       figure loads this; the results page needs it for the identity-against-
-       coverage scatter. */
-    $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
     $bauplan->includeScript('/js/mgdb-blast-results.js?v=' . (int) @filemtime($doc_root . '/js/mgdb-blast-results.js'));
   }
   /* BLAST.js drives the legacy form and the legacy results poller. The new

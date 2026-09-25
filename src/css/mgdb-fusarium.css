@@ -1,0 +1,862 @@
+/* file: css/mgdb-fusarium.css
+ *
+ * /fusarium, the Fusarium Protein Toolkit. Loaded last, after mgdb-modern.css,
+ * mgdb-hub.css and any page sheet (mgdb-foldseek.css on the Foldseek page,
+ * mgdb-protein-structure.css on Structures).
+ *
+ * Two jobs:
+ *
+ *   1. The toolkit's own chrome -- header, navigation, footer, page ground --
+ *      in its logo's three colors, which are MaizeGDB's own burgundy, gold and
+ *      red tokens: the toolkit reads as itself and as part of the family.
+ *   2. The furniture of its pages that no MaizeGDB page has: the tool cards,
+ *      the species tables, the protein chooser and model comparison on
+ *      Structures, and the effector table.
+ *
+ * Everything else -- sections, cards, tabs, fields, tables, metrics,
+ * references, related resources, the 3D viewers -- is the design system's,
+ * unchanged. Contents:
+ *
+ *   1. Ground and page card       6. Structures
+ *   2. Header and navigation      7. Effectors
+ *   3. Footer                     8. Help
+ *   4. Hero                       9. Narrow screens
+ *   5. Shared page furniture     10. Motion, forced colors, print
+ */
+
+/* --------------------------------------------------------------------------
+   1. Ground and page card
+   -------------------------------------------------------------------------- */
+
+.fpt-site {
+  --fpt-burgundy: var(--mgdb-burgundy);
+  --fpt-burgundy-deep: #2e0c0e;
+  --fpt-gold: var(--mgdb-gold);
+  --fpt-red: var(--mgdb-red);
+  --fpt-cream: #fbf7f2;
+}
+
+/* The MaizeGDB page card, on the toolkit's burgundy instead of the site's
+   blue. */
+body.mgdb-modern.fpt-site {
+  background: radial-gradient(120% 90% at 50% 0%, #5a1c1f 0%, var(--fpt-burgundy-deep) 70%);
+}
+
+.mgdb-modern.fpt-site #wrapper { box-shadow: 0 0 34px rgba(20, 3, 4, .45); }
+
+#fpt-content:focus { outline: none; }
+
+/* --------------------------------------------------------------------------
+   2. Header and navigation
+   -------------------------------------------------------------------------- */
+
+.fpt-header {
+  position: relative;
+  z-index: 50;
+  background: #fff;
+  font-family: var(--mgdb-font);
+}
+
+.fpt-header-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-4);
+  min-height: 112px;
+  padding: var(--mgdb-space-3) var(--mgdb-gutter);
+  overflow: hidden;
+}
+
+.fpt-brand {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  line-height: 0;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.fpt-brand img { width: 220px; height: auto; }
+.fpt-brand:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 4px; }
+
+/* The toolkit's micrograph of macroconidia, fading in from the logo side so
+   the logo keeps a clean white ground. */
+.fpt-header-band {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 0 22%;
+  background: url("/images/fusarium/fusarium-conidia.jpg") right center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  opacity: .9;
+}
+
+.fpt-host {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-radius: var(--mgdb-radius);
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 1px 3px rgba(46, 12, 14, .18);
+  color: var(--fpt-burgundy);
+  line-height: 1.15;
+  text-decoration: none;
+}
+
+.fpt-host span { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); font-weight: 600; }
+.fpt-host strong { font-size: var(--mgdb-text-lg); font-weight: 800; letter-spacing: .01em; }
+.fpt-host:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.fpt-host:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+
+.fpt-nav {
+  border-top: 3px solid var(--fpt-gold);
+  background: var(--fpt-burgundy);
+}
+
+.fpt-nav-list {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0 var(--mgdb-gutter);
+  list-style: none;
+}
+
+.fpt-nav-list li { margin: 0; }
+
+.fpt-nav-list a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 var(--mgdb-space-4);
+  border-bottom: 4px solid transparent;
+  color: #fff;
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.fpt-nav-list a:hover { background: rgba(255, 255, 255, .1); }
+.fpt-nav-list a:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+
+.fpt-nav-list a[aria-current="page"] {
+  border-bottom-color: var(--fpt-gold);
+  background: rgba(0, 0, 0, .16);
+}
+
+/* Help sits at the far end, as it did on the toolkit's own bar. */
+.fpt-nav-list li:last-child { margin-left: auto; }
+
+/* --------------------------------------------------------------------------
+   3. Footer
+   -------------------------------------------------------------------------- */
+
+.fpt-footer {
+  border-top: 4px solid var(--fpt-gold);
+  background: var(--fpt-burgundy-deep);
+  color: #f3e9e6;
+  font-family: var(--mgdb-font);
+}
+
+.fpt-footer-inner {
+  max-width: var(--mgdb-max-width);
+  margin: 0 auto;
+  padding: var(--mgdb-space-4) var(--mgdb-gutter);
+}
+
+.fpt-footer-tagline {
+  margin: 0 0 var(--mgdb-space-3);
+  color: rgba(255, 255, 255, .9);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+  text-align: center;
+}
+
+.fpt-footer-tagline a { color: #fff; }
+
+.fpt-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid rgba(255, 255, 255, .14);
+}
+
+.fpt-footer-usda { display: block; line-height: 0; }
+.fpt-footer-usda img { width: 260px; max-width: 100%; height: auto; }
+
+.fpt-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.fpt-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  color: rgba(255, 255, 255, .92);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fpt-footer a:hover,
+.fpt-footer a:focus-visible { color: #fff; }
+.fpt-footer :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+/* --------------------------------------------------------------------------
+   4. Hero
+   -------------------------------------------------------------------------- */
+
+.fpt-page .mgdb-hero.fpt-hero {
+  border-color: #ead7c6;
+  background: linear-gradient(115deg, #fffaf3 0%, #fbf0e3 48%, #f6e4e1 100%);
+}
+
+.fpt-page .mgdb-hero.fpt-hero::after { border-color: rgba(80, 23, 25, .06); }
+
+.fpt-page .fpt-hero .mgdb-hero-emblem {
+  border-right-color: #ead7c6;
+  color: var(--fpt-burgundy);
+}
+
+.fpt-page .fpt-hero .mgdb-hero-emblem strong { color: var(--fpt-burgundy); }
+.fpt-page .fpt-hero h1 { color: var(--fpt-burgundy); }
+
+.fpt-page .fpt-hero .mgdb-button-primary { background: var(--fpt-burgundy); }
+.fpt-page .fpt-hero .mgdb-button-primary:hover { background: #3a1012; }
+.fpt-page .fpt-hero .mgdb-button-secondary { border-color: var(--fpt-burgundy); color: var(--fpt-burgundy) !important; }
+
+.fpt-page .fpt-hero-mark { width: min(100%, 132px); height: auto; mix-blend-mode: normal; }
+.fpt-page .fpt-hero-icon { width: min(100%, 120px); height: auto; object-fit: contain; }
+
+.fpt-page .fpt-hero-photo {
+  width: min(100%, 104px);
+  height: auto;
+  border-radius: var(--mgdb-radius);
+  box-shadow: 0 0 0 1px #ead7c6;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   5. Shared page furniture
+
+   Spacing rules on a <p>, <ul>, <ol>, <dl>, <figure> or <table> start with
+   `.fpt-page`. mgdb-modern.css resets all six with `.mgdb-page p { margin: 0 }`,
+   which outranks a single class, so `.fpt-note { margin-top: ... }` alone was
+   silently ignored: notes sat 0px under their tables and card text 3px above
+   its buttons. The design system's own `.mgdb-hero-actions` margin loses the
+   same way when the action row is a <p>, which is why the toolkit's heroes
+   write it as a <div>.
+
+   Text that is followed by buttons gets a line's worth of space first --
+   24px under 16px text, as under the hero -- so a button never sits against
+   the sentence above it.
+   -------------------------------------------------------------------------- */
+
+.fpt-page .mgdb-hero-actions { margin-top: var(--mgdb-space-5); }
+
+.fpt-lookup-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: end;
+}
+
+.fpt-lookup-form > .fpt-hint,
+.fpt-lookup-form > .fpt-example-row { grid-column: 1 / -1; }
+
+.fpt-page .fpt-hint { margin: 0; }
+
+.fpt-example-row,
+.fpt-page .fpt-suggest-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: var(--mgdb-space-1) 0 0;
+}
+
+/* The example chips are buttons: a line break before them, on this page's
+   own forms and on the Foldseek form it shares with /foldseek. With the
+   form grid's 8px row gap that is 24px under the hint. */
+.fpt-page .fpt-example-row,
+.fpt-page .fs-example-row,
+.fpt-page .fpt-suggest-row,
+.fpt-page .fs-suggest-row,
+.fpt-page .fs-note-actions { margin-top: var(--mgdb-space-4); }
+
+.fpt-example-row > span,
+.fpt-suggest-row > span {
+  margin-right: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.fpt-page a.mgdb-chip { text-decoration: none; }
+
+.fpt-status:not(:empty) { margin-top: var(--mgdb-space-4); }
+
+.fpt-page .fpt-note {
+  max-width: 78ch;
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.fpt-page .fpt-note + .fpt-note { margin-top: var(--mgdb-space-1); }
+
+.fpt-page .fpt-caption {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.fpt-mono { font-family: var(--mgdb-font-mono); font-size: .92em; }
+
+/* The reference-genome star in the species table, and the same star leading
+   the note that explains it. Gold-dark rather than the logo's gold: the star
+   carries meaning, and #f2a515 is 2.0:1 on white. */
+.fpt-ref-star {
+  margin-left: 4px;
+  color: var(--mgdb-gold-dark);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.fpt-table-note .fpt-ref-star { margin-left: 0; }
+
+.fpt-cell-note {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+}
+
+/* The toolkit's accent on the shared tab bar and section titles: its burgundy
+   where the design system has dark green, with the gold bar kept. Structure
+   and behavior stay the shell's. */
+.fpt-page .mgdb-section-tabs a:hover { border-color: #e3c9c7; background: var(--mgdb-burgundy-soft); }
+
+.fpt-page .mgdb-section-tabs a.is-current {
+  border-color: var(--fpt-burgundy);
+  background: var(--fpt-burgundy);
+}
+
+.fpt-page .mgdb-section-heading h2 { color: var(--fpt-burgundy); }
+.fpt-pending { color: var(--mgdb-muted); font-size: var(--mgdb-text-base); font-weight: 600; }
+
+.fpt-flag {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fpt-flag-yes {
+  border-color: #b8d8c5;
+  background: var(--mgdb-status-ok-soft);
+  color: var(--mgdb-status-ok);
+}
+
+/* Tools on the home page. Three analyses over two applications on wide
+   screens -- 3 + 2 rather than 4 + 1, which left PanEffect alone on a row. */
+.fpt-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+@media (min-width: 1000px) {
+  .fpt-tool-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .fpt-tool { grid-column: span 2; }
+  .fpt-tool:nth-child(n+4) { grid-column: span 3; }
+}
+
+.fpt-tool {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, var(--mgdb-line));
+  border-top: 4px solid var(--fpt-burgundy);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface, #fff);
+  box-shadow: var(--hub-shadow);
+}
+
+.fpt-tool:nth-child(2) { border-top-color: var(--fpt-gold); }
+.fpt-tool:nth-child(3) { border-top-color: var(--fpt-red); }
+.fpt-tool:nth-child(4) { border-top-color: var(--mgdb-green); }
+.fpt-tool:nth-child(5) { border-top-color: #8a8178; }
+
+.fpt-tool h3 { margin: 0; font-size: var(--mgdb-text-xl); }
+.fpt-tool h3 a { color: var(--fpt-burgundy); text-decoration: none; }
+.fpt-tool h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.fpt-page .fpt-tool-kind {
+  margin: 2px 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.fpt-tool p { margin-top: 0; }
+.fpt-tool > p:not([class]) { flex: 1 1 auto; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+
+/* A line break after the description, then the count sits just above its
+   button. The description grows to fill the card, so in a row of cards the
+   counts and buttons line up and a shorter description gets more air. */
+.fpt-page .fpt-tool-stat {
+  margin: var(--mgdb-space-5) 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.fpt-tool-stat b { color: var(--mgdb-ink); font-size: var(--mgdb-text-base); font-variant-numeric: tabular-nums; }
+.fpt-tool-actions { margin: 0; }
+
+.fpt-tool-new { background: linear-gradient(180deg, #f3faf5 0%, #fff 60%); }
+
+/* The species table on the home page */
+.fpt-species-table th[scope="row"],
+.fpt-species-cell { white-space: nowrap; }
+
+.fpt-species-cell i { font-weight: 700; }
+
+.fpt-species-cell .fpt-species-sub,
+.fhp-species span {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+}
+
+.fpt-species-table td { vertical-align: middle; }
+
+/* --------------------------------------------------------------------------
+   6. Structures
+   -------------------------------------------------------------------------- */
+
+.fst-chooser {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid #ead7c6;
+  border-radius: var(--mgdb-radius);
+  background: #fffaf3;
+}
+
+.fpt-page .fst-chooser-lead { margin: 0 0 var(--mgdb-space-4); font-size: var(--mgdb-text-sm); }
+
+.fst-chooser-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--mgdb-space-2);
+}
+
+.fst-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+  color: var(--mgdb-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fst-choice b { font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-sm); }
+.fst-choice span { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+.fst-choice:hover { border-color: var(--fpt-burgundy); }
+.fst-choice:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+
+.fst-choice[aria-pressed="true"] {
+  border-color: var(--fpt-burgundy);
+  box-shadow: inset 4px 0 0 var(--fpt-burgundy);
+}
+
+.fpt-page .fst-identity { border-left-color: var(--fpt-burgundy); }
+.fst-identity-main { min-width: 0; flex: 1 1 22rem; }
+.fst-identity h3 { color: var(--fpt-burgundy); font-family: var(--mgdb-font-mono); }
+
+.fst-symbol {
+  margin-left: var(--mgdb-space-2);
+  color: var(--fpt-burgundy);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.fpt-page .fst-name { margin: var(--mgdb-space-1) 0 0; font-size: var(--mgdb-text-base); }
+.fpt-page .fst-facts { margin: var(--mgdb-space-3) 0 0; }
+
+.fpt-page .fst-note {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.fpt-page .ps-identity-links { flex: 0 1 auto; max-width: 26rem; }
+
+.fpt-page .fst-tabs { margin-top: var(--mgdb-space-4); }
+.fpt-page .fst-tabs .ps-tab[aria-selected="true"] { border-bottom-color: var(--fpt-burgundy); color: var(--fpt-burgundy); }
+
+.fst-panel > .ps-viewer { margin-top: 0; }
+
+.fst-cmp-metrics { margin-top: 0; }
+
+.fst-strip { height: 110px; }
+
+.fst-key {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  margin: 0 4px 3px 8px;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
+.fst-key-af { background: #8fa6c4; }
+.fst-key-esm { background: #ff9f40; }
+
+/* --------------------------------------------------------------------------
+   7. Effectors
+   -------------------------------------------------------------------------- */
+
+/* 16px under the species buttons before the filter labels start, and 12px
+   between the count row and the table -- they were 12 and 8. */
+.fef-species {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: 0 0 var(--mgdb-space-4);
+}
+
+.fef-species .mgdb-chip[aria-pressed="true"] {
+  border-color: var(--fpt-burgundy);
+  background: var(--fpt-burgundy);
+  color: #fff;
+}
+
+.fef-chip-count {
+  margin-left: 2px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  opacity: .8;
+}
+
+.fef-filters {
+  display: grid;
+  grid-template-columns: minmax(14rem, 2fr) minmax(11rem, 1fr) minmax(11rem, 1fr) auto;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: end;
+}
+
+.fef-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--mgdb-space-4) 0 var(--mgdb-space-3);
+}
+
+.fef-count { margin: 0; font-weight: 700; }
+
+.fef-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.fef-size { display: inline-flex; gap: var(--mgdb-space-2); align-items: center; font-size: var(--mgdb-text-sm); }
+.fef-size select { min-height: 36px; padding: 0 var(--mgdb-space-2); border: 1px solid #b9b2a5; border-radius: var(--mgdb-radius-sm); background: #fff; font: inherit; }
+
+.fef-table { min-width: 64rem; }
+.fef-table th, .fef-table td { vertical-align: top; }
+.fef-table.fef-one-species .fef-col-species { display: none; }
+
+.fef-table thead th button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.fef-table thead th button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.fef-table thead th button:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+.fef-table thead th[aria-sort="ascending"] button::after { content: " \2191"; }
+.fef-table thead th[aria-sort="descending"] button::after { content: " \2193"; }
+
+.fef-col-gene { min-width: 10.5rem; white-space: nowrap; }
+.fef-gene { display: block; font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-sm); font-weight: 700; }
+.fef-acc { display: inline-block; margin-top: 2px; font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-xs); font-weight: 400; }
+
+.fef-flag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+
+.fef-empty { color: #9a948c; }
+
+.fef-prob { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.fef-meter {
+  display: block;
+  width: 4.5rem;
+  height: 4px;
+  margin: 4px 0 0 auto;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--mgdb-line-soft);
+}
+
+.fef-meter span { display: block; height: 100%; background: var(--fpt-burgundy); }
+
+.fef-col-signal { min-width: 11rem; }
+
+.fef-signal {
+  display: inline-block;
+  margin: 0 4px 4px 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.fef-signal span { color: inherit; opacity: .75; font-variant-numeric: tabular-nums; }
+.fef-signal-chloroplast { background: #e6f4ea; color: #1c5b34; }
+.fef-signal-mitochondria { background: #fdecea; color: #8e2a1f; }
+.fef-signal-nucleus { background: #e9f0fb; color: #1f4f8f; }
+
+.fef-col-function { min-width: 18rem; }
+.fef-desc { display: block; }
+
+.fef-go { margin-top: 4px; font-size: var(--mgdb-text-sm); }
+.fef-go summary { color: var(--mgdb-green-dark); cursor: pointer; font-weight: 600; }
+.fef-go ul { margin: 4px 0 0; padding-left: 1.1rem; }
+.fef-go li { margin: 2px 0; }
+.fef-go a { font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-xs); }
+.fef-aspect { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+
+.fef-ec { display: block; margin-top: 4px; font-size: var(--mgdb-text-xs); }
+
+/* Two by two, not four stacked: a stacked list set every row's height. */
+.fef-col-links {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 0 var(--mgdb-space-3);
+  align-content: start;
+  white-space: nowrap;
+}
+
+.fef-col-links a { font-size: var(--mgdb-text-sm); line-height: 1.7; }
+
+.fef-none { padding: var(--mgdb-space-5); color: var(--mgdb-muted); text-align: center; }
+
+.fef-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.fef-pager:empty { display: none; }
+
+.fef-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0 var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.fef-page[aria-current="page"] { border-color: var(--fpt-burgundy); background: var(--fpt-burgundy); color: #fff; font-weight: 700; }
+.fef-page[disabled] { opacity: .45; cursor: default; }
+.fef-page:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+.fef-gap { padding: 0 4px; color: var(--mgdb-muted); }
+
+/* The species breakdown under the metrics. `.mgdb-figure` carries no margin
+   of its own and a figure is zeroed by the shell's reset, so without this the
+   figure's border ran straight into the metric cards' (0px). 16px is the
+   metric grid's own gap, so the two read as one group. */
+.fpt-page .fef-figure { margin-top: var(--mgdb-space-4); }
+.fef-figure h3 { margin: 0 0 var(--mgdb-space-3); font-size: var(--mgdb-text-lg); }
+.fef-breakdown { min-width: 36rem; }
+.fef-breakdown-bar { width: 40%; }
+
+.fef-stack {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--mgdb-line-soft);
+}
+
+.fef-seg { display: block; height: 100%; }
+.fef-seg-apo, .fef-key-apo { background: var(--fpt-gold); }
+.fef-seg-both, .fef-key-both { background: var(--fpt-red); }
+.fef-seg-cyto, .fef-key-cyto { background: var(--fpt-burgundy); }
+.fef-seg-none { background: #c9c2b8; }
+
+.fef-stack-numbers {
+  display: block;
+  margin-top: 3px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.fef-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px 0 2px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+/* --------------------------------------------------------------------------
+   8. Help
+   -------------------------------------------------------------------------- */
+
+.fpt-deflist { margin: 0; }
+
+.fpt-deflist > div {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.fpt-deflist > div:last-child { border-bottom: 0; }
+.fpt-deflist dt { font-weight: 800; }
+.fpt-deflist dt a { color: var(--fpt-burgundy); }
+.fpt-deflist dd { max-width: 72ch; margin: 0; color: var(--mgdb-ink-soft); }
+.fpt-deflist-compact > div { padding: var(--mgdb-space-2) 0; }
+
+.fhp-subhead { margin: var(--mgdb-space-6) 0 var(--mgdb-space-2); font-size: var(--mgdb-text-lg); }
+
+.fhp-genomes { min-width: 58rem; }
+.fhp-species { white-space: nowrap; }
+
+/* The note under a name wraps; left on one line, F. vanettenii's former
+   names made the species column 478px wide and pushed the table past its
+   card at 1280. */
+.fhp-genomes .fhp-species span { min-width: 12rem; white-space: normal; }
+
+.fhp-genomes th.fhp-mark { width: 5.25rem; line-height: 1.25; white-space: normal; }
+
+/* Seven check columns at the shell's 16px padding need 1,273px; at 6px the
+   table fits its card at 1280. */
+.fhp-genomes th.fhp-mark,
+.fhp-genomes td.fhp-mark { padding-right: 6px; padding-left: 6px; }
+
+@media (min-width: 1000px) {
+  .fhp-method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.fhp-mark { text-align: center; }
+.fhp-yes { color: var(--mgdb-status-ok); font-weight: 800; }
+.fhp-no { color: #b3aca2; }
+.fhp-genomes sup a { text-decoration: none; }
+
+/* --------------------------------------------------------------------------
+   9. Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .fef-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .fef-field-q { grid-column: 1 / -1; }
+}
+
+@media (max-width: 767px) {
+  .fpt-header-inner { min-height: 84px; }
+  .fpt-brand img { width: 168px; }
+  .fpt-header-band { inset: 0 0 0 38%; }
+
+  /* One scrolling rail rather than wrapped rows; the current item stays in
+     reach by swiping, as on the MaizeGDB section tabs. */
+  .fpt-nav-list {
+    overflow-x: auto;
+    padding: 0 var(--mgdb-space-2);
+    scrollbar-width: thin;
+  }
+
+  .fpt-nav-list li:last-child { margin-left: 0; }
+  .fpt-nav-list a { min-height: 44px; padding: 0 var(--mgdb-space-3); font-size: var(--mgdb-text-sm); }
+
+  .fpt-deflist > div { grid-template-columns: minmax(0, 1fr); gap: var(--mgdb-space-1); }
+}
+
+@media (max-width: 640px) {
+  /* Three short model tabs fit one row at 375 once the shell's 16px sides
+     come down; at full padding Compare wrapped onto a row of its own. */
+  .fpt-page .fst-tabs .ps-tab { padding-right: var(--mgdb-space-3); padding-left: var(--mgdb-space-3); }
+  .fpt-lookup-form { grid-template-columns: minmax(0, 1fr); }
+  .fpt-lookup-form .mgdb-hub-field-action .mgdb-button { width: 100%; justify-content: center; }
+  .fef-filters { grid-template-columns: minmax(0, 1fr); }
+  .fef-filters .mgdb-hub-field-action .mgdb-button { width: 100%; justify-content: center; }
+  .fpt-host { display: none; }
+  .fpt-header-band { inset: 0 0 0 45%; }
+  .fpt-footer-row { justify-content: center; }
+  .fpt-footer-links { justify-content: center; }
+  .fpt-footer-usda img { width: 220px; }
+}
+
+/* --------------------------------------------------------------------------
+   10. Motion, forced colors, print
+   -------------------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .fpt-nav-list a[aria-current="page"] { border-bottom-color: CanvasText; }
+  .fef-seg, .fef-meter span { forced-color-adjust: none; }
+}
+
+@media print {
+  body.mgdb-modern.fpt-site { background: #fff; }
+  .fpt-header-band, .fpt-nav, .fpt-footer-links { display: none; }
+}

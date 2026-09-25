@@ -192,6 +192,18 @@ deploy/check_bau.py src/templates/static/mgdb_gene.bau
 ./deploy/deploy.sh src/css/mgdb-modern.css
 ```
 
+### What deploy.sh does not carry
+
+Data built on the server from the database is not deployed: each instance
+builds its own. That is the search suggestion indexes in `data/suggest/` (every
+Data Hub box's, and the header's) and the dashboard cache, which a nightly job
+rebuilds whenever the database changes; and `/data_center/protein_structure`'s
+index, rebuilt when its export is refreshed. Moving to production, or standing
+up any new instance, means running the first build there by hand and
+installing the nightly job -- ADMIN_DEPENDENCIES.md **AD-081** has the steps,
+the cron line and the prerequisites (AD-019 for the structure index, AD-023
+for the dashboard cache directory).
+
 ## Rollback
 
 ```bash
@@ -395,6 +407,301 @@ the pattern library. Every rule in `mgdb-modern.css` is scoped under
 **3. Add page-specific CSS** in its own file, scoped under a unique page class
 (`.mgdb-page.mgdb-<page>-page`), and reuse the shared tokens rather than
 introducing new colors or spacing values.
+
+### Charts: Plotly is fetched when a figure needs it
+
+Do not include Plotly from a controller. It is 4.6 MB (1.3 MB compressed), and
+until 2026-09-25 every chart page loaded it in `<head>` -- 54 controllers and
+two page entry points -- where it held up the first paint whether or not the
+reader ever reached a figure. The gene record downloaded it on every view and
+drew nothing with it in the first screen. `MGDB.chart()` now fetches it itself,
+once per page, when the first figure comes within 200px of the viewport, and a
+figure within a screen and a half of view starts the download early so a
+reader scrolling down meets a drawn chart rather than a loading line. The one URL is
+`PLOTLY_SRC` at the top of the Plotly block in `js/mgdb-modern.js`. Two versions
+used to be in use -- 2.35.2 from the CDN in 46 of those files, a local 2.25.2 in
+the other ten and in TYPSimSelector's own loader -- and every page now gets
+2.35.2, so a reader's browser caches one copy for the whole site.
+
+Three things follow for page code:
+
+- **`MGDB.chart()` returns a promise for the drawn element** (or `null` if the
+  figure could not be drawn), and it stays pending until the figure comes into
+  view. Anything that needs a drawn figure goes in its `then()`. Twelve hubs
+  installed their breakpoint relayout with `if (window.Plotly) { ... }` right
+  after the call; with Plotly not yet on the page that test fails at load and
+  the handler is never installed, so each now waits on the promise.
+- **A page that draws with Plotly itself asks `MGDB.loadPlotly()`**, which
+  resolves with `window.Plotly` and shares the one download. `MGDB.whenNear(el,
+  fn)` is the same when-in-view trigger `MGDB.chart()` uses. The map hub, the
+  reference hub and Expression Tools draw this way; TYPSimSelector had its own
+  loader for the local 2.25.2 and now goes through `MGDB.chart()`.
+- **A figure in a hidden section is not drawn until the section is shown.**
+  An element with no box is near nothing, so it waits -- which is also when it
+  can be drawn at its real width, instead of at Plotly's 700px default.
+
+The old three-second fallback drew every figure after three seconds whether
+or not it was near the screen, because `IntersectionObserver` does not report
+in some headless and embedded browsers. Left as it was, it would have fetched
+Plotly on every chart page three seconds in. It now fires only if the observer
+has said nothing at all -- a working observer reports every target once as
+soon as it starts watching -- so it still covers those browsers (the in-app
+pane among them) and never fires in an ordinary one.
+
+### Bundling a page's stylesheets and scripts
+
+```php
+$bauplan->bundle('gene-record');
+```
+
+serves the page's local stylesheets as one file and its local scripts as
+another, in the order the controller and its templates asked for them. The
+files every modern page opens with (`Bauplan::BUNDLE_SHELL`: `static.css`,
+`mgdb-modern.css`, `mgdb-megamenu.css`, `mgdb-modern.js`, `mgdb-chrome.js`)
+form a bundle of their own, so a reader moving between bundled pages fetches
+them once. Anything that is not a plain local file -- a CDN script, an inline
+`<style>`, a module -- keeps its place and splits the run around it, so no file
+moves past it. Pages that do not call `bundle()` are written byte for byte as
+before.
+
+There is no build step. The first request that needs a bundle writes it to
+`temp/bundles/`, named for its members' paths, modification times and sizes,
+so deploying any member changes the name and the next request builds the new
+one; a single-file deploy cannot leave a stale bundle behind. `temp/` is used
+because it is the one tree httpd may write to (a standing SELinux fcontext
+rule labels it `httpd_sys_rw_content_t`, and Apache is in its group), and the
+directory's `.htaccess`, which Bauplan writes, lets browsers keep a bundle for a
+year, since a name never outlives its content. Superseded versions are removed
+an hour after they are replaced.
+
+If a bundle cannot be written -- the directory not writable on a new host, a
+member unreadable -- the page is written exactly as without `bundle()`, with an
+HTML comment in `<head>` saying why: `<!-- bundle gene-record.js not built: ...
+-->`. Check the served HTML for that comment before concluding a page is
+bundled. On the gene record it turns fourteen stylesheets and eleven scripts
+into four files.
+
+**What each change was worth, measured 2026-09-25** on a cold cache through
+Cloudflare in headless Chrome, the median of three runs (two on the slow
+profile, which is Lighthouse's mobile one: 1.6 Mbps, 150 ms round trips and a
+CPU four times slower):
+
+| | first paint, 10 Mbps | first paint, slow | transferred | requests |
+| --- | ---: | ---: | ---: | ---: |
+| gene record, before | 1,848 ms | 8,902 ms | 2,449 KB | 40 |
+| without Plotly, unbundled | 704 ms | 2,142 ms | 1,147 KB | 37 |
+| without Plotly, bundled | 700 ms | 2,090 ms | 1,121 KB | 16 |
+
+Nearly all of it is Plotly. Five hubs and records that are not bundled went
+from 1.4-2.1 s to 0.52-0.56 s on the same profile, and the locus hub from
+8.1 s to 1.4 s on the slow one. Bundling barely moves a first visit: over
+HTTP/2 to Cloudflare, 25 small requests were already cheap. What it buys is
+the repeat visit -- 25 files the edge marked stale after 30 minutes, each
+revalidated before the page could paint, are now four that a browser keeps for
+a year -- and, as more pages opt in, one shared copy of the shell.
+
+## Search suggestions (typeahead)
+
+Every hub's own search field suggests as the reader types, in the look of the
+Expression Tools gene box: a plain list under the field, an identifier in mono,
+a name in bold, one muted line of context. **Typing only suggests.** The results
+change when the reader submits -- Enter, the search button, or picking a
+suggestion, which puts its value in the field and submits the form so the
+page's own search runs exactly as though it had been typed. Several hubs used
+to re-run their search on every keystroke; that is gone, because an answer that
+lands after the reader has typed more shows results for text no longer in the
+box (the stock and map pages also dropped a submit made while a keystroke search
+was still running). A search asked for while one is running is now queued, not
+dropped, on every hub that had that guard.
+
+### Using it
+
+```html
+<input id="stock-query" data-suggest="stock" ...>
+```
+
+That is all a page needs: `mgdb-modern.js` binds every `input[data-suggest]` on
+load. Optional attributes: `data-suggest-pick="navigate"` opens the record
+instead of searching, `data-suggest-submit="#button"` for a field with no form,
+`data-suggest-anchor=".box"` to align the list with a wrapper (a bordered
+wrapper around a borderless input is found automatically), and
+`data-suggest-paused` to switch it off while the field takes something else --
+the Overgo box sets it in sequence mode -- and `data-suggest-list` for a
+textarea of identifiers, where the entry under the caret is completed, a pick
+replaces just that entry and starts a new line, and nothing is submitted
+(`/insertion`'s two list boxes). A page whose data is already in the
+page passes a function instead of a scope:
+
+```js
+MGDB.typeahead(input, { source: function (qn) { return [{ v: 'B73', name: 'B73', meta: '…' }]; } });
+```
+
+`/genome`, `/ai` and `/genetic_variation` do this, each asking the same match
+function the page's own filter uses, so a suggestion is a row the filter keeps.
+
+### The index
+
+Suggestions never touch Postgres. `tools/suggest_index.php` writes one SQLite
+file per scope into `data/suggest/` on the server, and
+`search/suggest/suggest_api.php` answers from it -- 1-7 ms at the origin, about
+100 ms from a browser, which is almost all network. **It has to be rebuilt
+after every database reload**, like the dashboard cache. A nightly job does that
+(`tools/nightly_rebuild.php`, below); by hand:
+
+```bash
+cd /var/www/claude/html && php tools/suggest_index.php            # all scopes, ~5 minutes
+cd /var/www/claude/html && php tools/suggest_index.php --only=stock
+```
+
+Each scope is built beside its live file and renamed into place, keeping the
+old one as `<scope>.sqlite.previous` for a rollback; the directory's `.htaccess`
+keeps every file out of reach of a browser. The whole index is about 1 GB, most
+of it variations (1.7 M), gene models (1.6 M), loci and markers.
+
+**A suggestion is only ever something the hub's search finds.** Each scope reads
+the fields its hub's search reads, and each suggestion carries the value that
+search finds the record by -- the name, the gene model id, a reference's title.
+Where a hub has rules of its own, the builder applies them: the stock search
+never reads a stock's name, only its descriptions, synonyms and accessions, so
+each name is checked against the stock hub's own token rules
+(`stock_search_lib.php`) and the 723 stocks it cannot find by name are left
+out. `tools/tests/suggest_accuracy.php` proves it end to end: for sampled
+queries it takes every suggestion, runs the hub's search API with its value
+over HTTP at the origin, and looks for the record in the answer. Run it after
+touching a scope or a hub's search.
+
+Ranking: names first -- a record's own or official name equal to the text,
+then starting with it -- then synonyms and other identifiers the same way, then
+words inside names, titles and synonyms. An exact synonym still comes after
+every name: "waxy" is wx1 (waxy1) before gbss2, which lists "waxy" as a synonym.
+Within those, how often readers open the record (`perm_tables.record_access`),
+then the shorter name. A suggestion matched on a
+synonym or accession says so ("Ki11 · Ames 27124"), and several records sharing
+one value are one row ("adh1 · 3 records") because picking any of them runs the
+same search.
+
+| Scope | Field | Matches on |
+| --- | --- | --- |
+| `gene` | `/gene_center/gene`, `/expression` | gene model ids (every assembly), locus symbols with current models, full names, synonyms |
+| `pan_gene` | `/pan_gene_center/pan_gene` | pan-gene names, member gene models, loci, protein values |
+| `locus` | `/data_center/locus` | names, full names, synonyms, gene models |
+| `stock` | `/data_center/stock` | names (checked findable), synonyms, accessions, description words |
+| `marker` | `/data_center/marker` | names, names without `p-`, synonyms |
+| `reference` | `/data_center/reference` | titles, DOIs, PubMed ids, author names, title/author/journal words |
+| `phenotype`, `variation`, `qtl`, `map`, `gene_product`, `image`, `pathway` | their hubs | as each hub's search reads them |
+| `bac`, `est`, `overgo`, `ssr` | the four clone hubs | names (and SSR repeats) |
+| `gene_v5` | `/data_center/protein_structure` tool boxes, `/genomebrowser` | B73 v5 gene models with a protein |
+| `uniformmu_gene`, `uniformmu_insertion`, `uniformmu_stock` | `/uniformmu` | only records with UniformMu insertions |
+| `trait_stock` | `/traits_ibm_nam` | stocks that have trait values |
+| `insertion_gene`, `insertion_name` | `/insertion` list boxes | gene models and insertion names of the hub's four collections |
+| `all` | `/search_engine/searchall` refine box | ten scopes merged, each row naming its type; **a pick opens the record**, as the header search's suggestions do, because the all-data search cannot find every record by its own name (a filled-in value missed one time in six: it tokenises "Mo17/H99 F6:7 5" differently, lists references by year, and reads no author names) |
+
+Adding a scope is an entry in `suggestScopes()` (`include/suggest_lib.php`), a
+source in `sgSources()` (`tools/suggest_index.php`) and a hub adapter in the
+accuracy test.
+
+Not on this system, deliberately: the header search (its own grouped endpoint,
+`controllers/search_engine/autocomplete.php`, with its own index -- below), the
+pages that already had a typeahead of their own (protein structure, AlphaFill,
+FATCAT, `/person`, SNPversity, TYPSimSelector, the Breeders' Toolbox), "Narrow
+this page" filters, and the Data Hub directory's card filter.
+
+### The header search's index
+
+The header search keeps its own suggestions -- grouped, with a top hit, from
+`controllers/search_engine/autocomplete.php` -- but no longer waits on
+Postgres for the three parts that made it slow. The logic moved unchanged into
+`include/autocomplete_lib.php` (`acSuggest`); the all_text_search groups, the
+locus-name lookup and the gene models are answered from
+`data/suggest/header.sqlite` (`include/header_index_lib.php`, built by
+`tools/header_index.php`, about 590 MB and two and a half minutes), and the rest
+-- the exact stock, pan-gene, genome and ID lookups, and the rows each
+suggestion is drawn from -- stays live. `AC_HEADER_INDEX` at the top of the
+controller switches the index off; the response says which answered in
+`X-Suggest-Engine: index|live`, and an index that fails answers live.
+
+**The rule is parity, not similarity.** For every term the index returns the
+rows the header's own SQL returns, in the same order, so the JSON is the same
+field for field. `tools/tests/header_index_parity.php` computes both and
+compares them; run it after every rebuild. On 2026-09-25 all 5,194 comparisons
+were identical -- 633 real and typed-out terms, every two-character term
+(1,296), 3,216 in six other categories, 49 with underscores -- and an HTTP run
+of 539 against the old controller matched 534 of 534; the other five had been
+HTTP 503 timeouts and now answer. At the origin the 90th percentile went from
+233 ms to 57 and the slowest from 1.5 s to 0.25 s; the median, 51 to 44 ms, is
+mostly the new database connection every request opens. What parity took:
+
+- **Postgres's words, not a re-implementation.** Each text row carries its own
+  `to_tsvector('english', text)` lexemes from the build, and a typed term is
+  turned into its tsquery by Postgres at query time (0.3 ms, no table read), so
+  stemming, stop words and the parser's splitting are never copied. Terms whose
+  LIKE pattern has wildcards (`_ % \`) or whose tsquery is a phrase
+  (`cl3360_1`) are answered by Postgres -- first narrowed by their rarest word
+  when another is one or two characters (`hxTextNarrowed`: 200 ms to 13 for the
+  `CL..._1` ESTs), otherwise by the live query itself.
+- **The database's collation.** Names are compared with PHP's `strcoll()` in
+  en_US.UTF-8 -- the same glibc 2.34 -- with `strcmp()` breaking ties as
+  Postgres does. The build checks every stored row against that order and stops
+  on the first disagreement.
+- **LIMIT with no ORDER BY, as Postgres runs it.** The locus lookup takes
+  twelve rows from each of four ranges in no stated order. With several case
+  variants ORed, Postgres reads a bitmap or the table, so the twelve are the
+  lowest physical positions. A single range -- every synonym range, and a name
+  range for a term with no letters -- it reads through the btree when the range
+  is narrow or very broad and through a bitmap or the table in between, so
+  the choice cannot be worked out from the prefix (`6` and `612` walk the btree,
+  `61` does not). The index keeps every row's ctid, and when a single range
+  holds more than twelve rows the reader asks Postgres (EXPLAIN of that arm,
+  planning only, one round trip).
+- **Ties made deterministic.** Two gene-model rows equal on every sort key --
+  one v5 model filed under both tua1 and tua2 -- came out in whatever order the
+  sort left them. Both gene queries now end on ctid, live and indexed alike.
+- **FTS5 term spaces kept apart.** The token holding the start of each text is
+  marked with a private-use character, so it never shares a doclist with a
+  lexeme. With a column filter instead, a lookup of the text start `mu` read
+  the whole doclist of the word `mu` to filter it by column: 185 ms across the
+  eleven groups to find nothing. Prefix indexes run to ten characters.
+
+The same work found that the header's prefix ranges had come back empty for any
+term ending in 9 or z: `acPrefixEnd` bumped the last byte ("...149" became
+"...14:"), and in the database's en_US order ":" and "{" sort before digits and
+letters. It now steps to the next string in that order (9 to "a", z carries).
+
+### Keeping them current: the nightly job
+
+The hub suggestions, the header index and the dashboard cache are all built from
+the database and none of them follows it on its own. After a reload they
+describe the old one: new records are not suggested, a renamed or removed locus
+or gene model can still be, and the header index's copy of Postgres's physical
+row order no longer matches, so its answers drift from the live SQL's.
+
+`tools/nightly_rebuild.php` runs from cron every night at 2:30 (on dev8, the
+`carson` account's crontab). It compares every table's file number and write
+counters with the last good build -- a reload, a refreshed materialized view or
+a curation edit moves them, a vacuum does not -- and does nothing if they match,
+which is most nights. When they do not, it rebuilds the hub suggestions, the
+header index and the dashboards, then runs the parity test over
+`tools/tests/header_parity_queries.json`. If the header index fails that test it
+is set aside as `header.sqlite.failed`, and the header answers live -- slower,
+never stale -- until a good build replaces it. The tables the site writes in
+ordinary use (record views, BLAST jobs) are ignored; a run that rebuilds names
+the tables that caused it.
+
+```bash
+cd /var/www/claude/html && php tools/nightly_rebuild.php --status   # what changed since the last build
+cd /var/www/claude/html && php tools/nightly_rebuild.php --force    # rebuild now, ~10 minutes
+cat /var/www/claude/html/data/suggest/nightly.log                   # one line per night
+```
+
+It prints only on failure, so cron's mail carries failures and nothing else;
+each run's whole output is in `data/suggest/nightly-last.log`. Installing it on
+production -- and on any other instance -- is ADMIN_DEPENDENCIES.md **AD-081**.
+
+To check the header index by hand, including every two-character term:
+
+```bash
+php tools/tests/header_index_parity.php --queries=tools/tests/header_parity_queries.json --gen=two
+```
 
 ## The JSON API
 
@@ -5163,81 +5470,277 @@ requires `id_num.curation_lvl = 0` on the locus, as the rest of the site does.
 On the worst pair that is 5,500 rows where the legacy page showed 5,505: five
 loci that are not public were being listed.
 
-## Foldseek structure search
+## Foldseek structural matches
 
-`/foldseek` came onto the design system on 2026-09-06. Carson: "it mainly uses
-an iframe for the core function of the page, but everything else needs to use
-the new redesign format." That is exactly the split: the search still runs at
-`foldseek.maizegdb.org` in a frame, untouched, and everything around it is new.
+`/foldseek` shows, for one maize protein, its Foldseek matches in eight
+proteomes: the closest structure in each, where on the protein they align, a
+sortable table of every match, and any one of them aligned and superposed in 3D
+with its TM-score. Rebuilt natively 2026-09-25; the 2026-09-06 version put the
+design system around foldseek.maizegdb.org in an iframe.
 
-`controller.php` checks `./controllers/<CONTROLLER>.php` before falling through
-to `redirect.php`, so `controllers/foldseek.php` takes the route from
-`controllers/tools/foldseek.php` without modifying it &mdash; the same trick
-`/fatcat` uses, and the same rollback: delete the file and the original is found
-again on the next request. Originals archived in `legacy/foldseek/`.
-
-### What was on the page before
-
-Almost nothing. No `<h1>`, no meta description, the title "Welcome to
-MaizeGDB", one pill-shaped link, and a 1,050px frame. The only other content was
-twenty lines of JavaScript that widened the legacy shell to hold the frame:
-
-```js
-document.getElementById("wrapper").setAttribute("style", "width:1700px");
-document.getElementById("logo").setAttribute("style", "width:1424px");
-document.getElementById("content_top").src = "/images/content_top_gbrowse.png";
-```
-
-&mdash; and five more like it, plus a second batch in `window.onload` for the
-footer. All of it exists to make a fixed-width chrome hold a wide frame. The
-modern shell is fluid, so it is deleted rather than ported, and the frame simply
-takes the width it is given.
-
-### A reflected injection that was live
-
-The old page pasted `?uniprot=` into both the iframe `src` and the full-screen
-`href` with no escaping, inside double-quoted attributes:
+The same page, script and adapter also serve `/fusarium/foldseek`, the Fusarium
+Protein Toolkit's analysis, with `set=fusarium`; see "Fusarium Protein Toolkit".
 
 ```
-/foldseek?uniprot=A0A1D6E9Y7"><b>INJECTED</b>
+controllers/foldseek.php                   the page; zero SQL, no upstream request
+templates/static/mgdb_foldseek.bau         its body, on the Data Hub shell
+css/mgdb-foldseek.css  js/mgdb-foldseek.js its assets
+js/mgdb-tmalign.js                         TM-align's -I scoring, ported
+search/foldseek/foldseek_api.php           suggest · search · hit
+search/foldseek/foldseek_lib.php           the upstream adapter and its cache
+tools/tests/foldseek_adapter_check.php     the adapter against the live upstream (server)
+tools/tests/foldseek_tmscore_check.js      the TM-score port against upstream's numbers (workstation)
 ```
 
-closed the attribute and the tag and rendered the markup, in both places, on the
-running site. The value is now matched against `^[A-Za-z0-9_.:-]{1,64}$` before
-it is used at all and escaped on the way out; anything else is dropped and the
-tool opens on its own search form. Verified after: that payload renders zero
-markup and the frame loads the bare app, while `?uniprot=Zm00001eb000010` still
-reaches the tool and names the structure in a notice.
+Reuses `js/lib/3dmol/`, and the protein structure index under
+`data/protein_structure/` for suggestions and for maize matches' gene models.
 
-**The parameter is called `uniprot` and usually is not one.**
-`js/mgdb-protein-structure.js` passes a gene model id. The upstream app resolves
-either, and its bookmark URLs are built from the name upstream, so the name
-stays.
+### What the upstream is
 
-### Two things kept deliberately
+A PHP page wrapped around Foldseek's own HTML report. Every response is about
+**7.6 MB**: 5.5 MB of the report's viewer bundle, inline, then a call
 
-- **`name="gframe"`.** The upstream application reads the window name when it
-  builds a bookmark URL. The legacy template says so in a comment, and renaming
-  the frame would break every bookmark the tool hands out.
-- **The sandbox list, minus one entry.** It carried both
-  `allow-top-navigation` and `allow-top-navigation-by-user-activation`. The
-  broader of the two lets the framed application navigate the reader off
-  MaizeGDB on its own, with no click. The narrower one is kept, so the app's own
-  links still work. Restoring it is adding the word back.
+    render([{ "query": {...}, "alignments": [ ...165 hits... ] }]);
 
-### `/data_center/foldseek` was never a page
+holding 2 MB of JSON: per match the target accession, species, UniProt
+annotation, identity, score, E-value, both ranges, both aligned strings, the
+target's sequence and its C&alpha; coordinates; the query's coordinates ride on
+the query object. That call is the load-bearing parse, because it is what the
+upstream viewer itself draws from. A hand-written protein overview and a Pfam
+table above it are parsed more softly.
 
-It is the URL Carson reached for, and it answered **HTTP 200 with the legacy
-"Oops, Sorry!" body** &mdash; a page-shaped error that also tells a crawler
-everything is fine. It is a 301 to `/foldseek` now, carrying any identifier
-across and dropping anything that is not one. The Protein Structure Hub lives
-under `/data_center`, which is presumably why the form gets typed.
+The analysis is fixed: the 39,299 maize AlphaFold DB version 3 models (July
+2022), each searched against maize, sorghum, rice, soybean, Arabidopsis, human,
+budding yeast and fission yeast. Measured over 25 proteins: never more than
+**25 matches per proteome**, no E-value above 0.001, the query never among its
+own matches, and some proteins with matches in only a few proteomes or none.
 
-The frame is `clamp(720px, 82vh, 1200px)` tall, and `clamp(480px, 70vh, 720px)`
-below 640px &mdash; a phone cannot show the tool's three-pane layout at any
-height, so there the full-screen button is the real way in. Checked at 1280 and
-375: no horizontal overflow at either, all four section tabs point at sections
-that exist, and both reference cards render.
+**Its lookup is exact and case-sensitive.** It answers `Zm00001eb374230`,
+`Zm00001d045055`, `P16165`, `bz1` and `wx1`, and an **empty HTTP 500** for
+`zm00001eb374230`, `Zm00001eb374230_T001`, `p16165`, `AF-P16165-F1`, `BZ1`,
+`GRMZM2G165390` and `"bz1 "`. `fsCandidates()` puts every one of those shapes
+into one the upstream accepts before asking, then tries the gene models and
+accessions the structure index maps the term to. When all of that misses, the
+API asks `geneResolveId()` and the locus's v5 gene models, so a B73 v3 model
+reaches the analysis: `GRMZM2G165390` now opens bz1, which upstream never
+allowed.
+
+### The adapter
+
+One upstream request per protein, ~0.3 s from dev8; the parse itself is
+~10 ms. Three cache files per protein under `<search_cache_path>/foldseek`: a
+~40 KB summary, the ~2 MB of alignments and coordinates gzipped to ~0.6 MB, and
+a map from each typed identifier to its accession. 30-day TTL, a one-day TTL on
+"not in the analysis", and one write in fifty sweeps out expired files. The
+directory was created 2026-09-25 with `chcon -t httpd_sys_rw_content_t`: made by
+httpd under `/home/cache` it would be `user_home_t` and every write denied
+silently; the API reports `summary.cache_error` if that happens again.
+
+**The `render([...])` JSON is not valid JSON.** The last match is followed by a
+trailing comma, and `json_decode()` rejects all 2 MB for that byte. It is
+stripped by a pattern that steps over string literals first, so a comma inside
+an annotation cannot be touched; possessive quantifiers keep it linear, 5 ms
+with the PCRE JIT off, which is how this host runs.
+
+**Maize matches link to their B73 v5 gene where the structure index knows
+them.** Most do not: they are 2016 TrEMBL entries built on the v4 annotation,
+since deleted by UniProt ("not part of a reference proteome"), and the index
+never held them. Each maize match carries an "Its own matches" link instead,
+because the upstream still resolves those accessions.
+
+### The TM-score, and what was wrong with the old one
+
+The upstream viewer rebuilt each C&alpha; trace with PULCHRA, loaded both into
+NGL and ran TM-align, compiled to WebAssembly, as
+`TMalign target.pdb query.pdb -I aln.fa -m matrix.txt`, showing the score
+normalized by the target's aligned length. Under `-I` TM-align skips its whole
+alignment search and keeps every aligned pair, so the number is one final
+`TMscore8_search`. `js/mgdb-tmalign.js` ports exactly that from TMalign.cpp
+2022/04/12, the file tmalign-wasm compiles, keeping TM-align's Kabsch, fragment
+ladder, iteration count and convergence test so the number agrees to the
+printed digit.
+
+Checked against both the upstream page and its own TM-align binary, extracted
+from the page and run on the same coordinates: **152 of bz1's 165 matches agree
+with the upstream display exactly. The other 13 do not, and the upstream is
+wrong on all 13.** PULCHRA leaves a stretched peptide bond in some rebuilds —
+1.98 Å C–N on the sorghum match `A0A1Z5R994` — NGL splits the model into chains
+A and B there, and TM-align, which reads only the first chain by default,
+scores **390 of the 498 residues**. The page showed 0.72573; TM-align on the
+whole structure gives 0.77119, and that is what `/foldseek` shows. PULCHRA moves
+no C&alpha; atom (maximum shift 0.000 Å), so the port uses the search's own
+coordinates and never rebuilds anything.
+
+**Speed.** The score runs in a Web Worker. With nested arrays and fresh 3x3
+matrices per Kabsch call, a 2,158-residue alignment (dek1 against its rice
+ortholog) was still computing after 30 s; on flat `Float64Array`s with reused
+scratch it is **2.6 s**, and a typical 470-residue alignment is **73 ms**
+median, 166 ms at worst over bz1's matches. Same arithmetic in the same order,
+so the scores did not move.
+
+### The superposition
+
+The search returned C&alpha; atoms and nothing else, so both chains are drawn
+as tubes through them — a C&alpha;-only PDB with `CONECT` records, since 3Dmol's
+cartoon needs a backbone — in the rotation TM-align writes with `-m`. The
+picture is therefore the alignment the numbers describe, residue for residue.
+Color by protein or by the distance between aligned residues, with the
+unaligned parts and the pair lines optional; the alignment below it shades
+each aligned residue by the same distance bins. The superposition downloads as
+a two-chain PDB whose REMARKs carry both TM-scores and the RMSD.
+
+**The open match's panel is sticky and sized to the table's visible width.**
+It lives in a colspan row of a table that scrolls sideways on a phone; left
+alone it was 1,037px wide inside a 257px scroll area, with the viewer off to
+the side.
+
+### What the page adds
+
+The closest match in each proteome as one table; a figure of where each
+proteome's matches fall on the protein, shaded by the best identity at each
+position, with the Pfam domains above; the match table sortable, filterable by
+proteome and text, paged, and exportable as TSV; deep links to a match
+(`?uniprot=bz1&hit=C5Z5X2`); gene links for maize matches; B73 v3 identifiers;
+typeahead from the structure index; RMSD, share within 2 Å and both TM-score
+normalizations beside the superposition; the alignment's similarity line and
+distance shading; the correct TM-score. The page transfers about 20 KB and a
+protein's results about 9 KB, where the upstream page is 7.6 MB each time.
+
+### Kept from 2026-09-06
+
+`?uniprot=` (the parameter every link into this tool uses), `/foldseek/<id>`
+and `?term=`; `/data_center/foldseek` is still a 301 here. The reflected
+injection the legacy page had — `?uniprot=` pasted unescaped into an iframe src
+and an href — stays fixed: the value is matched against
+`^[A-Za-z0-9_.:-]{1,64}$` before use and escaped on the way out.
+
+### Open
+
+The analysis still lives only on foldseek.maizegdb.org, and that page still
+shows the truncated TM-scores to anyone who reaches it directly. AD-080 asks
+for the source data and a fix upstream. After any change there, run
+`php tools/tests/foldseek_adapter_check.php` from the web root: it fetches past
+the cache and checks every field the adapter reads.
+
+## Fusarium Protein Toolkit
+
+`/fusarium` recreates fusarium.maizegdb.org, the Fusarium Protein Toolkit
+(FPT), on the design system: every page is the Data Hub shell and the site's
+components, inside the toolkit's own chrome -- its logo, the micrograph of
+macroconidia in the header, a burgundy navigation bar and footer. The logo's
+three colors are MaizeGDB's own burgundy, gold and red tokens, so the toolkit
+reads as itself and as part of the family. Built 2026-09-25.
+
+| Route | What it is | Upstream page |
+|---|---|---|
+| `/fusarium` | one lookup box, the tools, what exists per species, downloads | `index.php` |
+| `/fusarium/foldseek` | Foldseek matches -- `/foldseek`'s page with `set=fusarium` | `protein_structure/index.php` |
+| `/fusarium/structures` | AlphaFold and ESMFold models, superposed; the page for one protein | the home page's two viewers |
+| `/fusarium/effectors` | the predicted effector table, all six species, filter/sort/TSV | `effector.php` |
+| `/fusarium/help` | the tools, data and methods, the 22 genomes, citing | `help.php` |
+
+The upstream paths (`index.php`, `effector.php`, `help.php`,
+`protein_structure/index.php?uniprot=`) 301 to their pages here, so pointing
+the old host at this code later needs no link rewriting. Unknown pages are a
+real 404 in the toolkit's shell. SNPTools
+(<https://fusarium-snptools.maizegdb.org/>, PanEffect's successor) is in the
+navigation, on the home page's tools and on every protein; it takes no
+parameters, so those links open its front page. PanEffect stays linked until
+SNPTools replaces it.
+
+```
+controllers/fusarium.php                  router; legacy redirects; 404
+controllers/fusarium/<page>.php           home, foldseek, structures, effectors, help, notfound
+include/fusarium_page.php                 the shell: assets, navigation, references
+include/fusarium_lib.php                  species, the protein index, URLs
+templates/fusarium/fpt_shell.bau          header, navigation, footer
+templates/fusarium/fpt_<page>.bau         one per page
+css/mgdb-fusarium.css                     chrome + page furniture, loaded last
+js/mgdb-fusarium.js                       suggestions on [data-fpt-suggest]; tab spy on main[data-fpt-tabs]
+js/mgdb-fusarium-structures.js            lookup, chooser, viewers, the comparison
+js/mgdb-fusarium-effectors.js             the table once loaded
+search/fusarium/fusarium_api.php          suggest · protein (SQLite, no SQL database)
+data/fusarium/                            effectors.json genomes.json summary.json, the workbook,
+                                          proteins.sqlite (out of band)
+images/fusarium/                          logo, FPT mark, header micrograph, effector emblem
+tools/fusarium_index.py                   builds everything under data/fusarium/
+```
+
+Foldseek reuses `search/foldseek/foldseek_lib.php`, `foldseek_api.php` and
+`js/mgdb-foldseek.js` unchanged in shape: `$FS_SETS` in the lib and `SETS` in
+the script hold everything that differs (host, species, identifier ladder,
+wording, routes, model file, cache prefix `fusarium-`), the page opts in with
+`data-set="fusarium"`, and the maize set keeps every value it had, including
+its unprefixed cache names. Structures mounts the Protein Structure Hub's own
+viewer (`MGDB.proteinStructureViewer`) and scores the comparison with
+`js/mgdb-tmalign.js`.
+
+**Rebuilding the data** (workstation, ~5 minutes cold, 2 s from cache):
+
+```bash
+python3 tools/fusarium_index.py --cache ~/fusarium-cache --sqlite /tmp/fpt/proteins.sqlite --data src/data/fusarium
+scp /tmp/fpt/proteins.sqlite development-server:/var/www/claude/html/data/fusarium/proteins.sqlite
+```
+
+then deploy the three JSON files. It reads the twelve model directory
+listings, the toolkit's effector workbook and help page, both of PanEffect's
+synonym files, UniProtKB (by proteome and by taxon) and UniParc.
+
+Facts that shaped it -- each measured 2026-09-25:
+
+- **Listed is not served.** The ESMFold directories of *F. fujikuroi*,
+  *F. oxysporum*, *F. proliferatum* and *F. solani* list every model but answer
+  HTTP 403 for every file (25 of 25 sampled each; the other eight directories
+  25 of 25 answer 200). The builder probes each directory, so the index's
+  `esm` flag means "can be opened": 33,250 of 108,938. Those four species'
+  ESMFold models are in the Box archive, and the page says so. AD-082.
+- **The upstream resolver knew two species.** `record_data/protein_structure_data.php`
+  resolves F. graminearum and F. verticillioides only; anything else came back
+  as a model URL that does not exist, labeled F. graminearum. The index is
+  built from the directories themselves, so all 108,965 AlphaFold models open.
+- **F. graminearum's UniProt names are placeholders.** 11,081 of 15,911
+  entries are named "Chromosome 1, complete genome" (or 2-4): the EMBL
+  record's title. Stored as no name, and dropped from Foldseek annotations
+  too. Their current ORF names are the 2019 re-annotation's FGRAMPH1_ ids;
+  FGSG_ and FGRRES_ ids come from PanEffect's synonym file.
+- **UniProt deleted the F. oxysporum 4287 proteome** ("Not part of a reference
+  proteome"): 30,368 of its 30,406 models are of entries UniProtKB no longer
+  has, and AlphaFold DB's pages for them are gone. UniParc still maps them to
+  FOXG_ ids -- keep only names with the species' own prefix, since UniParc
+  pools every strain with an identical sequence. The genes were entered twice
+  (A0A0D2 and A0A0J9), so 12,534 ids name two models; the page lists both.
+- **255 F. oxysporum effectors name an entry with no model** while the same
+  FOXG gene has one under its other accession; the upstream table sent all of
+  them to a deleted AlphaFold DB page. The effector JSON records the model
+  accession separately (`model`, `model_by_gene`).
+- **The Foldseek analysis searched nine proteomes, not ten.** Five Fusarium
+  species and four outgroups; F. verticillioides is not a target, and a
+  F. graminearum protein never matches its own proteome
+  (`foldseek_adapter_check.php --set=fusarium` checks both on every protein
+  it reads). The upstream text says "nine proteomes" and then lists ten. No
+  Fusarium protein has Pfam rows, so the Pfam track and toggle are off for
+  this set.
+- **PanEffect has per-gene data for F. graminearum and F. verticillioides
+  only.** Its `csv/<id>.csv` exists for their UniProt accessions and is the
+  39 KB not-found page (HTTP 200) for FFUJ_, FOXG_, FPRO_ and NECHADRAFT_ ids,
+  which the upstream effector table linked anyway. Links here use the
+  accession and appear for those two species only.
+- **fusarium.maizegdb.org sends Access-Control-Allow-Origin for
+  claude.maizegdb.org and www.maizegdb.org only**, which is what lets the
+  browser read its model files directly. A move to any other host needs that
+  list extended.
+- **The workbook:** EffectorP probabilities are binary floats (rounded to
+  three places); 36 LOCALIZER cells lost their closing parenthesis when the
+  range ends past residue 99; 10 F. graminearum effectors have no EffectorP
+  probability at all, and none there is predicted both apoplastic and
+  cytoplasmic, against 9-14% in the other five species.
+- **The help page's genome table** gives F. venenatum 113,945 proteins;
+  UniProt's UP000245910 has 13,945. The builder corrects it and records the
+  original, and the page says so under the table.
+
+Checks: `php tools/tests/foldseek_adapter_check.php --set=fusarium` (server);
+the builder prints per-species counts and exits non-zero on any reshaped
+input.
 
 ## FATCAT structural ortholog comparison
 
@@ -8614,6 +9117,55 @@ the qTeller button. The
 sample table below it is the shared collection with TSV download.
 `data/expression/.htaccess` denies every file except `index.json`.
 
+### Not measured is never zero (rebuilt 2026-09-24)
+
+The first builder read every NULL in a `gene_table` as "not measured". That is
+right for most of qTeller's tables, which store their zeros, and wrong for the
+two that do not: Walley 2019 (`gene_protein_qt5db`, `gene_protein_qt4db`, RNA
+and protein) and the NAM Consortium (`qtnamdb`) leave a quantified gene's zero
+out, so its NULL means 0. The builder now decides per table: a table with no
+zeros at all and some NULLs is a zero-omitting table, and in it a gene the
+table quantified (a value somewhere) carries 0 in the samples it omits, while
+a gene the table never lists stays NULL. On B73 v5 that filled 192,958 RNA and
+160,488 protein values from Walley 2019 and 181,263 from the NAM table; the
+other 25 NAM founders gained between 100,326 (Ki11) and 199,100 (Mo18W).
+Recorded per genome as `zeros_filled`.
+
+A column that reads zero in every gene is a failed load, not a measurement.
+The builder checks each against qTeller's `exp_table` (matched by source and
+experiment, never by column name) and either recovers it or marks it not
+measured, with the reason (`samples_recovered`, `samples_not_measured`):
+
+| Genome | Sample | Outcome |
+| --- | --- | --- |
+| B73 v5 | Li 2017 Control | recovered, 43,117 values |
+| B73 v5 | Johnston 2014 L4 preligule, lg1 3 lg1 R mutant | not measured: `exp_table` is zero too |
+| B73 v5 | Ravazzolo 2021 Negative control, Nitrate treatment | not measured: `exp_table` holds Ravazzolo 2020's values for the same labels |
+| B73 v4 | Stelpflug 2015 Endosperm 12 DAP | recovered, 39,497 values |
+
+The Ravazzolo case is why recovery compares before it copies: `exp_table` had
+rows for those samples, and they were another study's. A candidate is refused
+when it matches an existing sample on at least 99.5% of 1,000 or more genes
+both measured.
+
+What moved because of it, on every surface that reads the release (gene
+record, pan-gene record, Expression Data Hub, `/api/v1/data/expression`,
+Expression Tools): sample counts rise (mybr4 went from 278 samples with a
+value to 309), medians fall to where the zeros put them (the mean of Oh7B's
+per-gene medians went from 9.75 to 7.78 FPKM), and tau and "detected" are now
+computed over every sample that measured the gene. B73 v5 has 309 usable RNA
+samples of 313. The previous build is kept beside each release as
+`<genome>.previous`.
+
+Two more facts the rebuild surfaced, both left in the data and reported:
+qTeller's NAM table lists every CML277 gene twice (45,242 duplicate rows; the
+second is skipped), and CML277 has no values for the two 16 DAP seed samples,
+so it is measured in 21 of the 23 samples the NAM genomes share. And on B73
+v5, Li 2017's "Heat treatment 42C for 2 hrs" and Liang 2022's "Heat treatment"
+carry the same value in every gene -- one study's data loaded under the other
+as well. Both stay; Expression Tools lists them on its overview, and they pair
+at r = 1 in the sample map.
+
 ### The Function section: "Function at a glance"
 
 Three payloads feed one figure (`js/mgdb-gene-function.js`, `MGDB.geneFunction`),
@@ -8714,3 +9266,229 @@ survivor and `meta.resolved_as`.
 
 Trap: `data/go/` is swapped whole on rebuild, so the builder writes the
 directory's `.htaccess` itself; a deployed one is lost at the next build.
+
+## Expression Tools (`/expression/tools`, 2026-09-24)
+
+ExpressionTools (github `andorfc/rna_seq_tools`) was a Flask application over
+its own copies of qTeller's SQLite files. It is rebuilt here as a page on the
+modern shell that reads the site's own expression releases, so a number on it
+is the number on the gene record, the pan-gene record, the Expression Data Hub
+and `/api/v1/data/expression`. Nothing of the original's code is reused; its
+analyses are, corrected (below), and the pan-genome tools are new.
+
+| Piece | File |
+| --- | --- |
+| Route | `controllers/expression.php` sends PAGE `tools` here; anything below it is the site 404 |
+| Page | `controllers/expression/expression_tools_modern.php`, `templates/static/mgdb_expression_tools.bau` |
+| Application | `js/mgdb-exptools-core.js` (API client, router, selection, basket, table, figure, stats), `-genes.js`, `-discover.js`, `-pangenome.js`; `css/mgdb-expression-tools.css` |
+| API | `search/expression_tools/expression_tools_api.php` over `expression_tools_lib.php` |
+| Data build | `tools/expression_tools_export.php` (two database exports), `tools/expression_tools_index.py` |
+
+### The data: `data/expression_tools/`
+
+Built on the server from the expression releases (`data/expression/`), the
+gene-models, gene-positions, paralogs and GO releases, and two exports the PHP
+CLI writes outside the docroot (the database credentials never leave the
+server):
+
+```bash
+cd /var/www/claude/html
+php tools/expression_tools_export.php --dest /var/www/claude/expression_tools_src
+python3 tools/expression_tools_index.py --source-dir /var/www/claude/expression_tools_src \
+    --dest data/expression_tools
+```
+
+The export streams `pan_genes.tsv.gz` (every Pan-Zea v4 member with its
+exemplar and chromosome) and `go_annotations.tsv.gz` through a server-side
+cursor; `--only pan_genes|go` redoes one. The index takes about 170 s and
+writes 1.1 GB: per genome, float32 matrices of raw and log2(value + 1)
+values (`rna.raw.f32`, `rna.log.f32`, and `protein.*` for B73), per-gene
+statistics, `annot.sqlite` (gene, symbol, name, location, aliases -- v3 and v4
+ids mapped 1:1 through the pan-genes and the B73 v4-to-v5 table -- and a
+prefix FTS index), `go.sqlite` (annotations, the is_a/part_of closure, term
+background counts); and `pangenome/pangenes.sqlite` (97,184 pan-genes,
+2,280,526 members, each pan-gene's presence, expression and silence across
+the NAM genomes as bitmasks, its class and conservation). The build goes to
+`.building`, swaps in, and keeps the last one as `data/expression_tools.previous`;
+it writes the directory's `.htaccess` itself (deny all but `index.json`).
+Rebuild it after `expression_index.py`, the gene-models release or the GO
+index changes.
+
+### The API
+
+`expression_tools_api.php?action=…`, GET or JSON POST (gene lists run to
+thousands), `{ok, data, meta}` like the Data API, errors without paths.
+Timed on origin, B73 v5:
+
+| Action | What | Time |
+| --- | --- | --- |
+| `genomes`, `catalog` | genome list (embedded in the page); a genome's samples with quantiles | 4 ms, 80 ms |
+| `search`, `resolve`, `values` | typeahead; ids, symbols, v3/v4 ids, B73 symbols on NAM genomes; values in chunks of 1,000 | 3-60 ms |
+| `gene`, `interval` | the gene report payload; genes in a window | 60 ms, 25 ms |
+| `coexpression` | one gene against all, Pearson or Spearman, optional within-study centering | 1.4 s cold, cached after |
+| `specific`, `contrast`, `variable` | target against background; group A against B; the most variable genes (sample map) | 0.2-1.2 s |
+| `enrich` | hypergeometric GO test with BH FDR over the closure | 30 ms |
+| `pangene`, `landscape`, `pairs`, `homeologs`, `protein_global` | the pan-genome and B73 tools | 0.05-0.5 s |
+
+Genome-wide results are cached with `dashboardCache` under the release stamp
+and the library's mtime, so a rebuild or a deploy invalidates them.
+
+### Rules the tools apply
+
+- **Missing is never zero** (see the expression dataset section). Every
+  correlation is pairwise-complete: a pair needs half the selected samples in
+  common and at least five.
+- **Compare within a study.** Units and pipelines differ across studies, so
+  co-expression and the sample map can center each study first, and Compare
+  samples warns when its groups span studies.
+- **Expressed, low, silent** for a genome carrying a pan-gene: the summed value
+  of its members reaches 1 FPKM in at least one of the 23 shared samples;
+  never reaches 0.1; or between. A genome with no member measured is not
+  counted. Classes follow Hufford et al. 2021: core 26 of 26 NAM genomes,
+  near-core 24-25, dispensable 2-23, private 1.
+- **The 23 shared samples** are the NAM Consortium's 10 tissues, Lin 2017's 5
+  and Diepenbrock 2017's 8, matched by study and label, never by sample id.
+- **Conservation** is the mean Pearson r of each expressing genome's log
+  profile against the median profile (8 or more samples, 3 or more genomes).
+- **Tau** is Yanai's index on log2(value + 1), left blank below 1 FPKM.
+
+### What the original tool got wrong, and was not ported
+
+- **Complete rows only.** Its co-expression and most-variable-genes analyses
+  (`api/lib/Analysis.php`) skipped any gene missing a single selected sample,
+  and refused outright when the query gene was ("missing values in some of
+  the selected experiments"). It also read every qTeller NULL as missing,
+  including the Walley 2019 and NAM tables where a NULL is a zero, so across
+  all B73 v5 samples the genes dropped were exactly the ones switched off in
+  some tissue -- lg1 among them. Here correlations are pairwise-complete, the
+  sample map imputes a gene's own mean for up to 20% missing, and the
+  release no longer has those false gaps.
+- **No check on the samples.** It carried qTeller's failed and duplicated
+  loads (the table in the expression dataset section) straight into every
+  analysis.
+
+### The page
+
+The rail groups the 20 views (Genes, Visualize, Discover, Pan-genome, Protein,
+Data) and drives everything below the hero: nothing sits under the
+application. The References view is the page's reference cards, rendered by
+`include/references_lib.php` into an inert `<template>` and cloned in (it
+re-runs `MGDB.initCopyButtons()`, which bound the copy buttons at load before
+these existed); there is no Related resources section. The bar above the view
+holds the genome, a search box that takes an id,
+a symbol, a locus or a pasted list, and the gene basket (kept per genome in
+`localStorage`). A view's state is in the hash (`#gene?g=Oh7B&id=tb1&s=…`), so
+every figure has a link; `s=` is the sample selection (`shared`, `tissue:leaf`,
+`study:12`, or `ids:` ranges). Every figure has a table view, PNG and SVG; the
+legend sits above the plot; categorical colors are the validated fixed-order
+palettes in `mgdb-exptools-core.js`, never cycled (the sample map shows one
+study against the rest rather than 34 colors).
+
+Linked from: the Tools megamenu (Genes & function, tagged New), the site map,
+the Expression Data Hub's tools section (a full-width first card), the gene
+record's expression figure ("Analyze in Expression Tools", beside qTeller) and
+the pan-gene record's NAM heatmap (which draws the NAM Consortium's 10 tissues;
+the tool draws all 23).
+
+### Reading the strip: the profile explorer (2026-09-25)
+
+A strip of 309 bars shows a gene's pattern and hides every name. Under the
+per-sample figure on the gene report and on the Expression plot,
+`EX.explorer` (`js/mgdb-exptools-genes.js`) lists the samples as readable
+rows, four ways, chosen by a chip row: **Window** (the default) lists the
+samples inside a bracket drawn over the strip -- horizontal bars on the
+gene's scale, with the label, tissue and value, and a heading per study
+that fits the window to that study when clicked; **All, in columns** lists
+every sample in a multi-column layout; **By study** draws one small panel
+per study, each on its own scale because units differ between studies, and
+a click on a panel opens it in the window; **Strip only** is the old figure.
+The bracket is moved by its grip below the plot area, resized by its edges,
+or moved with the arrow keys once the figure has focus (Shift steps one
+sample); a click on a bar centers the window on it, a click on a study's
+name over the strip fits the window to it (`captureevents` on the band
+annotations, `plotly_clickannotation`), and the **Highest** chips name the
+eight highest bars, which also carry a marker on the strip. A find box
+narrows the rows to a sample, tissue or study and dims the other bars
+(`Plotly.restyle` of `marker.opacity` by the traces' `customdata`, the
+sample ids). The rows double as the figure's text alternative. The window
+and mode live in the hash (`pv`, `ws`, `wn`) beside the scale and order, so
+a copied link reopens the same rows. The bracket is positioned from
+`_fullLayout.xaxis.c2p` and `_size` after every `plotly_afterplot`, and its
+fill lets pointer events through, so hover on the bars under it survives;
+the strip's horizontal form (40 bars or fewer) already carries its labels,
+so the explorer stays hidden for it.
+
+**Never wipe a drawn plot node without purging it.** Plotly keeps its
+layout on the node; a `node.innerHTML = ''` followed by `Plotly.react` took
+the diff path against a DOM that was gone, which is why adding a second gene
+to the Expression plot left a spinner forever. `C.clear(node)` purges and
+empties; the plot view now redraws in place behind an `is-busy` dimming.
+
+### Review fixes (2026-09-25)
+
+A full review of the page (all 20 views exercised in the browser, three
+code-review passes) found these, all fixed the same day:
+
+- **Back and Forward.** The router kept the last hash it had written with
+  `replaceState` and skipped any change equal to it; `replaceState` fires no
+  `hashchange`, so the guard only ever swallowed Forward after Back. Gone.
+- **A genome switch overtaken by another** landed its catalog on top of the
+  newer one; `ET.useGenome` now carries a sequence and the loser returns
+  without touching the state.
+- **`etParseIds` hung a worker for the full `max_execution_time`** on a range
+  ending at PHP's integer maximum (`s=9223372036854775807-...`): `$i++`
+  overflowed to a float and `<=` never failed. Ids longer than seven digits
+  are refused before the loop. Sample ids a selection names that the release
+  lacks are reported in `meta.unknown_samples`, and the client says how many
+  ids of a link it left out.
+- **Selections outlive a release honestly.** A hand-picked selection in the
+  hash carries the release it was made on (`s=ids:1-40@qteller-20260912`);
+  a link from another release says so and shows all samples. Saved sets keep
+  each sample's study name and label beside its id and are found again by
+  those; a set from another browser says it is not here.
+- **GO enrichment** asks for the API's maximum (2,000 terms) and the table
+  says "the 200 most enriched of N tested" when it is still short.
+- **Landscape** reads `min_silent=0` back as "any" instead of a blank select,
+  keeps its page in the hash, and its sort select no longer widens a phone.
+- **Compare samples** keeps `fc=0` and writes edited thresholds to the hash.
+- **Genome pairs** says in its caption that the profile r is over all 23
+  shared samples whatever set the level uses (a review claim that a small
+  set zeroed the histogram was wrong; the API never narrows r), and shows
+  a message rather than zeros should no pair have one; the pan-gene page
+  offers the basket only when the current genome has a copy.
+- **The sample map's correlation map** is now clustered on 1 - r between
+  the samples, as its caption says, and the most-variable genes are ranked
+  on the centered values when centering is on.
+- **Exports carry a key**: PNG and SVG downloads switch Plotly's own legend
+  in under the plot for the file, since the page's key is HTML.
+- **"Load a file" is a button** (a label around a hidden input is not
+  focusable); the locus track is a `group`, not an `img`, so its gene links
+  reach screen readers; a one-gene Expression plot gets the tissue key.
+- **The ETag and the cache keys include the paralogs release**, and no
+  validator goes out with the TSV export. `homeologs` is cached like the
+  other genome-wide passes; the whole-list TSV is streamed row by row; a
+  gene report for an ambiguous symbol names the other genes; contrast means
+  keep four significant digits; `values` caps resolved rows at 5,000.
+- **One sample count.** The hero and the genome select now say 309 for B73
+  v5, the samples every analysis uses (`samples_usable` in the manifest,
+  written by the builder), beside the overview's "4 more were not
+  measured". The index builder's tau applies the 1 FPKM floor the PHP side
+  always had, so the landscape's tau and the gene report's agree.
+
+### Traps found building it
+
+- `.mgdb-visually-hidden` inside a scrolling table widens the document on a
+  phone unless the scroller is `position: relative` (the genetic variation
+  trap); and a `<select>` sized to its longest option did the same.
+- Hash navigation does not reload the scripts: after a deploy, reload the page
+  before believing what a view shows.
+- Study-band labels over 300 samples overprinted until placement measured the
+  plot width; the pan-gene heatmap's shared samples arrive interleaved by study
+  and are regrouped for display only (`top_sample` indexes the API's order).
+- 2,567 B73 v5 "symbols" in the gene-models release are gene ids (the gene's
+  own, or a v3 or v4 id); `etSymbol()` hides them as symbols but they stay
+  searchable. `ids1` and `ts4` are not in the B73 v5 release at all.
+- `tools/gen_sitemap.py` still emitted explicit external-link arrows that were
+  removed from the deployed site map by hand on 2026-09-14 (the page's
+  `.mgdb-arrows-v2` CSS draws them); the generator now matches the deployed
+  file, so regenerating no longer puts them back.

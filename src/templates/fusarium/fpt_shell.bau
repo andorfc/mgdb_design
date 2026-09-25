@@ -1,0 +1,55 @@
+$$SYNTAX-LEVEL 2
+*(fpt-shell
+  ;; The Fusarium Protein Toolkit's document shell: its own header, navigation
+  ;; and footer around a page built from the MaizeGDB design system. The
+  ;; #wrapper / #content ids are the modern shell's, kept so the page card, its
+  ;; flex column and the hub ground in mgdb-modern.css and mgdb-hub.css apply
+  ;; unchanged; css/mgdb-fusarium.css restyles only the chrome.
+  ;;
+  ;; No megamenu and no translation.php: nothing here declares the MaizeGDB
+  ;; menu's identifiers, and translation.php throws on a missing one.
+
+  <a class="mgdb-skip-link" href="#fpt-content">Skip to main content</a>
+
+  <div id="wrapper" class="fpt-wrapper">
+    <header class="fpt-header">
+      <div class="fpt-header-inner">
+        <a class="fpt-brand" href="/fusarium">
+          <img src="/images/fusarium/fpt-logo.png" alt="Fusarium Protein Toolkit" width="640" height="286" />
+        </a>
+        <div class="fpt-header-band" aria-hidden="true"></div>
+        <a class="fpt-host" href="/">
+          <span>Hosted by</span>
+          <strong>MaizeGDB</strong>
+        </a>
+      </div>
+      <nav class="fpt-nav" aria-label="Fusarium Protein Toolkit">
+        <ul class="fpt-nav-list">$(nav_items)</ul>
+      </nav>
+    </header>
+
+    <div id="content">
+      <div id="fpt-content" tabindex="-1">
+        *(body)
+      </div>
+    </div>
+
+    <footer class="fpt-footer" role="contentinfo">
+      <div class="fpt-footer-inner">
+        <p class="fpt-footer-tagline"><strong>Fusarium Protein Toolkit</strong> &middot; designed and hosted by <a href="/">MaizeGDB</a> with support from the USDA Agricultural Research Service</p>
+        <div class="fpt-footer-row">
+          <a class="fpt-footer-usda" href="https\://www.usda.gov/">
+            <img src="/images/usda-v2-white-lockup.svg" alt="United States Department of Agriculture" width="200" height="46" />
+          </a>
+          <ul class="fpt-footer-links">
+            <li><a href="/fusarium/help#fpt-help-cite">Cite</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="https\://www.usda.gov/accessibility-statement">Accessibility</a></li>
+            <li><a href="https\://www.usda.gov/privacy-policy">Privacy Policy</a></li>
+            <li><a href="https\://www.usda.gov/non-discrimination-statement">Non-Discrimination</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </div>
+)

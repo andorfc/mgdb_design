@@ -518,7 +518,6 @@
      restates any more. Converted 2026-09-05. */
   $bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime($um_doc_root . '/css/mgdb-hub.css'));
   $bauplan->includeCss('/css/mgdb-uniformmu.css?v=' . (int) @filemtime($um_doc_root . '/css/mgdb-uniformmu.css'));
-  $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-uniformmu.js?v=' . (int) @filemtime($um_doc_root . '/js/mgdb-uniformmu.js'));

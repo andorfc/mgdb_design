@@ -54,7 +54,6 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-ai.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-ai.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Search 27 maize AI and machine learning resources at MaizeGDB: analysis tools, AI-ready datasets, open-source code, and the publications behind them.">');
 

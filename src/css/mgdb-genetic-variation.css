@@ -317,9 +317,21 @@
 
 .mgdb-genetic-variation-page .gv-query-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--mgdb-space-3);
   align-items: stretch;
+}
+
+/* The search runs on submit, so it has a button -- the stock hub's row,
+   stacked on a phone so the field keeps the width. */
+.mgdb-genetic-variation-page .gv-query-submit {
+  height: 52px;
+  padding-inline: var(--mgdb-space-6);
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .mgdb-genetic-variation-page .gv-query-row { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-genetic-variation-page .gv-query-control {

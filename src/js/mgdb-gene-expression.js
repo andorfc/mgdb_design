@@ -17,8 +17,11 @@
  *                       per organ) and the top samples
  *            sources    every study behind the figure, with its link
  *
- *          and the way out to qTeller, which still holds the interactive
- *          atlas, plus the JSON and TSV of exactly what is drawn.
+ *          and the ways out: Expression Tools (/expression/tools), which
+ *          analyzes the same release -- co-expression, rank among genes, the
+ *          pan-gene across the NAM genomes -- and qTeller, which still holds
+ *          the interactive atlas; plus the JSON and TSV of exactly what is
+ *          drawn.
  *
  *          spec = {
  *            gene:    { name, symbol }
@@ -448,9 +451,20 @@
       var note = html('p', null, esc(profile.attributes.units_note || '') + esc(tissueNote) + ' ' + esc(BANDS_NOTE));
       footer.appendChild(note);
       var links = html('div', 'ge-footer-links');
-      if (spec.qteller) {
-        links.innerHTML = '<a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="' + esc(spec.qteller) + '" target="_blank" rel="noopener">Open in qTeller</a>';
+      var parts = [];
+      /* The gene report of Expression Tools reads this same release, so the
+         numbers match; the genome goes by its assembly name, which the tools
+         accept as well as their short keys. */
+      var gene = (spec.gene && spec.gene.name) || profile.attributes.gene;
+      if (gene && profile.attributes.genome) {
+        parts.push('<a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="' +
+          esc('/expression/tools#gene?g=' + encodeURIComponent(profile.attributes.genome) + '&id=' + encodeURIComponent(gene)) +
+          '">Analyze in Expression Tools</a>');
       }
+      if (spec.qteller) {
+        parts.push('<a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="' + esc(spec.qteller) + '" target="_blank" rel="noopener">Open in qTeller</a>');
+      }
+      links.innerHTML = parts.join('');
       footer.appendChild(links);
     }
 

@@ -107,6 +107,7 @@ SECTIONS = [
         ("Phylostrata", "https://phylostrata.maizegdb.org", "Phylostratigraphy: evolutionary conservation level of a protein."),
         ("Protein structures", "/data_center/protein_structure", "Predicted structures for gene model proteins, with Foldseek and FATCAT."),
         ("qTeller", "https://qteller.maizegdb.org", "Comparative RNA-seq expression across multiple data sources."),
+        ("Expression Tools", "/expression/tools", "Co-expression, tissue-specific genes, GO enrichment, and each pan-gene's expression across the 26 NAM genomes."),
         ("reelGene", "https://reelgene.maizegdb.org/", "Look up a gene model for its reelGene functionality score, conservation level, and pan-gene class."),
         ("SNPTools", "https://snptools.maizegdb.org", "Variant browsing and per-gene structure views."),
         ("SNPversity 1.0", "/snpversity", "Genotype calls for a region of B73 RefGen_v2 or v3 across as many stocks as you choose, from the AllZeaGBS v2.7 and HapMap v3 datasets."),
