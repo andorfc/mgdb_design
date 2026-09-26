@@ -107,6 +107,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           . ' &middot; <a href="' . $esc($base . '/api/v1/data/' . $ds) . '">index</a></li>'
         : '<li><span class="mgdb-muted">Not built on this instance yet.</span></li>';
     }
+    $genome_items = array();
     foreach ($genomes as $name => $manifest) {
       $counts = isset($manifest['counts']) ? $manifest['counts'] : array();
       $figure = '';
@@ -117,9 +118,20 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       } elseif ($ds === 'expression' && isset($counts['samples'])) {
         $figure = number_format((int) $counts['samples']) . ' samples';
       }
-      $genome_html .= '<li><code>' . $esc($name) . '</code>'
+      $genome_items[] = '<li><code>' . $esc($name) . '</code>'
         . ($figure !== '' ? ' <span class="mgdb-muted">' . $esc($figure) . '</span>' : '')
         . ' &middot; <a href="' . $esc($base . '/api/v1/data/' . $ds . '/' . $name) . '">release</a></li>';
+    }
+    /* A dataset built for every genome (gene-models: 135) would fill the
+       cell with one line per release; past six it says how many, links the
+       list route, and keeps the full list behind a disclosure. */
+    if (count($genome_items) > 6) {
+      $genome_html .= '<li>' . number_format(count($genome_items)) . ' genomes &middot; <a href="'
+        . $esc($base . '/api/v1/data/' . $ds) . '">list</a>'
+        . '<details class="api-genome-list"><summary>Every release</summary><ul class="api-plain-list">'
+        . implode('', $genome_items) . '</ul></details></li>';
+    } else {
+      $genome_html .= implode('', $genome_items);
     }
     if ($genome_html === '') {
       $genome_html = '<li><span class="mgdb-muted">No release on this instance yet.</span></li>';

@@ -343,7 +343,7 @@
         panel.insertAdjacentHTML('beforeend', '<p class="fpt-caption">'
           + (esm ? 'ESMFold model of ' + escape(p.accession) + ', predicted for the Fusarium Protein Toolkit from the UniProt sequence.'
                  : 'AlphaFold model AF-' + escape(p.accession) + '-F1, version 4, as the toolkit downloaded it from the AlphaFold Protein Structure Database.')
-          + ' Served from fusarium.maizegdb.org.</p>');
+          + ' The file is fusarium.maizegdb.org\u2019s, read through MaizeGDB.</p>');
       }
     }
     writeUrl();

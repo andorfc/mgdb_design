@@ -191,10 +191,12 @@ function fsLooksLikeUniprot($value) {
 
 /* The model the page draws. Maize: AlphaFold DB's current file. Fusarium:
    the toolkit's copy of the very file the search used, which is also the only
-   copy there is for the F. oxysporum entries UniProt has deleted. */
+   copy there is for the F. oxysporum entries UniProt has deleted -- through
+   this site, because fusarium.maizegdb.org turns a browser's fetch away off
+   campus (fptModelLink). */
 function fsModelUrl($accession, $species = null) {
     if (fsSetKey() === 'fusarium' && $species) {
-        return fptModelUrl($accession, $species, 'alphafold');
+        return fptModelLink($accession, 'alphafold');
     }
     return 'https://alphafold.ebi.ac.uk/files/AF-' . rawurlencode($accession)
          . '-F1-model_' . FS_AF_VERSION . '.pdb';

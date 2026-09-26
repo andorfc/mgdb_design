@@ -39,9 +39,13 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     $genomes = array();
     foreach (MgdbData::genomes($GM_DATASET) as $name => $manifest) {
       $s = MgdbData::manifestSummary($manifest);
+      /* The registry's example gene belongs to its own genome; any other
+         release names one of its own genes in its manifest. */
+      $example = ($name === $api_entry['example']['genome']) ? $api_entry['example']['id']
+               : (isset($manifest['example_gene']) ? $manifest['example_gene'] : null);
       $s['links'] = array(
         'self' => $gm_base . '/api/v1/data/gene-models/' . $name,
-        'example' => $gm_base . '/api/v1/data/gene-models/' . $name . '/' . rawurlencode($api_entry['example']['id'])
+        'example' => $example === null ? null : $gm_base . '/api/v1/data/gene-models/' . $name . '/' . rawurlencode($example)
       );
       $genomes[] = $s;
     }
@@ -175,7 +179,9 @@ function gm_links($base, $genome, $manifest, $g) {
     'self' => $self,
     'record' => $base . '/api/v1/records/gene/' . rawurlencode($id),
     'html' => $base . '/gene_center/gene/' . rawurlencode($id),
-    'domains' => $protein === null ? null : $base . '/api/v1/data/domains/' . $genome . '/' . rawurlencode($protein),
+    /* Only B73 NAM-5.0 has a domains release; elsewhere the link would 404. */
+    'domains' => ($protein === null || !MgdbData::hasRelease('domains', $genome)) ? null
+               : $base . '/api/v1/data/domains/' . $genome . '/' . rawurlencode($protein),
     'region' => $base . '/api/v1/data/gene-models/' . $genome . '/region/' . $g['seq'] . ':'
               . max(1, (int) $g['start'] - 10000) . '-' . ((int) $g['end'] + 10000),
     'gff3' => $self . '?format=gff3',
@@ -407,7 +413,8 @@ function gm_region_links($base, $genome, $region, $next) {
     'genes' => $self,
     'gff3' => $self . '?format=gff3',
     'bed' => $self . '?format=bed',
-    'domains' => $base . '/api/v1/data/domains/' . $genome . '/region/' . $region['sequence'] . ':' . $region['start'] . '-' . $region['end'],
+    'domains' => !MgdbData::hasRelease('domains', $genome) ? null
+               : $base . '/api/v1/data/domains/' . $genome . '/region/' . $region['sequence'] . ':' . $region['start'] . '-' . $region['end'],
     'browser' => 'https://jbrowse.maizegdb.org?loc=' . $region['sequence'] . ':' . $region['start'] . '..' . $region['end'] . '&tracks=gene_models_official'
   );
 }//gm_region_links

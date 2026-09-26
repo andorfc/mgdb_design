@@ -132,6 +132,12 @@
         'Its ' + esc(mate.subgenome) + ' homeolog is ' + nameHtml(mate.gene, mate.symbol) + ' on ' + esc(mate.chr) + '. ' +
         'Both are syntenic with sorghum ' + sbHtml + '.'));
       b.appendChild(syntenySketch(sec));
+      /* Expression Tools draws the two copies sample by sample and gives
+         their correlation; the genome goes by its assembly name. */
+      var genome = ctx && ctx.profile && ctx.profile.attributes ? ctx.profile.attributes.genome : '';
+      b.appendChild(html('p', 'gp-links', '<a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="' +
+        esc('/expression/tools#compare?' + (genome ? 'g=' + encodeURIComponent(genome) + '&' : '') + 'g1=' + encodeURIComponent(me.gene) + '&g2=' + encodeURIComponent(mate.gene)) +
+        '">Compare the two copies sample by sample in Expression Tools</a>'));
     } else {
       b.appendChild(html('p', 'gp-lead',
         '<strong>' + nameHtml(me.gene, me.symbol, false) + '</strong> is the <strong>' + esc(me.subgenome) + '</strong> copy of a retained pair in the B73 RefGen_v4 table, syntenic with sorghum ' + sbHtml + '. ' +

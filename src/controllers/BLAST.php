@@ -188,6 +188,10 @@ function blast_edit_search_fields($job_id, $system) {
   if ($blast_is_results) {
     $bauplan->includeCss('/css/mgdb-blast-results.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-blast-results.css'));
     $bauplan->includeScript('/js/mgdb-blast-results.js?v=' . (int) @filemtime($doc_root . '/js/mgdb-blast-results.js'));
+    /* The identity-against-coverage scatter is WebGL (scattergl), which only
+       the full Plotly build carries; MGDB.loadPlotly() reads this. Other
+       chart pages get the smaller cartesian build. */
+    $bauplan->head('<meta name="mgdb-plotly" content="full">');
   }
   /* BLAST.js drives the legacy form and the legacy results poller. The new
      results page has its own engine and does not need it; loading it there

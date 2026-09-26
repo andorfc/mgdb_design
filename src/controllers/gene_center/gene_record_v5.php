@@ -285,8 +285,12 @@
   $bauplan->includeScript('/js/mgdb-gene-record-v5.js?v=' . $v('/js/mgdb-gene-record-v5.js'));
   /* Fourteen stylesheets and eleven scripts, all render-blocking, served as
      four files: the shell's own and this page's. Bauplan::bundle() builds
-     them on request and rebuilds when any member is deployed. */
+     them on request and rebuilds when any member is deployed. The scripts
+     are deferred: the page is painted while they download, which on a slow
+     connection brought the first paint forward by 15%. This page has no
+     inline script that could need them first; Bauplan checks. */
   $bauplan->bundle('gene-record');
+  $bauplan->deferScripts();
   /* The basket mockup, /gene_center/gene_basket/{id}: the same page with two
      more assets and no indexing. Defined by the guard in gene_center.php. */
   if (defined('MGDB_BASKET_MOCK')) {

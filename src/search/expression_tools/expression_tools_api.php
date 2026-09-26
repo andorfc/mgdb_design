@@ -9,6 +9,7 @@
  *            POST {action:resolve, genome, ids:[]}      identifiers -> genes
  *            POST {action:values, genome, assay, ids:[]}  values, aligned with the columns
  *            GET  ?action=gene&genome=&id=              one gene, for the gene report
+ *            GET  ?action=rank&genome=&id=&n=            a gene's percentile among all genes in each sample
  *            GET  ?action=interval&genome=&chr=&start=&end=&within=
  *            GET  ?action=coexpression&genome=&id=&s=&method=&n=&min=&center=
  *            POST {action:specific, genome, target, s, metric, direction, min, n}
@@ -23,6 +24,9 @@
  *
  *          Sample selections (s, target, a, b) are sample ids of the assay,
  *          as ranges: "1-40,52". An empty selection is every usable sample.
+ *          Genome pairs are the exception: their samples are indexes of the
+ *          23 shared samples (0-22) and choose what the level is taken over;
+ *          the profile r is always over all 23.
  *
  *          The envelope is {ok: true, data, meta} or {ok: false, error}; the
  *          HTTP status carries the kind of failure. GET responses carry a
@@ -92,7 +96,10 @@ function etBool($p, $k) {
   return in_array(strtolower(etStr($p, $k, '')), array('1', 'true', 'yes', 'on'), true);
 }
 
-/* A list: a JSON array, or a string split on whitespace, commas and semicolons. */
+/* A list: a JSON array, or a string split on whitespace, commas and
+   semicolons. Always strings: array_keys() hands a numeric key back as an
+   integer ("5" -> 5), and ctype_digit() reads an integer as a character
+   code, which once dropped every sample index Genome pairs sent. */
 function etList($p, $k, $max) {
   $v = isset($p[$k]) ? $p[$k] : array();
   if (is_string($v)) { $v = preg_split('/[\s,;]+/', $v); }
@@ -104,7 +111,7 @@ function etList($p, $k, $max) {
     if ($x !== '') { $out[$x] = true; }
   }
   if (count($out) > $max) { throw new EtError('Too many values in ' . $k . ' (at most ' . number_format($max) . ').'); }
-  return array_keys($out);
+  return array_map('strval', array_keys($out));
 }
 
 function etAssay($p, $G) {
@@ -249,6 +256,13 @@ try {
       }
       break;
 
+    case 'rank':
+      $G = EtData::requireGenome(etStr($p, 'genome'));
+      $a = etAssay($p, $G);
+      $row = etResolveOne($G, etStr($p, 'id', '', 100));
+      $data = etRank($G, $a, $row, etInt($p, 'n', 20, 1, 100));
+      break;
+
     case 'interval':
       $G = EtData::requireGenome(etStr($p, 'genome'));
       $data = etInterval($G, etStr($p, 'chr', '', 60), etInt($p, 'start', 1, 0, PHP_INT_MAX),
@@ -337,12 +351,24 @@ try {
       break;
 
     case 'pairs':
+      /* Indexes of the shared samples the level is taken over, sorted and
+         each once; none, or all of them, is every one. An index that is not
+         a shared sample is refused rather than read as "all". */
+      $k = count(EtData::sharedSamples());
       $samples = array();
-      foreach (etList($p, 'samples', 23) as $x) { if (ctype_digit($x)) { $samples[] = (int) $x; } }
-      $stat = etStr($p, 'stat', 'mean');
+      foreach (etList($p, 'samples', $k) as $x) {
+        if (!ctype_digit($x) || (int) $x >= $k) { throw new EtError('Samples are shared-sample indexes, 0 to ' . ($k - 1) . '.'); }
+        $samples[(int) $x] = true;
+      }
+      ksort($samples);
+      $samples = count($samples) === $k ? array() : array_keys($samples);
+      $stat = etStr($p, 'stat', 'mean') === 'max' ? 'max' : 'mean';
       $ka = etStr($p, 'a', 'B73v5'); $kb = etStr($p, 'b', 'Oh7B');
       $build = function () use ($ka, $kb, $samples, $stat) { return etPairs($ka, $kb, $samples, $stat); };
-      $data = etCached('pairs|' . $ka . '|' . $kb . '|' . implode(',', $samples) . '|' . $stat, $build);
+      /* Only the every-sample result is kept, as for the other tools: a
+         subset builds live in under a second, and at 2 MB an entry, 26
+         subsets of every genome pair would grow a cache that never expires. */
+      $data = $samples ? $build() : etCached('pairs|' . $ka . '|' . $kb . '|' . implode(',', $samples) . '|' . $stat, $build);
       break;
 
     case 'homeologs':

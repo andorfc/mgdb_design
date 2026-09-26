@@ -292,12 +292,63 @@ def main():
     if s == 200 and d:
         sc = d['data']['sections']['structure']['scores']
         pl = [x for x in sc if x['metric'] == 'ALPHAFOLD2_AVERAGE_pLDDT'][0]
-        check(len(sc) == 16 and pl['scale'] == {'min': 0, 'max': 100} and pl['better'] == 'high' and pl['range'] and pl['range']['n'] > 60000 and pl['range']['p50'] and pl['range']['min'] < pl['value'] < pl['range']['max'], 'gdh1 pLDDT has scale, direction and a genome-wide range with percentiles')
+        # every isoform is scored, sixteen metrics each (gdh1 has six)
+        per = {}
+        for x in sc:
+            per[x['feature']] = per.get(x['feature'], 0) + 1
+        check(len(per) == 6 and set(per.values()) == {16} and pl['scale'] == {'min': 0, 'max': 100} and pl['better'] == 'high' and pl['range'] and pl['range']['n'] > 60000 and pl['range']['p50'] and pl['range']['min'] < pl['value'] < pl['range']['max'], 'gdh1 pLDDT has scale, direction and a genome-wide range with percentiles')
         aed = [x for x in sc if x['metric'] == 'AED_score'][0]
         check(aed['better'] == 'low' and aed['range'] and aed['range']['n'] > 1000000, 'AED has a range from featureprop')
 
     s, h, b, d = get(B, H, '/api/v1/records/gene/Zm00001eb067740?fields=overview')
     check(s == 200 and d and d['data']['type'] == 'gene', 'record API still answers')
+
+    # every genome (2026-09-25): compressed releases, and the GFF3 conventions they came in
+    NAM = 'Zm-B97-REFERENCE-NAM-1.0'
+    s, h, b, d = get(B, H, '/api/v1/data/gene-models')
+    genomes = [g['genome'] for g in d['data']['sections']['genomes']] if s == 200 and d else []
+    check(len(genomes) >= 100 and NAM in genomes, 'gene-models lists %d genomes, the NAM founders among them' % len(genomes))
+    s, h, b, d = get(B, H, '/api/v1/data/gene-models/' + NAM + '/Zm00018ab000010')
+    ok = s == 200 and d and d['data']['id'] == 'Zm00018ab000010'
+    check(ok, 'a NAM founder gene, from a compressed release')
+    if ok:
+        at = d['data']['attributes']
+        check(at['canonical_transcript'] == 'Zm00018ab000010_T003' and at['protein_length_aa'] == 613 and len(d['data']['sections']['transcripts']) == 4, 'B97: four transcripts, canonical T003, 613 aa')
+        check(d['links'].get('domains') is None, 'no domains link where the genome has no domains release')
+    s, h, b, d = get(B, H, '/data/gene_models/' + NAM + '/genes/000.json.gz')
+    check(s == 403, 'a compressed shard is not served (%s)' % s)
+    s, h, b, d = get(B, H, '/api/v1/records/gene/Zm00018ab000010?fields=structure')
+    gm = d['data']['sections']['structure'].get('gene_model') if s == 200 and d else None
+    check(gm and gm['strand'] == '+' and len(gm['transcripts']) == 4 and gm['links'].get('domains') is None, 'the B97 record carries its gene model, and no domains link')
+    s, h, b, d = get(B, H, '/api/v1/records/gene/Zm00052a000001.1?fields=structure')
+    check(s == 200 and d and d['data']['sections']['structure'].get('gene_model'), 'LH244 (Bayer): the database\'s .1-suffixed name finds its model')
+    s, h, b, d = get(B, H, '/api/v1/data/gene-models/Zm-Mo17-REFERENCE-YAN-1.0/Zm00009a000001')
+    check(s == 200 and d and d['data']['id'] == 'Zm00009a000001', 'Mo17 YAN: a gene named by Name= (its IDs are serial numbers)')
+    s, h, b, d = get(B, H, '/api/v1/data/gene-models/Zm-B104-DRAFT-ISU_USDA-0.1')
+    if s == 200 and d:
+        small = [q for q in d['data']['sections']['sequences'] if q['genes'] and q['length'] <= 5000000]
+        check(d['data']['attributes']['shards'].get('small_bins') and small, 'B104 draft: %d contigs in shared bin files' % len(small))
+        if small:
+            q = small[0]
+            s, h, b, d = get(B, H, '/api/v1/data/gene-models/Zm-B104-DRAFT-ISU_USDA-0.1/region/%s:1-%d' % (q['name'], q['length']))
+            check(s == 200 and d and len(d['data']) == q['genes'], 'contig %s returns its %d gene(s) from a shared bin' % (q['name'], q['genes']))
+    PA = 'Ab-Traiperm_572-DRAFT-PanAnd-1.0'
+    s, h, b, d = get(B, H, '/api/v1/data/gene-models/' + PA)
+    seqs = sorted(d['data']['sections']['sequences'], key=lambda q: -q['genes']) if s == 200 and d else []
+    minus = []
+    if seqs:
+        s, h, b, d = get(B, H, '/api/v1/data/gene-models/%s/region/%s:1-%d' % (PA, seqs[0]['name'], min(seqs[0]['length'], 3000000)))
+        minus = [g['id'] for g in (d['data'] if s == 200 and d else []) if g['attributes']['strand'] == '-']
+    tested = False
+    for gid in minus[:20]:
+        s, h, b, d = get(B, H, '/api/v1/data/gene-models/' + PA + '/' + gid)
+        multi = [t for t in d['data']['sections']['transcripts'] if len(t['exons']) > 1] if s == 200 and d else []
+        if multi:
+            ex = multi[0]['exons']
+            check(ex[0]['rank'] == 1 and ex[0]['start'] > ex[-1]['start'], 'PanAnd ranks minus-strand exons in genomic order; exon 1 of %s is still the 5\' exon' % multi[0]['id'])
+            tested = True
+            break
+    check(tested, 'a multi-exon minus-strand PanAnd gene was found to test')
 
     print()
     for path, status, ms in timings:

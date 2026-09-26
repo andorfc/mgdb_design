@@ -6,10 +6,14 @@
  *          compared gene by gene, the retained maize1/maize2 homeologs, RNA
  *          against protein, the sample catalog, and how the tools work.
  *
- *          The 26 NAM genomes (B73 v5 and the 25 founders) were measured in
- *          23 samples in common -- the NAM Consortium's ten tissues, Lin
- *          2017's five and Diepenbrock 2017's eight -- matched here by study
- *          and label, never by sample id, which is numbered per release.
+ *          The 26 NAM genomes (B73 v5 and the 25 founders) share 23 samples
+ *          -- the NAM Consortium's ten tissues, Lin 2017's five and
+ *          Diepenbrock 2017's eight -- matched here by study and label, never
+ *          by sample id, which is numbered per release. Not every founder
+ *          was measured in all 23 (13 were not; M162W has 14), so never
+ *          assume a genome has them: its statistics are over the ones it
+ *          has. A genome's samples_usable says how many, and the pairs API's
+ *          measured_a / measured_b say which.
  *
  * history:
  *  09/24/26  claude  created
@@ -504,6 +508,13 @@
         var what = (d.stat === 'max' ? 'highest' : 'mean') + ' over ' + (d.samples.length === 23 ? 'the 23 shared samples' : U.plural(d.samples.length, 'shared sample'));
         /* Keys (B73v5) name files and links; people read the short names. */
         var la = shortOf(d.genome_a), lb = shortOf(d.genome_b);
+        /* Several founders were never measured in some shared samples (CML333
+           in 8 of the 23), so a value is over the chosen samples its genome
+           has and r over those both have: say so where that is fewer. */
+        var inBoth = function (xs, ys) { return xs.filter(function (j) { return ys.indexOf(j) !== -1; }).length; };
+        var fewer = d.measured_a && d.measured_b ? [[la, inBoth(d.samples, d.measured_a)], [lb, inBoth(d.samples, d.measured_b)]].filter(function (x) { return x[1] < d.samples.length; }) : [];
+        if (fewer.length) { what += ' (' + fewer.map(function (x, i) { return i ? x[0] + ' in ' + x[1] : x[0] + ' was measured in ' + x[1] + ' of them'; }).join(', ') + ')'; }
+        var rOver = d.measured_a && d.measured_b ? inBoth(d.measured_a, d.measured_b) : 23;
         var p = UI.panel({ title: esc(la) + ' against ' + esc(lb) + ': ' + fmtInt(rows.length) + ' gene pairs',
           sub: fmtInt(one.length) + ' one-to-one · ' + fmtInt(d.pangenes_only_a) + ' pan-genes only ' + esc(la) + ' carries, ' + fmtInt(d.pangenes_only_b) + ' only ' + esc(lb) +
                ' · ' + fmtInt(d.pairs_not_measured) + ' pairs with a copy not measured · Spearman ρ of the one-to-one pairs ' + U.fmtR(rs) + ' · value: ' + what });
@@ -538,7 +549,8 @@
         } else {
           C.plot(rfig.plotNode, [{ type: 'bar', x: hx, y: hist, width: 0.09, marker: { color: ET.SERIES[0] }, hovertemplate: 'r %{x:.2f}: %{y:,} pairs<extra></extra>' }],
             { xaxis: { title: { text: 'r between the two copies’ tissue profiles' }, range: [-1, 1] }, yaxis: { title: { text: 'pairs' } }, showlegend: false, margin: { l: 64, r: 12, t: 12, b: 52 } }, { height: 440 });
-          rfig.caption.textContent = 'Profile r is over all 23 shared samples whatever the sample set above chooses for the level; ' + fmtInt(withR.length) + ' pairs are measured in at least 8 of them. A pair near 1 keeps its tissue pattern; one near 0 or below has changed it.';
+          rfig.caption.textContent = 'Profile r is over ' + (rOver === 23 ? 'all 23 shared samples' : 'the ' + rOver + ' shared samples both genomes were measured in,') +
+            ' whatever the sample set above chooses for the level; ' + fmtInt(withR.length) + ' pairs are measured in at least 8 of them. A pair near 1 keeps its tissue pattern; one near 0 or below has changed it.';
         }
         var tp = UI.panel({ title: 'The pairs', sub: 'Sorted by the size of the change; the profile r column finds pairs whose level agrees but pattern does not' });
         out.appendChild(tp);
@@ -548,6 +560,9 @@
           columns: [
             { key: 'a', label: esc(la), exportLabel: la, type: 'str', render: function (r) { return '<a class="et-mono" href="' + esc(ET.href('gene', { id: r.a, g: d.genome_a }, { keepSelection: false })) + '">' + esc(r.a) + '</a>'; } },
             { key: 'b', label: esc(lb), exportLabel: lb, type: 'str', render: function (r) { return '<a class="et-mono" href="' + esc(ET.href('gene', { id: r.b, g: d.genome_b }, { keepSelection: false })) + '">' + esc(r.b) + '</a>'; } },
+            { key: 'compare', label: 'Compare', action: true, render: function (r) {
+              return '<a href="' + esc(ET.href('compare', { g: d.genome_a, g1: r.a, g2: r.b, g2g: d.genome_b }, { keepSelection: false })) + '" aria-label="Compare ' + esc(r.a) + ' with ' + esc(r.b) + '">Compare</a>';
+            } },
             { key: 'kind', label: 'Copies', type: 'str' },
             { key: 'pan', label: 'Pan-gene', type: 'num', render: function (r) { return '<a class="et-mono" href="' + esc(ET.href('pangene', { id: r.a })) + '">pan' + ('0000' + r.pan).slice(-5) + '</a>'; } },
             { key: 'va', label: esc(la), exportLabel: la + ' FPKM', type: 'num', heat: true },
@@ -632,6 +647,9 @@
           columns: [
             { key: 'm1', label: 'maize1', type: 'str', render: function (x) { return UI.geneLink(x.m1) + (x.m1_symbol ? ' <span class="et-sym">' + esc(x.m1_symbol) + '</span>' : ''); } },
             { key: 'm2', label: 'maize2', type: 'str', render: function (x) { return UI.geneLink(x.m2) + (x.m2_symbol ? ' <span class="et-sym">' + esc(x.m2_symbol) + '</span>' : ''); } },
+            { key: 'compare', label: 'Compare', action: true, render: function (x) {
+              return '<a href="' + esc(ET.href('compare', { g1: x.m1, g2: x.m2 })) + '" aria-label="Compare ' + esc(x.m1) + ' with ' + esc(x.m2) + '">Compare</a>';
+            } },
             { key: 'mean1', label: 'maize1 mean', type: 'num', heat: true }, { key: 'mean2', label: 'maize2 mean', type: 'num', heat: true },
             { key: 'log2_ratio', label: 'log₂ maize1/maize2', type: 'num', render: function (x) { return '<span class="et-r ' + (x.log2_ratio >= 0 ? 'is-pos' : 'is-neg') + '">' + x.log2_ratio.toFixed(2) + '</span>'; } },
             { key: 'r', label: 'Profile r', type: 'num', render: function (x) { return x.r == null ? '—' : x.r.toFixed(2); } },
@@ -781,6 +799,11 @@
       var boot = ET.state.boot;
       var pg = boot.pangenome || {};
       var api = document.getElementById('et-app').getAttribute('data-api');
+      /* Founders measured in fewer than the 23 shared samples, fewest first.
+         A founder's columns are the shared samples, so its usable count is
+         how many of them it has. */
+      var partial = (boot.genomes || []).filter(function (g) { return g.nam && g.samples.rna === 23 && g.samples_usable && g.samples_usable.rna < 23; })
+        .sort(function (a, b) { return a.samples_usable.rna - b.samples_usable.rna || a.short.localeCompare(b.short); });
       var sections = [
         ['The values', '<p>Every value is the one qTeller holds: FPKM or TPM for RNA as each study published it, normalized abundance for protein, biological replicates averaged, rounded to four significant figures. The same files feed <a href="/expression">the Expression Data Hub</a>, the gene record’s Expression section and <a href="/api/v1/data/expression">/api/v1/data/expression</a>.</p>' +
           '<p><strong>Not measured is never zero.</strong> A gene a study did not quantify has no value in that study’s samples, and every statistic here is taken over the samples a gene has. Where a source table leaves its zeros out (Walley 2019 and the NAM Consortium tables store no zero at all), a gene the table quantified carries 0 in the samples it omits; a gene the table does not list stays not measured. A sample that reads zero in every gene is a failed load and is left out of every analysis.</p>' +
@@ -789,7 +812,10 @@
         ['Tissue-specific genes', '<p>Specificity is log₂ of (target mean + 1) over (the highest background sample + 1): on in the target and off everywhere else. Enrichment uses the background mean instead. Off in the target mirrors both against the lowest background sample. τ (Yanai et al. 2005) runs from 0, even everywhere, to 1, one sample only, and is left blank unless the gene reaches 1 somewhere.</p>'],
         ['GO enrichment', '<p>A one-sided hypergeometric test of each GO term against the genome’s GO-annotated genes, with a gene counted under a term when it is annotated to the term or anything below it (is_a and part_of). Terms with 5 to 2,000 background genes and 2 or more list genes are tested; the false discovery rate is Benjamini–Hochberg.</p>'],
         ['The pan-genome', '<p>' + esc(pg.class_rule || '') + ' ' + esc(pg.expressed_rule || '') + '</p><p>' + esc(pg.conservation_rule || '') + '</p>' +
-          '<p>The 26 NAM genomes were measured in 23 samples in common: the NAM Consortium’s ten tissues, Lin 2017’s five and Diepenbrock 2017’s eight. They are matched by study and label, never by sample id, which is numbered per release. Members come from the Pan-Zea v4 analysis (' + fmtInt(pg.counts ? pg.counts.pangenes : 0) + ' pan-genes, ' + fmtInt(pg.counts ? pg.counts.members : 0) + ' gene models in 66 annotations).</p>'],
+          '<p>The 26 NAM genomes share 23 samples: the NAM Consortium’s ten tissues, Lin 2017’s five and Diepenbrock 2017’s eight' +
+          (partial.length ? ', though ' + partial.length + ' of the 25 founders were measured in fewer of them (' + partial.map(function (g) { return esc(g.short) + ' ' + g.samples_usable.rna; }).join(', ') +
+            ') and every statistic is taken over the samples a genome has' : '') +
+          '. They are matched by study and label, never by sample id, which is numbered per release. Members come from the Pan-Zea v4 analysis (' + fmtInt(pg.counts ? pg.counts.pangenes : 0) + ' pan-genes, ' + fmtInt(pg.counts ? pg.counts.members : 0) + ' gene models in 66 annotations).</p>'],
         ['Homeologs', '<p>The 4,578 retained maize1/maize2 pairs of the published table, 4,395 placed on B73 v5 through the pan-gene crosswalk and the v4-to-v5 chain file (the gene record’s Homeologs section reads the same release). Ka, Ks and ω are each copy against its sorghum syntelog as the source gives them.</p>'],
         ['Programmatic use', '<p>Everything these pages draw comes from one JSON endpoint, <code>' + esc(api) + '</code>: <code>?action=coexpression&amp;genome=B73v5&amp;id=adh1</code>, <code>?action=pangene&amp;id=lg1</code>, <code>?action=landscape&amp;silent_in=Oh7B&amp;format=tsv</code>, and the rest listed at the top of the file. Per-gene profiles, gene models, protein domains and GO terms are the documented <a href="/api">MaizeGDB API</a>.</p>'],
         ['Where this came from', '<p>These tools were built as ExpressionTools, a browser for qTeller databases, and rebuilt to run on MaizeGDB’s own expression releases. qTeller itself remains at <a href="https://qteller.maizegdb.org">qteller.maizegdb.org</a>. The papers behind the data and the methods are under <a href="' + esc(ET.href('references', {}, { keepSelection: false })) + '">References</a>.</p>']

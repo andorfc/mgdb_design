@@ -481,7 +481,8 @@
         gene: { name: attrs.name || structure.gene_model.canonical_transcript, symbol: attrs.symbol,
                 chromosome: structure.gene_model.chromosome, strand: structure.gene_model.strand,
                 start: structure.gene_model.start, end: structure.gene_model.end },
-        geneModel: structure.gene_model, domains: structure.domains || null, model: structure.model || null, base: ''
+        geneModel: structure.gene_model, domains: structure.domains || null, model: structure.model || null, base: '',
+        proteinDomains: structure.protein_domains || null
       });
       if (!figureDrawn) { figureBlock.parentNode.removeChild(figureBlock); } else { rendered = true; }
     }

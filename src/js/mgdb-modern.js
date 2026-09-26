@@ -536,17 +536,37 @@
      A page that still includes Plotly in its <head> is not affected: the
      promise resolves at once with the copy already there.
 
-     The copy is served from this site rather than cdn.plot.ly. Fetched from
-     the CDN, the moment a reader scrolled to a chart was also the moment the
-     browser opened a connection to a third host, and the CDN sends it gzipped
-     with no Cache-Control at all; from here it rides the connection the page
-     already has, brotli-compressed. The file is byte-identical to
-     plotly.min.js in the npm release plotly.js-dist-min@2.35.2. Its name
-     carries the version, so a new release is a new file and a new path here.
+     Two builds are served from this site, byte-identical to Plotly's own
+     npm releases of 2.35.2, and each file's name carries its version, so a
+     new release is a new file and a new path here. A page gets the cartesian
+     build: 1.36 MB against 4.56 MB for the full one (441 KB against 1.29 MB
+     compressed), and from scrolling to a figure to seeing it drawn that was
+     3.7 s against 8.0 s on a slow phone connection, 0.48 s against 1.35 s on
+     a fast one (the gene record's Metrics, 2026-09-25). It carries every
+     type the site draws -- bar, scatter, heatmap, box and pie, with histogram,
+     contour, violin, image and ternary besides. The full build adds the WebGL,
+     3D, polar, map and hierarchy types, and the two pages that draw scattergl,
+     the BLAST results and Expression Tools, ask for it from their controllers
+     with <meta name="mgdb-plotly" content="full">.
+
+     A type the cartesian build lacks is not an error: Plotly draws it as a
+     plain SVG scatter and says nothing, which for a scattergl figure of a few
+     thousand points is a slow page rather than a broken one. MGDB.chart()
+     warns in the console when a figure comes out as another type than it
+     asked for, so the missing <meta> is found by whoever adds the figure.
      ------------------------------------------------------------------------ */
 
-  var PLOTLY_SRC = '/js/lib/plotly/plotly-2.35.2.min.js';
+  var PLOTLY_BUILDS = {
+    cartesian: '/js/lib/plotly/plotly-cartesian-2.35.2.min.js',
+    full: '/js/lib/plotly/plotly-2.35.2.min.js'
+  };
   var plotlyPromise = null;
+
+  function plotlySrc() {
+    var meta = document.querySelector('meta[name="mgdb-plotly"]');
+    var build = meta ? meta.getAttribute('content') : '';
+    return PLOTLY_BUILDS[build] || PLOTLY_BUILDS.cartesian;
+  }
 
   function loadPlotly() {
     if (window.Plotly) { return Promise.resolve(window.Plotly); }
@@ -554,6 +574,7 @@
 
     plotlyPromise = new Promise(function (resolve, reject) {
       var script = document.createElement('script');
+      var src = plotlySrc();
 
       function failed() {
         // Forgotten, so the next figure to come into view tries again: one
@@ -561,10 +582,10 @@
         // page for good.
         plotlyPromise = null;
         if (script.parentNode) { script.parentNode.removeChild(script); }
-        reject(new Error('Plotly could not be loaded from ' + PLOTLY_SRC));
+        reject(new Error('Plotly could not be loaded from ' + src));
       }
 
-      script.src = PLOTLY_SRC;
+      script.src = src;
       script.async = true;
       script.onload = function () {
         if (window.Plotly) { resolve(window.Plotly); } else { failed(); }
@@ -673,6 +694,20 @@
     })();
   }
 
+  /* A trace whose type this page's Plotly build does not carry is drawn as
+     a plain scatter without a word from Plotly. See the note at loadPlotly. */
+  function warnSubstitutedTypes(target, traces) {
+    if (!window.console || !target._fullData) { return; }
+    target._fullData.forEach(function (full) {
+      var asked = traces[full.index] && traces[full.index].type;
+      if (asked && full.type !== asked) {
+        window.console.warn('MGDB.chart: ' + (target.id || 'a figure') + ' asked for "' + asked +
+          '", which this page\'s Plotly build does not carry, and was drawn as "' + full.type +
+          '". A page that needs it declares <meta name="mgdb-plotly" content="full">.');
+      }
+    });
+  }
+
   /* Renders a Plotly figure into config.target, lazily.
 
      config:
@@ -734,6 +769,7 @@
         // aria-label on the container is what assistive technology reads.
         var svg = target.querySelector('.main-svg');
         if (svg) { svg.setAttribute('aria-hidden', 'true'); }
+        warnSubstitutedTypes(target, traces);
         fitLegend(target, layout, 0);
         if (Plotly.Plots && Plotly.Plots.resize) {
           window.addEventListener('resize', debounce(function () {

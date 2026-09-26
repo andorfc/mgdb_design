@@ -204,6 +204,15 @@ installing the nightly job -- ADMIN_DEPENDENCIES.md **AD-081** has the steps,
 the cron line and the prerequisites (AD-019 for the structure index, AD-023
 for the dashboard cache directory).
 
+The Data API's release files are built on each instance too, from the download
+host's published files rather than from the database, so they change only
+when an annotation is republished and no nightly job keeps them: `data/gene_models/`
+for every genome by `python3 tools/gene_models_all.py --dest data/gene_models`
+(about 3 GB, two to three hours; it needs outbound HTTPS to
+download.maizegdb.org and skips what is already current), and B73 v5's gene
+models and domains by the commands under "Rebuilding a release" in the Data API
+section. Copying the directory from another instance with `tar` works as well.
+
 ## Rollback
 
 ```bash
@@ -417,11 +426,52 @@ reader ever reached a figure. The gene record downloaded it on every view and
 drew nothing with it in the first screen. `MGDB.chart()` now fetches it itself,
 once per page, when the first figure comes within 200px of the viewport, and a
 figure within a screen and a half of view starts the download early so a
-reader scrolling down meets a drawn chart rather than a loading line. The one URL is
-`PLOTLY_SRC` at the top of the Plotly block in `js/mgdb-modern.js`. Two versions
-used to be in use -- 2.35.2 from the CDN in 46 of those files, a local 2.25.2 in
-the other ten and in TYPSimSelector's own loader -- and every page now gets
-2.35.2, so a reader's browser caches one copy for the whole site.
+reader scrolling down meets a drawn chart rather than a loading line. The URLs
+are `PLOTLY_BUILDS` at the top of the Plotly block in `js/mgdb-modern.js`. Two
+versions used to be in use -- 2.35.2 from the CDN in 46 of those files, a local
+2.25.2 in the other ten and in TYPSimSelector's own loader -- and every page now
+gets 2.35.2.
+
+Plotly is served from this site, not cdn.plot.ly: two builds of 2.35.2 in
+`js/lib/plotly/`, each byte-identical to Plotly's own npm release (checked
+against jsDelivr's package metadata), with a `.htaccess` that lets browsers
+keep them for a year -- safe because every file name carries its version, so a
+new release is a new file and a new entry in `PLOTLY_BUILDS`.
+
+- **`plotly-cartesian-2.35.2.min.js`, the default** -- 1,358,851 bytes, 441 KB
+  on the wire. It carries bar, box, contour, heatmap, the three histograms,
+  image, pie, scatter, scatterternary and violin, checked by drawing each type
+  with it. Across all 61 chart pages the site draws bar, scatter, heatmap, box
+  and pie.
+- **`plotly-2.35.2.min.js`, the full build** -- 4,558,696 bytes, 1.29 MB on the
+  wire -- for a page whose controller declares
+  `<meta name="mgdb-plotly" content="full">`. Two do, because they draw WebGL
+  scatter plots (`scattergl`) of thousands of points: the BLAST results and
+  Expression Tools (Compare samples, Genome pairs, Homeolog expression, RNA
+  and protein).
+
+A type the cartesian build lacks is not an error: Plotly draws it as a plain
+SVG scatter without a word, which for a `scattergl` figure of thousands of
+points is a slow page rather than a broken one. `MGDB.chart()` compares what
+each figure asked for with what Plotly drew and warns in the console --
+`MGDB.chart: <id> asked for "scattergl", which this page's Plotly build does
+not carry...` -- so whoever adds such a figure finds the missing `<meta>`.
+
+What each step was worth, from scrolling to the gene record's Metrics until
+its chart is drawn, on a cold cache: two A/B runs, each three alternating
+pairs, with the second variant's copy of `mgdb-modern.js` rewritten in flight
+by `tools/defer_ab.py`'s interception.
+
+| A/B | 10 Mbps | slow profile |
+| --- | ---: | ---: |
+| full build from cdn.plot.ly | 1,240 ms | 8,228 ms |
+| full build from this site | 1,271 ms | 8,007 ms |
+| full build from this site (second run) | 1,352 ms | 8,027 ms |
+| cartesian build from this site | 480 ms | 3,733 ms |
+
+Moving the full build off the CDN changed little -- the transfer is the whole
+cost -- and what it bought was no dependence on a third host. The cartesian
+build is what more than halved the wait.
 
 Three things follow for page code:
 
@@ -481,20 +531,59 @@ HTML comment in `<head>` saying why: `<!-- bundle gene-record.js not built: ...
 bundled. On the gene record it turns fourteen stylesheets and eleven scripts
 into four files.
 
-**What each change was worth, measured 2026-09-25** on a cold cache through
-Cloudflare in headless Chrome, the median of three runs (two on the slow
-profile, which is Lighthouse's mobile one: 1.6 Mbps, 150 ms round trips and a
-CPU four times slower):
+### Deferring a page's scripts
+
+```php
+$bauplan->deferScripts();
+```
+
+gives every classic `<script src>` in `<head>` the `defer` attribute -- bundles,
+single files and CDN scripts alike -- so the browser paints the server-rendered
+page while they download and then runs them, in the same order, before
+`DOMContentLoaded`. Page scripts already wait for `DOMContentLoaded` (or check
+`readyState`) before touching the document, so for them nothing changes but
+the wait. It is refused, with `<!-- scripts not deferred: ... -->` in `<head>`,
+when anything on the page would run first and might need them: an inline
+script, or a plain `<script src>` in the body. JSON-LD and other data blocks,
+modules and async scripts do not count. Without the call, output is byte for
+byte as before.
+
+The gene record opts in. Measured as an A/B on the same page -- the HTML
+intercepted in headless Chrome and `defer` added in flight, so neither side
+was deployed differently -- five alternating pairs at 10 Mbps and four on the
+slow profile:
+
+| gene record | first paint, 10 Mbps | first paint, slow | content drawn, slow | layout shift |
+| --- | ---: | ---: | ---: | ---: |
+| scripts in `<head>` | 716 ms | 2,004 ms | 3,526 ms | 0.0365 |
+| deferred | 660 ms | 1,698 ms | 3,368 ms | 0.0365 |
+
+Every deferred run beat every blocking one. The content drawn from the API
+arrives sooner too, because the stylesheets no longer share the connection
+with the scripts before the first paint; the one layout shift, when the
+content replaces "Loading the full record", is the same either way. What a
+reader sees before the scripts run is the whole server-rendered identity panel
+and both tab bars; the search box's category control gains its icon and the
+section tabs their counts when they do.
+
+### What the speed changes were worth
+
+Measured 2026-09-25 on a cold cache through Cloudflare in headless Chrome
+(`tools/page_speed.py`), the median of two or three runs; the slow profile is
+Lighthouse's mobile one, 1.6 Mbps, 150 ms round trips and a CPU four times
+slower:
 
 | | first paint, 10 Mbps | first paint, slow | transferred | requests |
 | --- | ---: | ---: | ---: | ---: |
 | gene record, before | 1,848 ms | 8,902 ms | 2,449 KB | 40 |
 | without Plotly, unbundled | 704 ms | 2,142 ms | 1,147 KB | 37 |
 | without Plotly, bundled | 700 ms | 2,090 ms | 1,121 KB | 16 |
+| bundled, scripts deferred | 564 ms | 1,600 ms | 1,121 KB | 16 |
 
-Nearly all of it is Plotly. Five hubs and records that are not bundled went
-from 1.4-2.1 s to 0.52-0.56 s on the same profile, and the locus hub from
-8.1 s to 1.4 s on the slow one. Bundling barely moves a first visit: over
+Most of it is Plotly. Five hubs and records that are not bundled went from
+1.4-2.1 s to 0.52-0.56 s at 10 Mbps, and the locus hub from 8.1 s to 1.4 s on
+the slow profile. Deferring the scripts took the gene record the rest of the
+way. Bundling barely moves a first visit: over
 HTTP/2 to Cloudflare, 25 small requests were already cheap. What it buys is
 the repeat visit -- 25 files the edge marked stale after 30 minutes, each
 revalidated before the page could paint, are now four that a browser keeps for
@@ -5725,10 +5814,19 @@ Facts that shaped it -- each measured 2026-09-25:
   39 KB not-found page (HTTP 200) for FFUJ_, FOXG_, FPRO_ and NECHADRAFT_ ids,
   which the upstream effector table linked anyway. Links here use the
   accession and appear for those two species only.
-- **fusarium.maizegdb.org sends Access-Control-Allow-Origin for
-  claude.maizegdb.org and www.maizegdb.org only**, which is what lets the
-  browser read its model files directly. A move to any other host needs that
-  list extended.
+- **The model files come through this site, not straight from
+  fusarium.maizegdb.org.** That host sits behind a Cloudflare bot check for
+  visitors off the Iowa State network, and a page's background, cross-origin
+  fetch can neither pass it nor carry a pass the visitor earned -- so until
+  2026-09-25 the viewers drew a model on campus and nothing off campus.
+  Pages now ask
+  `search/fusarium/fusarium_api.php?action=model&model=alphafold&term=<accession>`;
+  the web server, on campus, fetches each file once and keeps it for 90 days
+  in `<search_cache_path>/fusarium` (the directory needs httpd's SELinux
+  label, as the Foldseek cache does; without it each model is fetched afresh).
+  Only models the index lists can be asked for. The same link is the
+  Fusarium Foldseek page's query model, and "Download PDB" now keeps the
+  file's name. ADMIN_DEPENDENCIES.md AD-084 has the Cloudflare side.
 - **The workbook:** EffectorP probabilities are binary floats (rounded to
   three places); 36 LOCALIZER cells lost their closing parenthesis when the
   range ends past residue 99; 10 F. graminearum effectors have no EffectorP
@@ -8917,8 +9015,10 @@ GET /api/v1/data/domains/{genome}/batch?ids=
 in the manifest (`B73v5`) or `current` answers with a 302 to it. `?format=`
 gives GFF3, BED12 or TSV where the route offers it -- a query parameter, not an
 extension, because the sitewide rewrite skips any URI containing `.js`
-(AD-011). Coordinates are 1-based inclusive; blocks are in transcript (rank)
-order, so exon 1 of a minus-strand gene has the highest coordinate.
+(AD-011). Coordinates are 1-based inclusive; blocks are in transcript order,
+5' to 3', so exon 1 of a minus-strand gene has the highest coordinate -- in
+every release, including the ones whose source ranks them the other way (see
+"Every genome" below).
 
 ### Where the answers come from
 
@@ -8936,16 +9036,22 @@ data/gene_models/<genome>/
   index.json             the public copy (no disagreements)
   genes/<xxx>.json       4,096 shards by sha1(lowercase gene id)[:3]; ~11 genes each
   aliases/<xx>.json      transcript, protein and previous id -> gene id, 256 shards
-  bins/<seq>/<n>.json    1 Mb bins of gene summaries; a gene sits in every bin it overlaps
-  gff3/<seq>.gff3.gz     the published rows, split by sequence
+  bins/<seq>/<n>.json    bins of gene summaries (manifest shards.bin_bp; 1 Mb for
+                         B73 v5, 5 Mb for the rest); a gene sits in every bin it overlaps
+  bins/_small/<xx>.json  sequences that fit in one bin, keyed by name, 256 shards
+                         (every release but B73 v5: a draft has thousands of contigs)
+  gff3/<seq>.gff3.gz     the published rows, split by sequence (B73 v5 only)
+
+Every release but B73 v5 writes its shards and bins as .json.gz; MgdbData
+reads either, and the manifest's shards.compression says which.
 data/domains/<genome>/
   proteins/<xxx>.json    one payload per protein with at least one match
   entries/<key>.json     one file per InterPro entry and per member signature
   bins/<seq>/<n>.json    canonical-protein domains projected onto the genome
 ```
 
-Both directories carry an `.htaccess` that denies every `*.json` to the
-browser except `index.json`, as `data/alphafill/` does. The builder writes
+Both directories carry an `.htaccess` that denies every `*.json` and
+`*.json.gz` to the browser except `index.json`, as `data/alphafill/` does. The builder writes
 `<genome>.building`, then renames the live release to `<genome>.previous` and
 the new one into place, so a request never sees a half-written release and
 the previous one is a rename away.
@@ -8975,12 +9081,17 @@ python3 tools/domains_index.py \
 
 The gene-models builder reads the GFF3 and the non-coding GFF3, the canonical
 list, the protein FASTA index (lengths), the locus map, the full-data file
-(symbol, full name, description) and the xref file (previous ids). Rules it
-enforces rather than assumes: the protein id comes from the CDS rows, never
-from the transcript name; exon order is the GFF `rank`; exactly one canonical
-transcript per coding gene; UTRs from the UTR rows; three times the protein
-length plus three equals the CDS length. Every violation is written to
-`manifest.disagreements`, never repaired silently.
+(symbol, full name, description), the xref file (previous ids) and the
+genome's FASTA index (sequence lengths the GFF3 does not state). Only the GFF3
+is required. Rules it enforces rather than assumes: a protein id is one the
+files state, or one the protein file confirms at the CDS's length -- never a
+guess from the transcript name; exons are ordered 5' to 3' from their
+coordinates and the GFF `rank` is checked against that order; exactly one
+canonical transcript per coding gene; UTRs from the UTR rows; three times the
+protein length plus three equals the CDS length. Every violation is written to
+`manifest.disagreements` (up to 200 examples of each check, with every
+check's full count in `disagreement_counts`), never repaired silently; every
+way a file's conventions were read is counted in `manifest.normalized`.
 
 The domains builder reads an InterProScan TSV, the sites TSV, and the domain
 atlas payload for the genome's functional classes, immunity calls and the
@@ -8995,6 +9106,102 @@ exercises every route against the origin, including the SBP domain of lg1
 projecting onto two CDS blocks and the whole of chromosome 1 paging at 2,000
 of 5,892.
 
+### Every genome (2026-09-25)
+
+`tools/gene_models_all.py` builds a release for every genome directory on
+download.maizegdb.org that publishes an annotation -- 139 besides B73 v5: the
+25 NAM founders and B73_AB10, 79 other maize assemblies and 34 PanAnd grasses,
+the newest annotation where a genome has two (ab over aa, .2 over .1).
+Annotations published outside the `<genome>_<annotation>.gff3.gz` naming are
+listed in the driver's `OFF_PATTERN`: B73 RefGen_v1 and v2 (their working gene
+sets, `ZmB73_4a.53_WGS` and `ZmB73_5a.59_WGS` -- the database holds every one
+of their models; the filtered sets are subsets), B73 RefGen_v3 (Ensembl's
+`Zea_mays.AGPv3.21`), and B73 v4's provisional models, read into the v4
+release with `--extra-gff3`. The driver also finds an unversioned annotation
+(Mo17 CAU-2.0: `Zm00014ba`) and a directory whose only annotation is
+`<genome>_<ann>.gene.gff3.gz` (the B chromosome). It runs `gene_models_index.py` once per genome with `--compress
+--no-gff3-copies --bin-bp 5000000 --share-small-bins`, skips a release whose
+manifest already matches the host's GFF3 (size and date), deletes each
+genome's downloads once built, and stops before a build would leave less than
+4 GB free (`tools/nightly_rebuild.php` needs 3). B73 v5 is never touched: it
+is built by hand with its aliases and SNPTools files, uncompressed, because
+`domains_index.py`, `paralogs_index.py` and `expression_tools_index.py` read
+its shards directly.
+
+**Built 2026-09-25 on the development instance:** 115 releases besides B73
+v5 -- the 25 NAM founders and B73_AB10, 79 other maize assemblies including
+B73 RefGen_v1 to v3, and 10 of the 34 PanAnd grasses -- 5.68 million genes and
+9.72 million transcripts in 2.7 GB, at about 25 seconds a release. 84 of the
+116 releases carry no disagreement at all; most of the rest are CDS lengths
+that are not a whole number of codons (the AMZ, HiLo and TUM annotations),
+which each manifest lists. **The other 24 PanAnd grasses are left for
+production** (decided 2026-09-26): the batch stops before a build would leave
+less than 4 GB free, the development host reached it, and they serve the API
+alone. They need about 0.7 GB; on production the ordinary run builds every
+release, and on the development host
+`python3 tools/gene_models_all.py --dest data/gene_models --group panand`
+builds them, and only them, once there is room.
+
+**What the gene page gains.** The gene record looks its release up by the
+database's `assembly_version`, so every gene model of an assembly with a
+release now has strand, exons, CDS, UTRs and protein length on the page, the
+"Gene model and protein" figure, and the header's transcript lengths -- every one of the 1,833,236 gene-model
+names in `chado.gene_model`, across all 36 assemblies, is found in a release
+(checked 2026-09-25). Where a genome has no domains release (all but B73 v5),
+the figure draws each transcript's Pfam domains from the database rows the
+page already carries, and says that is what they are. Where a release
+publishes no protein lengths (B73 v1 to v3), a named protein is drawn at the
+CDS's complete codons and labelled "about N aa, from the CDS". Where a release names no canonical transcript
+(most non-NAM maize: `manifest.canonical_from`), the record uses the
+database's canonical transcript instead, so the figure's star, the protein and
+the header agree. The database names Bayer's LH244 models with a version
+suffix the file does not have (`Zm00052a000001.1`), and spells the legacy
+assemblies with a space (`B73 RefGen_v3`, directory `B73_RefGen_v3`);
+`gene.php` and `gene_header_lib.php` handle both.
+
+**What no release can supply.** B73 RefGen_v1 and v2 publish no protein
+names or lengths, so their gene pages draw transcripts and CDS without a
+protein band (Mo17 YAN and Zx YAN publish none either). B73_AB10, the B
+chromosome, Mo17 CAU-2.0 and the PanAnd grasses have no gene records in the
+database, so their releases serve the API alone.
+
+**The annotations are written in a dozen conventions.** Each is read as the
+file means it and counted in the manifest, so a release says how it was read:
+
+| Convention | Releases | What the builder does | Counted in |
+|---|---|---|---|
+| legacy file names; provisional models in a file of their own | B73 RefGen_v1 to v3; B73 v4 | named in the driver's `OFF_PATTERN`; `--gff3`, `--extra-gff3` | `sources` |
+| Ensembl prefixes in IDs (`gene:`, `transcript:`); typed genes (`tRNA_gene`, `protein_coding_gene`) | B73 v4, B73 v3 | strips the prefix; any `*_gene` is a gene | -- |
+| a gene and its transcript given one ID | B73 v3's miRNAs | the transcript's Parent is that gene | -- |
+| serial-number IDs, the name in `Name=` | Mo17 YAN, Zx YAN | keys by the name, resolves Parents through the serials | `normalized.ids_from_name` |
+| mRNA rows with no `Parent` | the 12 CAAS_FIL assemblies | the gene its ID extends (`..._T001`), when that gene contains it | `normalized.parents_inferred` |
+| two Parents on one row | 7 AMZ, A188, Ia453, CML247 PANZEA | the row belongs to both | `normalized.shared_rows` |
+| UTR types spelled `five_P00rime_UTR` | Mo17 CAU | read as UTRs | `normalized.renamed_types` |
+| source and type joined, 8 columns (`EVM_mRNA`) | LH244 CAU, 38,431 rows | split back apart | `normalized.rows_repaired` |
+| no exon rows | SK YAN | exons are the CDS and UTR blocks, touching ones joined | `normalized.exons_from_cds_and_utr` |
+| every CDS row listed twice | 9 PanAnd | read once | `duplicate_rows` |
+| minus-strand exons ranked in genomic order | PanAnd, HiLo | ordered 5' to 3' from coordinates and renumbered | `exon_rank` |
+| no protein ID on the CDS rows | W22, A188, PH207, LH244, the CAAS_FIL assemblies and others | the transcript's Alias or `_T`-for-`_P` name, only when the protein file has it within one codon of the CDS | `protein_ids_from` |
+| CDS IDs that are protein names, with no protein file to confirm them | B73 v3 (`_P01`, fgenesh `_FGP001`) | taken when they have that shape | `protein_ids_from` |
+| protein FASTA named by transcript | Cc | lengths read by transcript ID | `protein_lengths_keyed_by` |
+| the genome index spells names differently (`1` for `chr1`, `Chr1`, `chr03` for `chr3`) | Mo17 YAN, Zx YAN, F2, F252, PH207 NS-UIUC_UMN, B73 v3 | matched when the key is unique on both sides | `normalized.sequence_names_matched` |
+| no sequence length anywhere | 5,899 sequences in nine releases, most in Cs, Cc, P8860 and CIMBL55 | the last gene's end, marked `length_from` | `normalized.sequence_lengths_unknown` |
+| no canonical flag and no list | most non-NAM maize | the first coding transcript by ID | `canonical_from` |
+
+Two things no reading can recover: CML247 PANZEA numbers its proteins for
+other transcripts than its GFF3 does (T001's CDS is 525 nt; `_P001` is
+234 aa), so 27,721 transcripts are left without a protein rather than given
+the wrong one; and Mo17 YAN and Zx YAN publish no protein file at all.
+ADMIN_DEPENDENCIES.md **AD-085** lists the defects in the published files for
+whoever maintains them.
+
+**Checking a builder change.** Rebuild B73 v5 into a scratch directory with its
+hand flags and compare every shard with the live release. On 2026-09-25, after
+the changes above, all 4,096 gene shards, 256 alias shards, 2,312 bins and 195
+SNPTools files were identical. `tools/tests/data_api_verify.py` covers a NAM
+founder, a compressed shard's 403, the LH244 suffix, a serial-ID release, a
+draft's shared bins and a PanAnd minus-strand gene.
+
 ### What did not change
 
 `/api/v1/records/*` is untouched: the data branch is taken only when the
@@ -9007,7 +9214,8 @@ in `controllers/api.php`, the same way the record registry feeds them.
 
 `include/api/v1/records/gene.php` looks the gene up in the gene-models
 release for its assembly once, right after the identity is resolved. When a
-release exists (B73 v5 today):
+release exists (B73 v5 first; since 2026-09-25 every assembly the download
+host publishes an annotation for -- "Every genome" below):
 
 - `overview.strand` is the strand from the GFF3 (it was always null);
 - `structure.protein.length_aa` comes from the FASTA index, so the 470 ms
@@ -9031,7 +9239,9 @@ selected transcript's CDS blocks carried down as connectors to the residues
 they encode, the protein with its InterPro entries and residue-level sites,
 and each domain painted back onto the CDS that encodes it. Choosing another
 transcript fetches that protein's domains from `/api/v1/data/domains/...`.
-The 3D panel loads `js/lib/3dmol/3Dmol-min.js` and the model only when the
+A genome with no domains release (every one but B73 v5) gets
+`links.domains: null` in its gene model, and the figure then asks for nothing
+and reports no failure. The 3D panel loads `js/lib/3dmol/3Dmol-min.js` and the model only when the
 reader asks, and colours the cartoon by the same domains or by pLDDT;
 clicking a domain in the figure zooms the model to it.
 
@@ -9284,6 +9494,28 @@ analyses are, corrected (below), and the pan-genome tools are new.
 | API | `search/expression_tools/expression_tools_api.php` over `expression_tools_lib.php` |
 | Data build | `tools/expression_tools_export.php` (two database exports), `tools/expression_tools_index.py` |
 
+### The gene record's Expression section reads the tools (2026-09-25)
+
+The record's expression figure (`js/mgdb-gene-expression.js`) gained three
+panels between "Highest samples" and the sources, filled from the tools'
+endpoint when they scroll into view, so the record's first paint never waits
+on them: **Co-expressed genes** (the six closest and the most opposite, from
+`coexpression`, about a second the first time a gene is asked for and cached
+after), **Across the 26 NAM genomes** (the 26 states, the class and the
+profile agreement, from `pangene`), and **Rank among all genes** (the best
+rank and the five highest, from a new `rank` action -- the gene report
+computes the same percentiles from the catalog's 101 quantiles per sample,
+which the record should not download). Each panel fails on its own with a
+line and a link. The single "Analyze in Expression Tools" button became
+purpose links: the gene report, co-expression, a comparison, the neighborhood
+(±150 kb, once co-expression has told us where the gene is), a heatmap of the
+co-expressed genes, qTeller, and **Add to the Expression Tools basket**, which
+writes the tools' own per-genome key in this origin's localStorage, so the
+basket fills from record pages. The Detected tile and the assay chip count
+the samples with a value (309 for B73 v5), with the unmeasured ones named,
+matching the tools. The Paralogs section links a retained homeolog pair to
+the tools' Compare two genes view.
+
 ### The data: `data/expression_tools/`
 
 Built on the server from the expression releases (`data/expression/`), the
@@ -9452,10 +9684,20 @@ code-review passes) found these, all fixed the same day:
   keeps its page in the hash, and its sort select no longer widens a phone.
 - **Compare samples** keeps `fc=0` and writes edited thresholds to the hash.
 - **Genome pairs** says in its caption that the profile r is over all 23
-  shared samples whatever set the level uses (a review claim that a small
-  set zeroed the histogram was wrong; the API never narrows r), and shows
-  a message rather than zeros should no pair have one; the pan-gene page
-  offers the basket only when the current genome has a copy.
+  shared samples whatever set the level uses, and shows a message rather
+  than zeros should no pair have one; the pan-gene page offers the basket
+  only when the current genome has a copy. The caption was only true by
+  accident until the Samples select was fixed: `etList()` returned
+  `array_keys()`, so "0".."22" came back as integers that PHP 8's
+  `ctype_digit()` reads as character codes, every index was dropped, and
+  all 23 were always used, while `etPairs()` took r over the same subset as
+  the level. Now the level follows the selection and r reads all 23 from
+  the same pass; a founder measured in none of the chosen samples (CML277
+  has neither 16 DAP sample) gets a message; only the every-sample result
+  is cached. The API sends the shared samples each genome was measured in
+  (`measured_a`, `measured_b`), so the subtitle says when a founder has
+  fewer of the chosen samples ("CML333 was measured in 15 of them") and the
+  r caption counts the samples both genomes have.
 - **The sample map's correlation map** is now clustered on 1 - r between
   the samples, as its caption says, and the most-variable genes are ranked
   on the centered values when centering is on.

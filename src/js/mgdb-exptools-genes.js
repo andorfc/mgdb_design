@@ -1575,12 +1575,26 @@
     render: function (root, ctx) {
       var g1 = ctx.get('g1'), g2 = ctx.get('g2');
       var scale = ctx.get('scale', 'log');
+      /* Gene 2 can come from another NAM genome (g2g), which is how the Genome
+         pairs table opens a pair here. Two genomes have only the 23 shared
+         samples in common, so the points are those, within the selection:
+         shared sample j of one genome is shared sample j of every other
+         (the catalogs' shared_sample_ids, checked over all 26). */
+      var G = ET.state.genome;
+      var gb = ET.genomeByKey(ctx.get('g2g'));
+      gb = G.nam && gb && gb.nam && gb.key !== G.key ? gb.key : '';
       var form = UI.panel({});
       var row = el('<form class="et-form-row"></form>');
       var i1 = UI.geneInput({ value: g1, label: 'Gene 1', onPick: function (v) { g1 = v; load(); } });
-      var i2 = UI.geneInput({ value: g2, label: 'Gene 2', onPick: function (v) { g2 = v; load(); } });
+      var i2 = UI.geneInput({ value: g2, label: 'Gene 2', genome: function () { return gb; }, onPick: function (v) { g2 = v; load(); } });
       row.appendChild(UI.field('Gene 1 (x axis)', i1));
       row.appendChild(UI.field('Gene 2 (y axis)', i2));
+      if (G.nam) {
+        var gSel = UI.select([{ value: '', label: 'Same as gene 1 (' + G.short + ')' }].concat(ET.state.genomes.filter(function (x) { return x.nam && x.key !== G.key; })
+          .map(function (x) { return { value: x.key, label: x.short }; })), gb);
+        gSel.addEventListener('change', function () { gb = gSel.value; });
+        row.appendChild(UI.field('Gene 2 genome', gSel));
+      }
       var go = el('<div class="mgdb-hub-field mgdb-hub-field-action"><button type="submit" class="mgdb-button mgdb-button-primary">Compare</button></div>');
       row.appendChild(go);
       row.addEventListener('submit', function (e) { e.preventDefault(); g1 = i1.value; g2 = i2.value; load(); });
@@ -1603,21 +1617,46 @@
       var p2 = UI.panel({ title: 'Where they differ' }); UI.body(p2).appendChild(dfig);
       grid.appendChild(p1); grid.appendChild(p2);
       root.appendChild(grid);
+      /* Gene 2's genome and its catalog as of the last load, so the genome
+         select changes nothing until Compare runs. */
+      var GB = null, catB = null, seq = 0;
       function load() {
         if (!g1 || !g2) { C.clear(fig.plotNode); fig.plotNode.appendChild(UI.message('Enter two genes.', 'info')); return; }
-        ctx.set({ g1: g1, g2: g2 });
-        ET.values([g1, g2], { signal: ctx.signal }).then(function (v) {
-          if (!ctx.alive()) { return; }
-          a = v.genes.filter(function (g) { return g.gene === v.map[g1]; })[0];
-          b = v.genes.filter(function (g) { return g.gene === v.map[g2]; })[0];
-          if (!a || !b) { C.clear(fig.plotNode); fig.plotNode.appendChild(UI.message('Not found: ' + esc(v.missing.join(', ')), 'error')); return; }
+        ctx.set({ g1: g1, g2: g2, g2g: gb });
+        var my = ++seq, want = gb;
+        var got = want
+          ? Promise.all([ET.values([g1], { signal: ctx.signal }), ET.values([g2], { genome: want, signal: ctx.signal }), ET.catalogOf(want)])
+          : ET.values([g1, g2], { signal: ctx.signal }).then(function (v) { return [v, v, null]; });
+        got.then(function (r) {
+          if (my !== seq || !ctx.alive()) { return; }
+          a = r[0].genes.filter(function (g) { return g.gene === r[0].map[g1]; })[0];
+          b = r[1].genes.filter(function (g) { return g.gene === r[1].map[g2]; })[0];
+          GB = want ? ET.genomeByKey(want) : null;
+          catB = r[2];
+          if (!a || !b) {
+            var missing = !want ? r[0].missing : r[0].missing.map(function (m) { return m + ' in ' + G.short; }).concat(r[1].missing.map(function (m) { return m + ' in ' + GB.short; }));
+            C.clear(fig.plotNode); fig.plotNode.appendChild(UI.message('Not found: ' + esc(missing.join(', ')), 'error')); return;
+          }
           draw();
-        }, function (e) { C.clear(fig.plotNode); fig.plotNode.appendChild(UI.errorBox(e)); });
+        }, function (e) { if (my === seq && ctx.alive()) { C.clear(fig.plotNode); fig.plotNode.appendChild(UI.errorBox(e)); } });
       }
       function draw() {
         if (!a || !b) { return; }
-        pts = ET.SEL.list().filter(function (s) { return a.values[s.idx] != null && b.values[s.idx] != null; }).map(function (s) { return { s: s, x: a.values[s.idx], y: b.values[s.idx] }; });
-        if (pts.length < 3) { C.clear(fig.plotNode); fig.plotNode.appendChild(UI.message('These genes share ' + pts.length + ' measured samples in the selection.', 'info')); return; }
+        if (catB) {
+          var picked = {};
+          ET.SEL.list().forEach(function (s) { picked[s.id] = true; });
+          var byA = ET.state.catalog.assays.rna.byId, byB = catB.assays.rna.byId, idsB = catB.shared_sample_ids || [];
+          pts = [];
+          (ET.state.catalog.shared_sample_ids || []).forEach(function (id, j) {
+            var s = byA[id], t = byB[idsB[j]];
+            if (s && t && picked[id] && a.values[s.idx] != null && b.values[t.idx] != null) { pts.push({ s: s, x: a.values[s.idx], y: b.values[t.idx] }); }
+          });
+        } else {
+          pts = ET.SEL.list().filter(function (s) { return a.values[s.idx] != null && b.values[s.idx] != null; }).map(function (s) { return { s: s, x: a.values[s.idx], y: b.values[s.idx] }; });
+        }
+        if (pts.length < 3) { C.clear(fig.plotNode); fig.plotNode.appendChild(UI.message('These genes share ' + pts.length + ' measured samples in the selection' + (catB ? ', of the 23 the NAM genomes share' : '') + '.', 'info')); return; }
+        /* Across two genomes both genes can carry the same symbol. */
+        var nameA = (a.symbol || a.gene) + (catB ? ' (' + G.short + ')' : ''), nameB = (b.symbol || b.gene) + (catB ? ' (' + GB.short + ')' : '');
         var tf = function (v) { return scale === 'log' ? S.log2p1(v) : v; };
         var X = pts.map(function (p) { return tf(p.x); }), Y = pts.map(function (p) { return tf(p.y); });
         var rp = S.pearson(X, Y), rs = S.spearman(pts.map(function (p) { return p.x; }), pts.map(function (p) { return p.y; }));
@@ -1628,26 +1667,29 @@
           present[t] = sub.length;
           return { type: 'scatter', mode: 'markers', name: t, x: sub.map(function (p) { return tf(p.x); }), y: sub.map(function (p) { return tf(p.y); }),
                    marker: { size: 9, color: C.tissueColor(t), symbol: ET.TISSUE_SYMBOLS[t], line: { color: '#ffffff', width: 1.5 } }, hoverinfo: 'text',
-                   hovertext: sub.map(function (p) { return esc(p.s.label) + '<br>' + esc(U.shortStudy(p.s.studyName)) + '<br>' + esc(a.symbol || a.gene) + ' <b>' + fmt(p.x) + '</b> · ' + esc(b.symbol || b.gene) + ' <b>' + fmt(p.y) + '</b>'; }) };
+                   hovertext: sub.map(function (p) { return esc(p.s.label) + '<br>' + esc(U.shortStudy(p.s.studyName)) + '<br>' + esc(nameA) + ' <b>' + fmt(p.x) + '</b> · ' + esc(nameB) + ' <b>' + fmt(p.y) + '</b>'; }) };
         }).filter(Boolean);
         var mx = Math.max.apply(null, X.concat(Y)) * 1.05 || 1;
         traces.push({ type: 'scatter', mode: 'lines', x: [0, mx], y: [0, mx], line: { color: '#9a9994', width: 1 }, hoverinfo: 'skip', showlegend: false });
         var fit = S.linfit(X, Y), x0 = Math.min.apply(null, X), x1 = Math.max.apply(null, X);
         traces.push({ type: 'scatter', mode: 'lines', x: [x0, x1], y: [fit.a + fit.b * x0, fit.a + fit.b * x1], line: { color: ET.INK, width: 2 }, hoverinfo: 'skip', showlegend: false });
         var unit = scale === 'log' ? 'log₂(value + 1)' : 'value';
-        C.plot(fig.plotNode, traces, { showlegend: false, xaxis: { title: { text: EX.geneTitle(a) + ' · ' + unit }, rangemode: 'tozero' }, yaxis: { title: { text: EX.geneTitle(b) + ' · ' + unit }, rangemode: 'tozero' },
+        C.plot(fig.plotNode, traces, { showlegend: false, xaxis: { title: { text: EX.geneTitle(a) + (catB ? ' · ' + G.short : '') + ' · ' + unit }, rangemode: 'tozero' },
+                                       yaxis: { title: { text: EX.geneTitle(b) + (catB ? ' · ' + GB.short : '') + ' · ' + unit }, rangemode: 'tozero' },
                                        margin: { l: 70, r: 12, t: 10, b: 56 } }, { height: 440 });
         legendHost.innerHTML = '';
         legendHost.appendChild(C.legend('tissue', present));
         fig.caption.innerHTML = 'n = <strong>' + pts.length + '</strong> samples · Pearson r = <strong>' + U.fmtR(rp) + '</strong> (' + (scale === 'log' ? 'log scale' : 'linear') + ') · Spearman ρ = <strong>' + U.fmtR(rs) + '</strong>' +
-          '. Gray line: equal values; dark line: least squares.' + (pts.length < 10 ? ' <span class="et-warn">Few points; read r as a hint.</span>' : '');
+          '. Gray line: equal values; dark line: least squares.' +
+          (catB ? ' Gene 1 is from ' + esc(G.short) + ' and gene 2 from ' + esc(GB.short) + '; two genomes have only the 23 samples the NAM genomes share in common, so the points are those, within the selection.' : '') +
+          (pts.length < 10 ? ' <span class="et-warn">Few points; read r as a hint.</span>' : '');
         fig.renderTable();
         var dd = pts.map(function (p) { return { s: p.s, x: p.x, y: p.y, r: Math.log((p.x + 1) / (p.y + 1)) / Math.LN2 }; }).sort(function (u, v) { return Math.abs(v.r) - Math.abs(u.r); }).slice(0, 25);
         diff = dd;
         C.plot(dfig.plotNode, [{ type: 'bar', orientation: 'h', x: dd.map(function (v) { return v.r; }), y: dd.map(function (_, i) { return i; }),
           marker: { color: dd.map(function (v) { return v.r >= 0 ? ET.DIV[0] : ET.DIV[4]; }) }, hoverinfo: 'text',
           hovertext: dd.map(function (v) { return '<b>' + v.r.toFixed(2) + '</b> log₂ ratio<br>' + esc(v.s.label); }) }],
-          { xaxis: { title: { text: '← ' + (b.symbol || b.gene) + ' higher · ' + (a.symbol || a.gene) + ' higher →' }, zeroline: true },
+          { xaxis: { title: { text: '← ' + nameB + ' higher · ' + nameA + ' higher →' }, zeroline: true },
             yaxis: { tickmode: 'array', tickvals: dd.map(function (_, i) { return i; }), ticktext: dd.map(function (v) { return v.s.label.length > 30 ? v.s.label.slice(0, 28) + '…' : v.s.label; }), autorange: 'reversed', tickfont: { size: 10.5 } },
             showlegend: false, margin: { l: 10, r: 12, t: 8, b: 50 } }, { height: Math.max(300, dd.length * 17 + 80) });
         dfig.caption.textContent = 'log₂ of (gene 1 + 1) / (gene 2 + 1), the 25 samples where they differ most. Across studies the units differ, so read a ratio within one study.';

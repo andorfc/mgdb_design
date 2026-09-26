@@ -100,10 +100,27 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   include_once('./include/api/v1/lib/mgdb_paralogs.php');
   $gene_release = null;
   $gene_shard = null;
-  if ($gene_name !== null && $assembly_version !== null && class_exists('MgdbData')) {
-    $gene_release = MgdbData::manifest('gene-models', $assembly_version);
+  /* The release directory for this assembly. The database spells the three
+     legacy B73 assemblies with a space ("B73 RefGen_v3"); the download host
+     and the release directory use an underscore. */
+  $release_genome = $assembly_version !== null ? str_replace(' ', '_', $assembly_version) : null;
+  if ($gene_name !== null && $release_genome !== null && class_exists('MgdbData')) {
+    $gene_release = MgdbData::manifest('gene-models', $release_genome);
     if ($gene_release !== null) {
-      $gene_shard = MgdbData::shardEntry('gene-models', $assembly_version, 'genes', $gene_name, MgdbData::GENE_SHARD_DEPTH);
+      $gene_shard = MgdbData::shardEntry('gene-models', $release_genome, 'genes', $gene_name, MgdbData::GENE_SHARD_DEPTH);
+      /* The database names Bayer's LH244 models with a version suffix
+         (Zm00052a000001.1); the published GFF3 does not. */
+      if ($gene_shard === null && preg_match('/^(.+)\.\d+$/', $gene_name, $m_base)) {
+        $gene_shard = MgdbData::shardEntry('gene-models', $release_genome, 'genes', $m_base[1], MgdbData::GENE_SHARD_DEPTH);
+      }
+      /* A release whose files name no canonical transcript marks the first
+         by ID (manifest canonical_from says so); the database's own choice
+         wins when it is one of this gene's transcripts, so the figure, the
+         protein and the header agree. */
+      if ($gene_shard !== null && $canonical_transcript !== null && isset($gene_release['canonical_from'])
+          && strpos($gene_release['canonical_from'], 'none stated') === 0) {
+        $gene_shard = gene_api_release_canonical($gene_shard, $canonical_transcript);
+      }
     }
   }
 
@@ -560,7 +577,7 @@ function gene_api_tools($DBConn, $gene_name, $assembly_version) {
     /* Domains: from the domains release when this assembly has one -- every
        protein of the gene, all analyses the release carries, no query -- and
        from perm_tables.protein_domain (Pfam only) otherwise. */
-    $domains = ($gene_shard !== null) ? gene_api_release_domains($assembly_version, $gene_shard) : null;
+    $domains = ($gene_shard !== null) ? gene_api_release_domains($release_genome, $gene_shard) : null;
     if ($domains === null && $gene_name !== null) {
       // protein_domain_gene_model_idx. No SELECT DISTINCT pd.* -- that sorts
       // every column of a 25.2 M-row, 5.6 GB table.
@@ -702,8 +719,8 @@ function gene_api_tools($DBConn, $gene_name, $assembly_version) {
        protein's domains, and a 3D model when one is on file. Three to five
        shard reads, no query. Absent for assemblies without a release, and
        exon_structure_note says why. */
-    $gene_model = ($gene_shard !== null) ? gene_api_release_gene_model($assembly_version, $gene_release, $gene_shard) : null;
-    $protein_payload = ($gene_shard !== null) ? gene_api_release_protein($assembly_version, $gene_shard) : null;
+    $gene_model = ($gene_shard !== null) ? gene_api_release_gene_model($release_genome, $gene_release, $gene_shard) : null;
+    $protein_payload = ($gene_shard !== null) ? gene_api_release_protein($release_genome, $gene_shard) : null;
     $structure_model = ($gene_shard !== null && $gene_name !== null)
                      ? gene_api_structure_model($gene_name, $gene_shard['canonical_protein']) : null;
 
@@ -849,7 +866,7 @@ function gene_api_tools($DBConn, $gene_name, $assembly_version) {
     include_once('./include/api/v1/lib/mgdb_go.php');
     include_once('./include/api/v1/lib/mgdb_pathways.php');
     $fn_protein = isset($protein_payload) ? $protein_payload
-                : (($gene_shard !== null) ? gene_api_release_protein($assembly_version, $gene_shard) : null);
+                : (($gene_shard !== null) ? gene_api_release_protein($release_genome, $gene_shard) : null);
 
     $sections['function'] = array(
       'summary' => gene_api_function_line($summary_domains, $ontology, $full_name),
@@ -2502,6 +2519,23 @@ function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
    The annotation release behind the structure figure
    --------------------------------------------------------------------------- */
 
+/* The gene's shard with $name as its canonical transcript, when $name is one
+   of its transcripts; unchanged otherwise. */
+function gene_api_release_canonical($shard, $name) {
+  $pick = null;
+  foreach ($shard['transcripts'] as $t) {
+    if (isset($t['id']) && strcasecmp($t['id'], $name) === 0) { $pick = $t; break; }
+  }
+  if ($pick === null) { return $shard; }
+  foreach ($shard['transcripts'] as $i => $t) {
+    $shard['transcripts'][$i]['canonical'] = ($t['id'] === $pick['id']);
+  }
+  $shard['canonical_transcript'] = $pick['id'];
+  $shard['canonical_protein'] = isset($pick['protein']['id']) ? $pick['protein']['id'] : null;
+  $shard['protein_length_aa'] = isset($pick['protein']['length_aa']) ? $pick['protein']['length_aa'] : null;
+  return $shard;
+}//gene_api_release_canonical
+
 /* The gene's transcripts with exons, CDS and UTRs, as the gene-models dataset
    serves them, plus the links to that dataset's own routes. */
 function gene_api_release_gene_model($assembly, $release, $shard) {
@@ -2527,6 +2561,9 @@ function gene_api_release_gene_model($assembly, $release, $shard) {
       'gff3' => $self . '?format=gff3',
       'bed' => $self . '?format=bed',
       'region' => $base . '/api/v1/data/gene-models/' . $assembly . '/region/' . $shard['seq'] . ':' . max(1, $start - 10000) . '-' . ($end + 10000),
+      /* Null when this genome has no domains release (every one but B73
+         NAM-5.0), so the figure does not ask for one. */
+      'domains' => MgdbData::hasRelease('domains', $assembly) ? $base . '/api/v1/data/domains/' . $assembly : null,
       'browser' => $assembly === 'Zm-B73-REFERENCE-NAM-5.0'
         ? 'https://jbrowse.maizegdb.org?loc=' . $shard['seq'] . ':' . $start . '..' . $end . '&tracks=gene_models_official,gene_models_v4_json,gene_models_v3_json'
         : null

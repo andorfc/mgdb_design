@@ -309,13 +309,14 @@
 
   /* Values of many genes, kept gene by gene for the session, so a second view
      of the same genes costs nothing. -> {genes: [{row, gene, symbol, ...,
-     values}], missing, map} with values aligned to the assay's columns. */
+     values}], missing, map} with values aligned to the assay's columns.
+     opts.genome reads another genome than the current one. */
   var geneCache = {};
   var aliasCache = {};
 
   function values(ids, opts) {
     opts = opts || {};
-    var gk = ET.state.genome.key;
+    var gk = opts.genome || ET.state.genome.key;
     var assay = opts.assay || 'rna';
     var need = [];
     ids.forEach(function (id) {
@@ -391,6 +392,12 @@
     cat.studyById = studies;
     return cat;
   }
+
+  /* Another genome's catalog, prepared, without switching to it. */
+  ET.catalogOf = function (key) {
+    if (state.genome && state.catalog && state.genome.key === key) { return Promise.resolve(state.catalog); }
+    return api('catalog', { genome: key }).then(prepareCatalog);
+  };
 
   var useSeq = 0;
   ET.useGenome = function (key) {
@@ -765,7 +772,8 @@
      ------------------------------------------------------------------------ */
 
   /* One gene, with suggestions from the genome's annotation index: ids,
-     symbols, older ids, words in names and descriptions. */
+     symbols, older ids, words in names and descriptions. opts.genome, a
+     function returning a genome key, suggests from another genome. */
   function geneInput(opts) {
     opts = opts || {};
     var w = el('<div class="et-ta"><input type="text" class="et-input et-mono" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false"><ul class="et-ta-list" role="listbox" hidden></ul></div>');
@@ -807,7 +815,7 @@
       var q = input.value.trim();
       if (q.length < 2 || /[\s,;]/.test(q)) { items = []; render(); return; }
       var my = ++seq;
-      api('search', { genome: state.genome.key, q: q, limit: 10 }).then(function (d) {
+      api('search', { genome: (opts.genome && opts.genome()) || state.genome.key, q: q, limit: 10 }).then(function (d) {
         if (my !== seq) { return; }
         items = d.results;
         active = -1;
@@ -880,7 +888,10 @@
      button as the shared stylesheet expects.
 
      columns: [{key, label, type: 'num'|'str', value(row), render(row) -> html,
-                export(row), title, heat}]
+                export(row), title, heat, action}]
+
+     An action column holds a link per row (Compare): it has no sort button,
+     and the filter and the TSV leave it out.
      ------------------------------------------------------------------------ */
 
   function DataTable(container, opts) {
@@ -933,7 +944,7 @@
     var rows = this.rows;
     if (this.filterText) {
       var f = this.filterText;
-      var cols = this.columns.filter(function (c) { return c.type !== 'num'; });
+      var cols = this.columns.filter(function (c) { return c.type !== 'num' && !c.action; });
       rows = rows.filter(function (r) {
         return cols.some(function (c) { return String(self.val(c, r) == null ? '' : self.val(c, r)).toLowerCase().indexOf(f) !== -1; });
       });
@@ -971,6 +982,7 @@
     });
     var head = '<tr>' + (this.selectable ? '<th scope="col" class="et-sel"><input type="checkbox" aria-label="Select this page"></th>' : '');
     this.columns.forEach(function (c) {
+      if (c.action) { head += '<th scope="col" class="et-dt-action">' + c.label + '</th>'; return; }
       var sort = self.sort && self.sort.key === c.key ? (self.sort.dir === 'asc' ? 'ascending' : 'descending') : 'none';
       head += '<th scope="col" aria-sort="' + sort + '"' + (c.type === 'num' ? ' class="mgdb-numeric"' : '') + (c.title ? ' title="' + esc(c.title) + '"' : '') +
         '><button type="button" data-k="' + esc(c.key) + '">' + c.label + '</button></th>';
@@ -990,7 +1002,7 @@
             var t = Math.min(1, Math.log(v + 1) / Math.log(heatMax[c.key] + 1));
             style = ' style="--et-heat:' + t.toFixed(3) + '"';
           }
-          cells += '<td' + (c.type === 'num' ? ' class="mgdb-numeric' + (c.heat ? ' et-heat' : '') + '"' : '') + style + '>' + html + '</td>';
+          cells += '<td' + (c.type === 'num' ? ' class="mgdb-numeric' + (c.heat ? ' et-heat' : '') + '"' : (c.action ? ' class="et-dt-action"' : '')) + style + '>' + html + '</td>';
         });
         return '<tr>' + cells + '</tr>';
       }).join('');
@@ -1049,9 +1061,10 @@
   DataTable.prototype.exportTsv = function () {
     var self = this;
     var rows = this.view();
-    var header = this.columns.map(function (c) { return c.exportLabel || String(c.label).replace(/<[^>]+>/g, ''); });
+    var cols = this.columns.filter(function (c) { return !c.action; });
+    var header = cols.map(function (c) { return c.exportLabel || String(c.label).replace(/<[^>]+>/g, ''); });
     var data = rows.map(function (r) {
-      return self.columns.map(function (c) { return c.export ? c.export(r) : self.val(c, r); });
+      return cols.map(function (c) { return c.export ? c.export(r) : self.val(c, r); });
     });
     var notes = ['MaizeGDB Expression Tools, ' + new Date().toISOString().slice(0, 10), 'genome: ' + (state.genome ? state.genome.genome : '')].concat(this.notes);
     downloadTable(this.exportName, header, data, notes);

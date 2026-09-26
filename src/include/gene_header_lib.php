@@ -327,19 +327,39 @@ function geneHeaderCurrentModel($DBConn, $locus_id, $resolved_row, $prefer_resol
 
    Returns array('mrna_nt' => …, 'cds_nt' => …, 'exons' => …, 'protein_aa'
    => …, 'release' => …) or false when this assembly has no release or the
-   gene is not in it -- every annotation but B73 NAM-5.0 today. */
+   gene is not in it. */
+/* One gene shard of a release, decoded, or null. A release built with
+   --compress keeps its shards as .json.gz. */
+function geneHeaderShard($dir, $key) {
+  $path = $dir . '/genes/' . substr(sha1($key), 0, 3) . '.json';
+  if (is_file($path)) {
+    $raw = @file_get_contents($path);
+  } elseif (is_file($path . '.gz')) {
+    $raw = @file_get_contents('compress.zlib://' . $path . '.gz');
+  } else {
+    return null;
+  }
+  if ($raw === false || $raw === '') { return null; }
+  $shard = json_decode($raw, true);
+  return is_array($shard) ? $shard : null;
+}//geneHeaderShard
+
 function geneHeaderTranscript($assembly, $gene_name, $canonical) {
   if ($assembly === '' || $gene_name === '') { return false; }
+  /* "B73 RefGen_v3" in the database; B73_RefGen_v3 on disk. */
+  $assembly = str_replace(' ', '_', $assembly);
   if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9_.-]*$/', $assembly)) { return false; }
   $root = (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] !== '') ? $_SERVER['DOCUMENT_ROOT'] : getcwd();
   $dir = rtrim($root, '/') . '/data/gene_models/' . $assembly;
   if (!is_dir($dir)) { return false; }
   $key = strtolower(trim($gene_name));
-  $path = $dir . '/genes/' . substr(sha1($key), 0, 3) . '.json';
-  if (!is_file($path)) { return false; }
-  $raw = @file_get_contents($path);
-  if ($raw === false || $raw === '') { return false; }
-  $shard = json_decode($raw, true);
+  $shard = geneHeaderShard($dir, $key);
+  /* The database names Bayer's LH244 models with a version suffix
+     (Zm00052a000001.1); the published GFF3 does not. */
+  if ((!is_array($shard) || !isset($shard[$key])) && preg_match('/^(.+)\.\d+$/', $key, $m_base)) {
+    $key = $m_base[1];
+    $shard = geneHeaderShard($dir, $key);
+  }
   if (!is_array($shard) || !isset($shard[$key]) || empty($shard[$key]['transcripts'])) { return false; }
   $gene = $shard[$key];
   $pick = null;

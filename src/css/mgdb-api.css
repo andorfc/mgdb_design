@@ -302,6 +302,21 @@
 .mgdb-api-page .api-plain-list li + li {
   margin-top: 0.2em;
 }
+/* A dataset's releases past six, behind a disclosure (docs.php); styled as
+   the shell's .mgdb-chart-data summary. */
+.mgdb-api-page .api-genome-list > summary {
+  padding: var(--mgdb-space-1) 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mgdb-api-page .api-genome-list > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+.mgdb-api-page .api-genome-list > .api-plain-list {
+  max-height: 22rem;
+  overflow-y: auto;
+  font-size: var(--mgdb-text-sm);
+}
 
 /* --------------------------------------------------------------------------
    Try it

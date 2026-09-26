@@ -70,10 +70,17 @@ class MgdbData {
     return self::$reads;
   }
 
+  /* A JSON file, or its .gz twin: a release built with --compress writes
+     its shards and bins gzipped (manifests never are). */
   public static function readJson($path) {
     self::$reads++;
-    if (!is_file($path)) { return null; }
-    $raw = @file_get_contents($path);
+    if (is_file($path)) {
+      $raw = @file_get_contents($path);
+    } elseif (is_file($path . '.gz')) {
+      $raw = @file_get_contents('compress.zlib://' . $path . '.gz');
+    } else {
+      return null;
+    }
     if ($raw === false || $raw === '') { return null; }
     $decoded = json_decode($raw, true);
     return is_array($decoded) ? $decoded : null;
@@ -94,6 +101,14 @@ class MgdbData {
     }
     ksort($out);
     return $out;
+  }
+
+  /* Whether a genome has a release of a dataset on disk, without reading
+     its manifest: for links to another dataset's routes. */
+  public static function hasRelease($dataset, $genome) {
+    $dir = self::dir($dataset);
+    if ($dir === null || !preg_match('/^[A-Za-z0-9][A-Za-z0-9_.-]*$/', (string) $genome)) { return false; }
+    return is_file($dir . '/' . $genome . '/manifest.json');
   }
 
   public static function manifest($dataset, $genome) {
@@ -117,7 +132,10 @@ class MgdbData {
       if (array_key_exists($k, $manifest)) { $out[$k] = $manifest[$k]; }
     }
     $out['sequence_count'] = isset($manifest['sequences']) && is_array($manifest['sequences']) ? count($manifest['sequences']) : null;
-    $out['disagreement_count'] = isset($manifest['disagreements']) && is_array($manifest['disagreements']) ? count($manifest['disagreements']) : 0;
+    /* A manifest keeps at most 200 examples of each check; the counts are whole. */
+    $out['disagreement_count'] = isset($manifest['disagreement_counts']) && is_array($manifest['disagreement_counts'])
+      ? array_sum($manifest['disagreement_counts'])
+      : (isset($manifest['disagreements']) && is_array($manifest['disagreements']) ? count($manifest['disagreements']) : 0);
     return $out;
   }
 
@@ -244,12 +262,22 @@ class MgdbData {
   /* Every bin item overlapping [start, end] on a sequence, each once,
      sorted by start. $keyFn names the field(s) that make an item unique. */
   public static function binItems($dataset, $genome, $seq, $start, $end, $keyFn) {
-    $first = intdiv($start - 1, self::BIN_BP);
-    $last = intdiv($end - 1, self::BIN_BP);
+    /* The bin width is the release's own (manifest shards.bin_bp). */
+    $m = self::manifest($dataset, $genome);
+    $bp = (isset($m['shards']['bin_bp']) && (int) $m['shards']['bin_bp'] > 0) ? (int) $m['shards']['bin_bp'] : self::BIN_BP;
+    $first = intdiv($start - 1, $bp);
+    $last = intdiv($end - 1, $bp);
     $seen = array();
     $out = array();
     for ($b = $first; $b <= $last; $b++) {
       $items = self::readJson(self::dir($dataset) . '/' . $genome . '/bins/' . $seq . '/' . $b . '.json');
+      if ($items === null && $b === 0 && !empty($m['shards']['small_bins'])) {
+        /* A sequence that fits in one bin shares a file with others, keyed
+           by name (gene_models_index.py --share-small-bins). */
+        $shared = self::readJson(self::dir($dataset) . '/' . $genome . '/bins/_small/'
+                . self::shardKey($seq, (int) $m['shards']['small_bins']['depth']) . '.json');
+        $items = ($shared !== null && isset($shared[$seq])) ? $shared[$seq] : null;
+      }
       if ($items === null) { continue; }
       foreach ($items as $item) {
         if ($item['end'] < $start || $item['start'] > $end) { continue; }
@@ -368,12 +396,25 @@ class MgdbData {
         }
         $resolved['hint'] = 'The identifier resolves to ' . $name . ', which is not in this release.';
       } else {
-        $elsewhere[] = $name . ($asm !== '' ? ' (' . $asm . ')' : '');
+        /* once per model: the database can hold one per annotation version */
+        $elsewhere[$name . '|' . $asm] = array($name, $asm);
       }
     }
     if ($resolved['hint'] === null && count($elsewhere) > 0) {
-      $resolved['hint'] = 'The identifier names a gene model in another assembly (' . implode(', ', array_slice($elsewhere, 0, 5))
-                        . '); no correspondence to ' . $assembly . ' is recorded (AD-018).';
+      $named = array();
+      $links = array();
+      foreach (array_slice(array_values($elsewhere), 0, 5) as $e) {
+        $named[] = $e[0] . ($e[1] !== '' ? ' (' . $e[1] . ')' : '');
+        /* every assembly the host publishes has a release of its own; the
+           database spells the legacy B73 ones with a space */
+        $dir = str_replace(' ', '_', $e[1]);
+        if ($e[1] !== '' && self::hasRelease('gene-models', $dir)) {
+          $links[] = MgdbApi::baseUrl() . '/api/v1/data/gene-models/' . $dir . '/' . rawurlencode($e[0]);
+        }
+      }
+      $resolved['hint'] = 'The identifier names a gene model in another assembly (' . implode(', ', $named)
+                        . '); no correspondence to ' . $assembly . ' is recorded (AD-018).'
+                        . ($links ? ' Its own release answers it: ' . implode(', ', $links) . '.' : '');
     }
     return null;
   }

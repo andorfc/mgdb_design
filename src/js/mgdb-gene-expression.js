@@ -17,16 +17,23 @@
  *                       per organ) and the top samples
  *            sources    every study behind the figure, with its link
  *
+ *            tools      three panels filled from Expression Tools' own
+ *                       endpoint when they scroll into view: the genes that
+ *                       move with this one, its state across the 26 NAM
+ *                       genomes, and its rank among all genes in each sample
+ *
  *          and the ways out: Expression Tools (/expression/tools), which
- *          analyzes the same release -- co-expression, rank among genes, the
- *          pan-gene across the NAM genomes -- and qTeller, which still holds
- *          the interactive atlas; plus the JSON and TSV of exactly what is
- *          drawn.
+ *          analyzes the same release -- the gene report, co-expression, a
+ *          comparison, the neighborhood, a heatmap of the co-expressed genes,
+ *          and its basket, which lives in this origin's storage and so can be
+ *          filled from here -- and qTeller, which still holds the interactive
+ *          atlas; plus the JSON and TSV of exactly what is drawn.
  *
  *          spec = {
  *            gene:    { name, symbol }
  *            profile: expression.profile  ({attributes, sections, links})
  *            qteller: the qTeller URL for this gene, or null
+ *            tools:   { api } -- the Expression Tools endpoint (optional)
  *          }
  *
  *          Nothing here reads the DOM at module scope.
@@ -118,9 +125,10 @@
     tip.hidden = true;
     var legend = html('ul', 'ge-legend');
     var panels = html('div', 'ge-panels');
+    var toolsEl = html('div', 'ge-tools');
     var sourcesEl = html('details', 'ge-sources');
     var footer = html('div', 'ge-footer');
-    [tiles, toolbar, stage, tip, legend, panels, sourcesEl, footer].forEach(function (n) { container.appendChild(n); });
+    [tiles, toolbar, stage, tip, legend, panels, toolsEl, sourcesEl, footer].forEach(function (n) { container.appendChild(n); });
 
     function samplesFor(assay) { return allSamples.filter(function (s) { return s.assay === assay; }); }
     function summaryFor(assay) { return summaries[assay] || null; }
@@ -131,7 +139,8 @@
       tiles.innerHTML = '';
       if (!s) { return; }
       var unit = state.assay === 'protein' ? 'abundance' : 'expression';
-      var frac = s.detected_fraction == null ? 0 : s.detected_fraction;
+      var measured = s.samples_with_value || s.samples || 0;
+      var frac = measured ? s.detected / measured : (s.detected_fraction == null ? 0 : s.detected_fraction);
       var r = 16, c = 2 * Math.PI * r;
       var ring = '<svg class="ge-ring" viewBox="0 0 40 40" aria-hidden="true">' +
         '<circle cx="20" cy="20" r="' + r + '" fill="none" stroke="#e6ebe7" stroke-width="6"/>' +
@@ -139,8 +148,9 @@
         'stroke-dasharray="' + (c * frac).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 20 20)"/></svg>';
       tiles.appendChild(html('div', 'ge-tile',
         '<span class="ge-tile-label">Detected</span>' +
-        '<div class="ge-tile-row">' + ring + '<div><span class="ge-tile-value">' + s.detected + ' <small>of ' + s.samples + '</small></span>' +
-        '<div class="ge-tile-note">samples with ' + esc(s.detected_rule || 'a value') + '</div></div></div>'));
+        '<div class="ge-tile-row">' + ring + '<div><span class="ge-tile-value">' + s.detected + ' <small>of ' + measured + '</small></span>' +
+        '<div class="ge-tile-note">samples with ' + esc(s.detected_rule || 'a value') +
+        (s.samples > measured ? '; ' + (s.samples - measured) + ' more were not measured' : '') + '</div></div></div>'));
       tiles.appendChild(html('div', 'ge-tile',
         '<span class="ge-tile-label">Mean ' + unit + '</span>' +
         '<span class="ge-tile-value">' + fmt(s.mean) + '</span>' +
@@ -177,7 +187,8 @@
       toolbar.innerHTML = '';
       if (assays.length > 1) {
         toolbar.appendChild(chipGroup('Assay', assays.map(function (a) {
-          var n = samplesFor(a).length;
+          var sm = summaryFor(a);
+          var n = (sm && sm.samples_with_value) || samplesFor(a).length;
           return [a, (a === 'rna' ? 'RNA' : a === 'protein' ? 'Protein' : a) + ' · ' + n];
         }), state.assay, function (v) { state.assay = v; state.tissueFilter = null; state.conditionFilter = null; renderAll(); }));
       }
@@ -444,6 +455,58 @@
       sourcesEl.appendChild(ul);
     }
 
+    /* ---- Expression Tools: the endpoint, the links, the basket ----
+       The tools read this same release, so every number they show for the
+       gene matches this figure; the genome goes by its assembly name, which
+       the tools accept as well as their short keys. */
+    var toolsApi = (spec.tools && spec.tools.api) || '/search/expression_tools/expression_tools_api.php';
+    var geneId = (spec.gene && spec.gene.name) || profile.attributes.gene;
+    var genome = profile.attributes.genome || '';
+    var toolsData = { coexp: null, pan: null, rank: null };
+    function toolsHref(view, params) {
+      var q = ['g=' + encodeURIComponent(genome)];
+      Object.keys(params || {}).forEach(function (k) {
+        if (params[k] !== '' && params[k] != null) { q.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k])); }
+      });
+      return '/expression/tools#' + view + '?' + q.join('&');
+    }
+    function toolsGet(action, params) {
+      var q = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+      return window.fetch(toolsApi + '?action=' + encodeURIComponent(action) + '&' + q, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.json(); })
+        .then(function (b) {
+          if (!b || !b.ok) { throw new Error((b && b.error) || 'The expression tools did not answer.'); }
+          return b.data;
+        });
+    }
+    /* The tools keep their basket per genome under this origin's storage,
+       keyed by their short genome name. */
+    function toolsKey(g) {
+      var m;
+      if (/^Zm-B73-REFERENCE-NAM-5/.test(g)) { return 'B73v5'; }
+      if (/^Zm-B73-REFERENCE-GRAMENE-4/.test(g)) { return 'B73v4'; }
+      if ((m = /^Zm-([A-Za-z0-9]+)-REFERENCE-NAM-1/.exec(g))) { return m[1]; }
+      return null;
+    }
+    function basketList() {
+      var key = toolsKey(genome);
+      if (!key || !window.localStorage) { return null; }
+      try {
+        var v = JSON.parse(window.localStorage.getItem('mgdb-exptools-basket-' + key) || '[]');
+        return Array.isArray(v) ? v : [];
+      } catch (e) { return null; }
+    }
+    function basketAdd() {
+      var list = basketList();
+      if (!list) { return null; }
+      if (list.indexOf(geneId) === -1) { list.push(geneId); }
+      try { window.localStorage.setItem('mgdb-exptools-basket-' + toolsKey(genome), JSON.stringify(list)); } catch (e) { return null; }
+      return list;
+    }
+    function chip(href, label, external) {
+      return '<a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="' + esc(href) + '"' + (external ? ' target="_blank" rel="noopener"' : '') + '>' + label + '</a>';
+    }
+
     function renderFooter() {
       footer.innerHTML = '';
       var tissueNote = profile.attributes.tissue_note || '';
@@ -452,20 +515,151 @@
       footer.appendChild(note);
       var links = html('div', 'ge-footer-links');
       var parts = [];
-      /* The gene report of Expression Tools reads this same release, so the
-         numbers match; the genome goes by its assembly name, which the tools
-         accept as well as their short keys. */
-      var gene = (spec.gene && spec.gene.name) || profile.attributes.gene;
-      if (gene && profile.attributes.genome) {
-        parts.push('<a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="' +
-          esc('/expression/tools#gene?g=' + encodeURIComponent(profile.attributes.genome) + '&id=' + encodeURIComponent(gene)) +
-          '">Analyze in Expression Tools</a>');
+      if (geneId && genome) {
+        parts.push('<a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="' + esc(toolsHref('gene', { id: geneId })) + '">Gene report in Expression Tools</a>');
+        parts.push(chip(toolsHref('coexp', { id: geneId }), 'Co-expression'));
+        parts.push(chip(toolsHref('compare', { g1: geneId }), 'Compare with another gene'));
+        var q = toolsData.coexp && toolsData.coexp.query;
+        if (q && q.chr && q.start && q.end) {
+          parts.push(chip(toolsHref('region', { chr: q.chr, start: Math.max(1, q.start - 150000), end: q.end + 150000 }), 'Genes nearby, shaded by expression'));
+        }
+        if (toolsData.coexp && toolsData.coexp.positive && toolsData.coexp.positive.length) {
+          var set = [geneId].concat(toolsData.coexp.positive.slice(0, 20).map(function (x) { return x.gene; }));
+          parts.push(chip(toolsHref('heatmap', { genes: set.join(',') }), 'Heatmap of the co-expressed genes'));
+        }
       }
-      if (spec.qteller) {
-        parts.push('<a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="' + esc(spec.qteller) + '" target="_blank" rel="noopener">Open in qTeller</a>');
-      }
+      if (spec.qteller) { parts.push(chip(spec.qteller, 'Open in qTeller', true)); }
       links.innerHTML = parts.join('');
+      var list = basketList();
+      if (list && geneId) {
+        var inBasket = list.indexOf(geneId) !== -1;
+        var b = html('button', 'mgdb-button mgdb-button-secondary mgdb-button-sm ge-basket-btn', inBasket ? 'In the Expression Tools basket' : 'Add to the Expression Tools basket');
+        b.type = 'button';
+        b.disabled = inBasket;
+        b.title = 'The basket is kept in this browser; every Expression Tools view can use it';
+        b.addEventListener('click', function () { if (basketAdd()) { renderFooter(); } });
+        links.appendChild(b);
+        if (inBasket) {
+          links.insertAdjacentHTML('beforeend', '<a class="ge-basket-open" href="' + esc(toolsHref('list', { genes: list.join(',') })) + '">' +
+            list.length + ' gene' + (list.length === 1 ? '' : 's') + ' in it · open as a list</a>');
+        }
+      }
       footer.appendChild(links);
+    }
+
+    /* ---- what Expression Tools knows about this gene ----
+       Three panels, fetched when they come into view so the record's first
+       paint never waits on them; each fails on its own with a link to the
+       tools. */
+    function whenVisible(node, fn) {
+      var done = false;
+      var go = function () { if (!done) { done = true; fn(); } };
+      var near = function () {
+        var r = node.getBoundingClientRect();
+        return r.top < (window.innerHeight || 800) * 1.5 && r.bottom > -200;
+      };
+      if (near()) { go(); return; }
+      var onScroll = function () { if (near()) { window.removeEventListener('scroll', onScroll); go(); } };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      /* The record scrolls itself to a section named in the hash after it
+         has rendered, which is after this check; look again shortly. */
+      [800, 2500].forEach(function (ms) { window.setTimeout(onScroll, ms); });
+      if (window.IntersectionObserver) {
+        var io = new window.IntersectionObserver(function (entries) {
+          if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); window.removeEventListener('scroll', onScroll); go(); }
+        }, { rootMargin: '400px 0px' });
+        io.observe(node);
+      }
+    }
+    function toolCard(title, sub) {
+      var c = html('div', 'ge-panel ge-tool');
+      c.innerHTML = '<h4>' + title + (sub ? ' <small>' + sub + '</small>' : '') + '</h4><p class="ge-tool-wait">Loading from Expression Tools…</p>';
+      return c;
+    }
+    function toolFail(c, why, href, label) {
+      var w = c.querySelector('.ge-tool-wait');
+      if (w) { w.outerHTML = '<p class="ge-panel-key">' + esc(why) + (href ? ' <a href="' + esc(href) + '">' + esc(label) + '</a>' : '') + '</p>'; }
+    }
+    function geneLink(g) {
+      return '<a class="ge-co-name" href="/gene_center/gene/' + encodeURIComponent(g.gene) + '">' +
+        (g.symbol ? esc(g.symbol) + ' <small>' + esc(g.gene) + '</small>' : esc(g.gene)) + '</a>';
+    }
+    var STATE_TEXT = { expressed: 'expressed, 1 FPKM or more', low: 'low, 0.1 to 1 FPKM', silent: 'silent, under 0.1 FPKM', absent: 'no member', 'not measured': 'a member that was not measured' };
+    function drawCo(c, d) {
+      toolsData.coexp = d;
+      var w = c.querySelector('.ge-tool-wait');
+      var pos = (d.positive || []).slice(0, 6), neg = (d.negative || []).slice(0, 1);
+      if (!pos.length) {
+        w.outerHTML = '<p class="ge-panel-key">No gene keeps pace with it: over the ' + fmt(d.samples_used) + ' samples that measured it, it never reaches the level the comparison needs.</p>';
+        return;
+      }
+      var max = Math.max.apply(null, pos.concat(neg).map(function (x) { return Math.abs(x.r); })) || 1;
+      var rows = pos.concat(neg).map(function (x) {
+        return '<li' + (x.r < 0 ? ' class="is-neg"' : '') + '>' + geneLink(x) +
+          '<span class="ge-co-track"><i style="width:' + (100 * Math.abs(x.r) / max).toFixed(1) + '%"></i></span>' +
+          '<span class="ge-co-r">' + (x.r < 0 ? '−' : '') + Math.abs(x.r).toFixed(3) + '</span></li>';
+      }).join('');
+      w.outerHTML = '<ol class="ge-co">' + rows + '</ol>' +
+        '<p class="ge-panel-key">The ' + pos.length + ' closest of ' + fmt(d.tested) + ' genes compared over ' + fmt(d.samples_used) + ' samples' +
+        (neg.length ? ', and the most opposite' : '') + '. Pearson r on log₂(value + 1); no p-value, since the samples are not independent.</p>' +
+        '<a class="ge-more" href="' + esc(toolsHref('coexp', { id: geneId })) + '">All 50 each way, with their profiles</a>';
+      renderFooter();
+    }
+    function drawPan(c, d) {
+      toolsData.pan = d;
+      var w = c.querySelector('.ge-tool-wait');
+      var pg = d.pangene || {}, genomes = (d.nam && d.nam.genomes) || [];
+      if (!genomes.length) { w.outerHTML = '<p class="ge-panel-key">This gene is in no Pan-Zea v4 pan-gene.</p>'; return; }
+      var counts = {};
+      var cells = genomes.map(function (g) {
+        var st = g.state || 'not measured';
+        counts[st] = (counts[st] || 0) + 1;
+        var copies = g.members && g.members.length > 1 ? ', ' + g.members.length + ' copies' : '';
+        return '<i class="ge-nam-cell is-' + esc(st.replace(' ', '-')) + '" title="' + esc(g.short + ': ' + (STATE_TEXT[st] || st) + copies) + '"></i>';
+      }).join('');
+      var key = ['expressed', 'low', 'silent', 'absent', 'not measured'].filter(function (k) { return counts[k]; }).map(function (k) {
+        return '<li><i class="ge-nam-cell is-' + esc(k.replace(' ', '-')) + '"></i>' + esc(STATE_TEXT[k]) + ' <span>' + counts[k] + '</span></li>';
+      }).join('');
+      var h4 = c.querySelector('h4');
+      if (h4 && pg.name) { h4.innerHTML = 'Across the 26 NAM genomes <small>' + esc(String(pg.name).replace('pan-zea.v4.', '')) + (pg['class'] ? ' · ' + esc(pg['class']) : '') + '</small>'; }
+      var sentence = 'Expressed in ' + (pg.expressed || 0) + ', low in ' + (pg.low || 0) + ', silent in ' + (pg.silent || 0) + ' of the ' + (pg.present || 0) +
+        ' genomes that carry it, in the 23 samples they share' +
+        (pg.conservation != null ? '; tissue profiles agree at mean r = ' + Number(pg.conservation).toFixed(2) + (pg.divergent ? ' (least alike: ' + esc(pg.divergent) + ')' : '') : '') + '.';
+      w.outerHTML = '<div class="ge-nam" role="img" aria-label="' + esc(genomes.length + ' NAM genomes: ' + Object.keys(counts).map(function (k) { return counts[k] + ' ' + k; }).join(', ')) + '">' + cells + '</div>' +
+        '<ul class="ge-key">' + key + '</ul>' +
+        '<p class="ge-panel-key">' + sentence + '</p>' +
+        '<span class="ge-more-row"><a class="ge-more" href="' + esc(toolsHref('pangene', { id: geneId })) + '">Every copy’s profile</a>' +
+        (pg.exemplar_gene || pg.name ? ' <span class="ge-tip-muted">·</span> <a class="ge-more" href="/pan_gene_center/pan_gene/' + encodeURIComponent(pg.exemplar_gene || pg.name) + '">Pan-gene record</a>' : '') + '</span>';
+    }
+    function drawRank(c, d) {
+      toolsData.rank = d;
+      var w = c.querySelector('.ge-tool-wait');
+      if (!d.best) { w.outerHTML = '<p class="ge-panel-key">No sample measured it.</p>'; return; }
+      var top = (d.top || []).slice(0, 5), best = d.best;
+      var rows = top.map(function (t) {
+        return '<li><span class="ge-co-name"><span class="ge-top-tissue ' + tissueClass(t.tissue) + '"></span>' + esc(t.label) + ' <small>' + esc(shortStudy(t.source)) + '</small></span>' +
+          '<span class="ge-co-track"><i style="width:' + Number(t.percentile).toFixed(1) + '%"></i></span><span class="ge-co-r">' + Number(t.percentile).toFixed(1) + '</span></li>';
+      }).join('');
+      w.outerHTML = '<div class="ge-rank-best"><b>top ' + Math.max(0.1, 100 - best.percentile).toFixed(1) + '%</b><span>of genes in ' + esc(best.label) + ' <small>' + esc(shortStudy(best.source)) + '</small></span></div>' +
+        '<ol class="ge-co ge-rank">' + rows + '</ol>' +
+        '<p class="ge-panel-key">Percentile among all genes in the sample: the ' + top.length + ' samples where it ranks highest, of ' + fmt(d.samples) + '.</p>' +
+        '<a class="ge-more" href="' + esc(toolsHref('gene', { id: geneId })) + '">Its rank in every sample</a>';
+    }
+    function renderTools() {
+      toolsEl.innerHTML = '';
+      if (!geneId || !genome || !window.fetch) { return; }
+      var co = toolCard('Co-expressed genes', 'genes that move with it');
+      var pan = toolCard('Across the 26 NAM genomes', 'in the 23 samples they share');
+      var rank = toolCard('Rank among all genes', 'percentile in each sample');
+      [co, pan, rank].forEach(function (x) { toolsEl.appendChild(x); });
+      whenVisible(toolsEl, function () {
+        toolsGet('coexpression', { genome: genome, id: geneId, n: 8 }).then(function (d) { drawCo(co, d); }, function (e) {
+          toolFail(co, 'Co-expression is not available right now.', toolsHref('coexp', { id: geneId }), 'Try it in Expression Tools'); });
+        toolsGet('pangene', { id: geneId }).then(function (d) { drawPan(pan, d); }, function (e) {
+          toolFail(pan, e && e.message ? e.message : 'The pan-genome view is not available right now.', null, ''); });
+        toolsGet('rank', { genome: genome, id: geneId, n: 5 }).then(function (d) { drawRank(rank, d); }, function (e) {
+          toolFail(rank, 'The rank is not available right now.', toolsHref('gene', { id: geneId }), 'See it in Expression Tools'); });
+      });
     }
 
     function renderAll() {
@@ -478,6 +672,7 @@
       renderFooter();
     }
     renderAll();
+    renderTools();
 
     if (window.ResizeObserver) {
       var lastW = stage.clientWidth;

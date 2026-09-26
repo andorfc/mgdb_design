@@ -1090,6 +1090,43 @@ function etGeneReport($G, $row) {
   return $out;
 }
 
+/* Where one gene ranks among all genes in each sample: its percentile
+   against the sample's 101 quantiles from the index (the arithmetic the
+   gene report applies to the catalog), and the samples where it ranks
+   highest. The gene record asks here rather than load the catalog. */
+function etPercentile($v, $q) {
+  if ($v === null || $v < 0 || !is_array($q) || count($q) < 101) { return null; }
+  if ($v <= $q[0]) { return 0.0; }
+  if ($v >= $q[100]) { return 100.0; }
+  $lo = 0; $hi = 100;
+  while ($hi - $lo > 1) { $m = ($lo + $hi) >> 1; if ($q[$m] <= $v) { $lo = $m; } else { $hi = $m; } }
+  $span = $q[$hi] - $q[$lo];
+  return $lo + ($span > 0 ? ($v - $q[$lo]) / $span : 0);
+}
+
+function etRank($G, $a, $row, $n) {
+  $A = $G->assay($a);
+  $vals = etValues($G, $a, array($row));
+  if (!isset($vals[$row])) { throw new EtError('No values for this gene.', 404); }
+  $v = $vals[$row];
+  $out = array();
+  foreach ($A['samples'] as $j => $s) {
+    if (!etSampleUsable($A, $j) || !isset($v[$j]) || $v[$j] === null) { continue; }
+    $p = etPercentile($v[$j], $A['sample_stats'][$j]['q']);
+    if ($p === null) { continue; }
+    $out[] = array('id' => $s['id'], 'label' => $s['label'], 'source' => isset($s['source']) ? $s['source'] : null,
+                   'tissue' => isset($s['tissue']) ? $s['tissue'] : null, 'condition' => isset($s['condition']) ? $s['condition'] : null,
+                   'value' => $v[$j], 'percentile' => round($p, 1));
+  }
+  usort($out, function ($x, $y) {
+    if ($x['percentile'] == $y['percentile']) { return $y['value'] <=> $x['value']; }
+    return $y['percentile'] <=> $x['percentile'];
+  });
+  $info = etGeneInfo($G, array($row));
+  return array('gene' => isset($info[$row]) ? $info[$row] : null, 'assay' => $a, 'samples' => count($out),
+               'best' => $out ? $out[0] : null, 'top' => array_slice($out, 0, $n));
+}
+
 function etGeneGo($G, $row) {
   $db = $G->go();
   if (!$db) { return null; }
@@ -1401,7 +1438,8 @@ function etLandscape($f, $sort, $limit, $offset, $all = false, $each = null) {
 /* ------------------------------------------------------------------------
    Two NAM genomes, gene by gene through the pan-genes: every pair of
    members of one pan-gene, one in each genome, with each gene's value over
-   the chosen shared samples and the correlation of the two profiles.
+   the chosen shared samples and the correlation of the two profiles over
+   all of them.
    ------------------------------------------------------------------------ */
 
 function etPairs($keyA, $keyB, $sharedIdx, $stat) {
@@ -1422,11 +1460,34 @@ function etPairs($keyA, $keyB, $sharedIdx, $stat) {
   sort($use);
   if (!$use) { $use = range(0, $k - 1); }
 
-  /* Each genome's value and profile at the chosen shared samples, from one pass. */
-  $profile = function ($G) use ($use) {
+  /* The shared samples each genome was measured in at all: several founders
+     were never measured in some (CML277 in neither 16 DAP sample, M162W in
+     none of Diepenbrock's), so a value is over the chosen samples its genome
+     has and r over those both have, and the page says how many. A genome
+     with none of the chosen samples has no level at all: say so, rather
+     than pair nothing. */
+  $measured = array();
+  foreach (array($GA, $GB) as $G) {
+    $sc = $G->samples()['shared_columns'];
+    $st = $G->assay('rna')['sample_stats'];
+    $m = array();
+    for ($j = 0; $j < $k; $j++) { if ($st[$sc[$j]]['n'] > 0) { $m[] = $j; } }
+    if (!array_intersect($use, $m)) {
+      $shared = EtData::sharedSamples();
+      throw new EtError($G->info['short'] . ' was not measured in ' .
+                        (count($use) === 1 ? $shared[$use[0]]['label'] : 'any of the ' . count($use) . ' chosen samples') . '. Choose other samples.', 404);
+    }
+    $measured[] = $m;
+  }
+
+  /* Each genome's profile over every shared sample, from one pass. The value
+     reads the chosen samples and r reads all of them, so a pair's r does not
+     move with the level's samples (one sample alone could never give r its
+     8). */
+  $profile = function ($G) use ($k) {
     $sc = $G->samples()['shared_columns'];
     $cols = array();
-    foreach ($use as $j) { $cols[] = $sc[$j] + 1; }
+    for ($j = 0; $j < $k; $j++) { $cols[] = $sc[$j] + 1; }
     $out = array();
     foreach ($G->scan('rna', 'raw') as $r => $v) {
       $p = array();
@@ -1447,9 +1508,9 @@ function etPairs($keyA, $keyB, $sharedIdx, $stat) {
   $mb = $members($annOf[$GB->name]);
   $pa = $profile($GA);
   $pb = $profile($GB);
-  $value = function ($p) use ($stat) {
+  $value = function ($p) use ($stat, $use) {
     $xs = array();
-    foreach ($p as $x) { if ($x >= 0) { $xs[] = $x; } }
+    foreach ($use as $j) { if ($p[$j] >= 0) { $xs[] = $p[$j]; } }
     if (!$xs) { return null; }
     return $stat === 'max' ? max($xs) : array_sum($xs) / count($xs);
   };
@@ -1480,6 +1541,7 @@ function etPairs($keyA, $keyB, $sharedIdx, $stat) {
   }
   foreach ($mb as $pan => $g) { if (!isset($ma[$pan])) { $onlyB++; } }
   return $out + array('genome_a' => $GA->key, 'genome_b' => $GB->key, 'samples' => $use, 'stat' => $stat === 'max' ? 'max' : 'mean',
+                      'measured_a' => $measured[0], 'measured_b' => $measured[1],
                       'pangenes_only_a' => $onlyA, 'pangenes_only_b' => $onlyB, 'pairs_not_measured' => $unmeasured);
 }
 

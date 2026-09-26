@@ -494,7 +494,7 @@ function api_data_registry() {
       'formats' => array('json', 'gff3', 'bed', 'tsv'),
       'caps' => array('batch_ids' => 200, 'region_limit' => 2000, 'region_span_subgene_bp' => 10000000),
       'html' => '/gene_center/gene/{id}',
-      'notes' => 'Coordinates are 1-based and inclusive. Blocks are listed in transcript order with their rank. There is no v4 to v5 correspondence; a v4 identifier answers 404 with a hint.'
+      'notes' => 'Coordinates are 1-based and inclusive. Blocks are listed in transcript order, 5\' to 3\', with their rank. Every genome the download host publishes an annotation for has a release. There is no correspondence between assemblies; an identifier from another assembly answers 404 with a hint that links its own release.'
     ),
     array(
       'dataset' => 'domains',

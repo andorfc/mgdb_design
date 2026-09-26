@@ -374,3 +374,41 @@
 @media (prefers-reduced-motion: no-preference) {
   .ge-bar rect { transition: opacity .15s ease; }
 }
+
+/* ---- What Expression Tools knows about this gene: three panels filled
+   when they scroll into view (co-expressed genes, the NAM genomes, the
+   rank among all genes), and the row of ways into the tools. ---- */
+.ge-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--mgdb-space-3, 12px); margin-top: var(--mgdb-space-3, 12px); }
+.ge-tools:empty { display: none; }
+.ge-tool { display: flex; flex-direction: column; min-width: 0; }
+.ge-tool-wait { margin: 0; color: var(--ge-muted); font-size: var(--mgdb-text-sm, 14px); }
+.ge-co { display: flex; flex-direction: column; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.ge-co li { display: grid; grid-template-columns: minmax(0, 1fr) 30% 46px; gap: 8px; align-items: center; font-size: var(--mgdb-text-sm, 14px); }
+.ge-co-name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ge-co-name small { color: var(--ge-muted); font-size: var(--mgdb-text-xs, 12px); }
+.ge-co-track { position: relative; height: 10px; overflow: hidden; border-radius: 3px; background: var(--ge-band); }
+.ge-co-track i { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 3px; background: var(--ge-root); }
+.ge-co li.is-neg .ge-co-track i { background: var(--ge-mean); }
+.ge-co-r { color: var(--ge-ink); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.ge-rank .ge-co-track i { background: var(--ge-whole); }
+.ge-nam { display: grid; grid-template-columns: repeat(13, 1fr); gap: 3px; margin: 4px 0 8px; }
+.ge-nam-cell { display: block; aspect-ratio: 1; border: 1px solid transparent; border-radius: 3px; background: #edf0ec; }
+.ge-nam-cell.is-expressed { background: #285d46; }
+.ge-nam-cell.is-low { background: #c98500; }
+.ge-nam-cell.is-silent { background: #7a2c43; }
+.ge-nam-cell.is-absent { border-color: var(--ge-rule); background: transparent; }
+.ge-nam-cell.is-not-measured { border-color: var(--ge-rule); background: repeating-linear-gradient(45deg, var(--ge-band), var(--ge-band) 2px, #fff 2px, #fff 4px); }
+.ge-key { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; padding: 0; list-style: none; color: var(--ge-muted); font-size: var(--mgdb-text-xs, 12px); }
+.ge-key .ge-nam-cell { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+.ge-key span { color: var(--ge-ink); }
+.ge-rank-best { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+.ge-rank-best b { color: var(--ge-ink); font-size: var(--mgdb-text-xl, 24px); font-weight: 800; }
+.ge-rank-best span { color: var(--ge-muted); font-size: var(--mgdb-text-sm, 14px); }
+.ge-tool .ge-panel-key { margin-top: 8px; }
+.ge-more, .ge-more-row { display: inline-block; margin-top: auto; padding-top: 8px; font-size: var(--mgdb-text-sm, 14px); }
+.ge-more { color: var(--mgdb-green-dark, #174634); font-weight: 700; }
+.ge-more-row .ge-more { padding-top: 0; }
+.ge-footer-links { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2, 8px); align-items: center; }
+.ge-basket-btn[disabled] { opacity: .7; cursor: default; }
+.ge-basket-open { font-size: var(--mgdb-text-sm, 14px); }
+@media (max-width: 480px) { .ge-co li { grid-template-columns: minmax(0, 1fr) 26% 40px; } }

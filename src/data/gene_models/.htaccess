@@ -2,8 +2,9 @@ Options -Indexes
 
 # The shards are read by PHP on behalf of /api/v1/data/gene-models. A browser
 # fetching them directly would get an unversioned, un-enveloped copy, so every
-# JSON file is denied except the public index of each release.
-<FilesMatch "\.json$">
+# JSON file is denied except the public index of each release -- and so is
+# every .json.gz, the same shards from a release built with --compress.
+<FilesMatch "\.json(\.gz)?$">
   Require all denied
 </FilesMatch>
 

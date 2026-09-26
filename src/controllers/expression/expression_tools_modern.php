@@ -59,6 +59,11 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 foreach (array('core', 'genes', 'discover', 'pangenome') as $part) {
     $bauplan->includeScript('/js/mgdb-exptools-' . $part . '.js?v=' . $stamp('/js/mgdb-exptools-' . $part . '.js'));
 }
+/* Compare samples, Genome pairs, Homeolog expression and RNA and protein
+   draw WebGL scatter plots (scattergl) of thousands of genes, which only the
+   full Plotly build carries; MGDB.loadPlotly() reads this. Other chart pages
+   get the smaller cartesian build. */
+$bauplan->head('<meta name="mgdb-plotly" content="full">');
 $bauplan->head('<meta name="description" content="Analyze maize gene expression across B73 and the 25 NAM founders: gene reports, genome-wide co-expression, tissue-specific genes, sample maps, GO enrichment, and every copy of a pan-gene compared across 26 genomes.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');

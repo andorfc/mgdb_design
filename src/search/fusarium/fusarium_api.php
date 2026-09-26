@@ -9,13 +9,18 @@
  *                     all six species
  *            protein  every protein an identifier names, with its models and
  *                     the tools that have it
+ *            model    one model file (term = accession, model = alphafold or
+ *                     esmfold), from fusarium.maizegdb.org through this
+ *                     server -- see fptModelLink() for why a page cannot
+ *                     fetch it from there itself
  *
  * Query cost
  * ----------
- * No database and no upstream request. Both actions read
- * data/fusarium/proteins.sqlite through include/fusarium_lib.php: suggest is
- * one range scan of the alias key, protein one or two key lookups. Every
- * response carries summary.elapsed_ms.
+ * No database. suggest and protein read data/fusarium/proteins.sqlite through
+ * include/fusarium_lib.php: suggest is one range scan of the alias key,
+ * protein one or two key lookups; every response carries summary.elapsed_ms.
+ * model makes one upstream request per file, the first time it is asked for;
+ * after that the file comes from the cache (fptModelText).
  */
 
 include_once('../../include/db-api.php');
@@ -123,5 +128,25 @@ if ($action === 'protein') {
     ));
 }
 
-fptApiFail(400, 'Unknown action. Use suggest or protein.');
+/* -------------------------------------------------------------------------- *
+ * model -- the file itself, so the page reads it from its own origin: no CORS
+ * and no bot check. A week in the browser's cache; the files do not change.
+ * -------------------------------------------------------------------------- */
+if ($action === 'model') {
+    $tool = strtolower(trim((string) getCGIParam('model', 'G', '')));
+    list($status, $text) = fptModelText($term, $tool);
+    if ($status !== 200) {
+        fptApiFail($status, $status === 404 ? 'The toolkit has no such model.'
+                                            : 'fusarium.maizegdb.org did not return the model file.');
+    }
+    $name = ($tool === 'esmfold' ? 'ESMFold-' . strtoupper($term) : 'AF-' . strtoupper($term) . '-F1-model_v4') . '.pdb';
+    header('Content-Type: chemical/x-pdb');
+    header('Content-Disposition: inline; filename="' . $name . '"');
+    header('X-Content-Type-Options: nosniff');
+    header('Cache-Control: public, max-age=604800');
+    echo $text;
+    exit;
+}
+
+fptApiFail(400, 'Unknown action. Use suggest, protein or model.');
 ?>

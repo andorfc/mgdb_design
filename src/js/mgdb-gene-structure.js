@@ -27,6 +27,8 @@
  *            gene:      { name, symbol, chromosome, strand, start, end }
  *            geneModel: structure.gene_model  (genome, release, transcripts[], links)
  *            domains:   structure.domains     (the canonical protein's payload) or null
+ *            proteinDomains: structure.protein_domains (the database's Pfam rows,
+ *                       drawn when the genome has no domains release)
  *            model:     structure.model       ({source, pdb, plddt, ...}) or null
  *            base:      the API base URL for fetching another isoform's domains
  *          }
@@ -186,6 +188,27 @@
     });
     state.selected = state.transcripts[0];
     if (spec.domains && spec.domains.id) { state.domainsByProtein[spec.domains.id] = spec.domains; }
+    /* A genome with no domains release (links.domains null: every one but
+       B73 NAM-5.0) still has the database's Pfam matches for each transcript
+       (structure.protein_domains). They are drawn as they are and called Pfam
+       domains from the database, not InterPro entries. A gene with no rows at
+       all says so; rows that name none of a transcript's IDs say nothing, since
+       that may be a naming difference rather than an absence. */
+    var releaseLinks = spec.geneModel && spec.geneModel.links;
+    if (releaseLinks && releaseLinks.domains === null && Array.isArray(spec.proteinDomains)) {
+      state.transcripts.forEach(function (t) {
+        var pid = t.protein ? t.protein.id : null;
+        if (!pid || state.domainsByProtein[pid]) { return; }
+        var rows = spec.proteinDomains.filter(function (r) { return r.transcript === t.id && r.start && r.end; });
+        if (!rows.length && spec.proteinDomains.length) { return; }
+        state.domainsByProtein[pid] = {
+          id: pid, source: 'database', matches: [], sites: [], genomic: null, no_matches: !rows.length,
+          entries: rows.map(function (r) {
+            return { accession: r.accession, name: r.name || r.accession, start: r.start, end: r.end, url: r.url || null, members: [] };
+          }).sort(function (a, b) { return a.start - b.start || a.end - b.end; })
+        };
+      });
+    }
 
     container.innerHTML = '';
     container.classList.add('gs');
@@ -212,6 +235,10 @@
 
     function fetchDomains(protein) {
       if (!protein || state.domainsByProtein[protein]) { return Promise.resolve(); }
+      /* links.domains is null when the genome has no domains release (every
+         one but B73 NAM-5.0): there is nothing to ask for, and nothing failed. */
+      var gl = spec.geneModel && spec.geneModel.links;
+      if (gl && gl.domains === null) { return Promise.resolve(); }
       var url = (spec.base || '') + '/api/v1/data/domains/' + encodeURIComponent(spec.geneModel.genome) + '/' + encodeURIComponent(protein);
       stage.classList.add('is-busy');
       var req = MGDB.request ? MGDB.request(url, { key: 'gs-domains' })
@@ -323,7 +350,14 @@
 
       var domains = currentDomains();
       var protein = state.selected.protein;
-      var length = protein ? protein.length_aa : null;
+      var coding = (state.selected.cds || []).length > 0;
+      /* A release that publishes no protein lengths (B73 RefGen_v1 to v3 have
+         no protein file) leaves length_aa null. The protein is then drawn at
+         the CDS's complete codons -- within one residue, as the CDS may carry
+         its stop codon -- and labelled as read from the CDS. */
+      var derivedLength = (coding && protein && !protein.length_aa && state.selected.cds_length_nt)
+                        ? Math.floor(state.selected.cds_length_nt / 3) : null;
+      var length = protein ? (protein.length_aa || derivedLength) : null;
       var segments = cdsSegments(state.selected);
       var px = function (res) { return LEFT + ((res - 0.5) / length) * innerW; };
       var entries = (domains && domains.entries) ? domains.entries.slice(0, 64) : [];
@@ -332,7 +366,9 @@
       var svg = el('svg', { viewBox: '0 0 ' + width + ' ' + height, width: width, height: height, role: 'img' });
       svg.setAttribute('aria-label', 'Gene model of ' + gene.name + ' with ' + state.transcripts.length + ' transcript' +
         (state.transcripts.length === 1 ? '' : 's') + ' on the ' + (gene.strand === '-' ? 'minus' : 'plus') + ' strand, and its protein ' +
-        (protein ? protein.id + ' of ' + length + ' residues with ' + entries.length + ' InterPro entr' + (entries.length === 1 ? 'y' : 'ies') : 'without a protein'));
+        (protein ? protein.id + ' of ' + (derivedLength ? 'about ' : '') + length + ' residues with ' + entries.length +
+          (domains && domains.source === 'database' ? ' Pfam domain' + (entries.length === 1 ? '' : 's')
+                                                    : ' InterPro entr' + (entries.length === 1 ? 'y' : 'ies')) : 'without a protein'));
 
       /* genome ruler */
       var axis = el('g', { 'class': 'gs-axis' });
@@ -448,7 +484,8 @@
 
         // protein band
         var pg = el('g', { 'class': 'gs-protein' });
-        pg.appendChild(el('text', { x: LEFT, y: yProteinTitle + 10, 'class': 'gs-band-title' }, 'Protein ' + protein.id + ' · ' + fmt(length) + ' aa'));
+        pg.appendChild(el('text', { x: LEFT, y: yProteinTitle + 10, 'class': 'gs-band-title' }, 'Protein ' + protein.id + ' · ' +
+          (derivedLength ? 'about ' + fmt(length) + ' aa, from the CDS' : fmt(length) + ' aa')));
         pg.appendChild(el('rect', { x: LEFT, y: yProtein, width: innerW, height: PROTEIN_H, rx: 4, 'class': 'gs-protein-bar' }));
         var paxis = el('g', { 'class': 'gs-axis' });
         paxis.appendChild(el('line', { x1: LEFT, x2: LEFT + innerW, y1: yPRuler, y2: yPRuler, 'class': 'gs-axis-base' }));
@@ -519,13 +556,13 @@
         domainBlocksOnGenome.forEach(function (rect) { svg.appendChild(rect); });
       } else {
         var note = el('text', { x: LEFT, y: yProteinTitle + 10, 'class': 'gs-band-title' },
-          state.selected.type === 'mRNA' ? 'Protein not available' : 'Non-coding transcript: no protein');
+          coding ? 'Coding transcript; the release names no protein for it' : 'Non-coding transcript: no protein');
         svg.appendChild(note);
       }
 
       stage.innerHTML = '';
       stage.appendChild(svg);
-      renderSummary(segments, entries, domains, length);
+      renderSummary(segments, entries, domains, length, !!derivedLength);
       renderLegend(entries);
       applyHot();
     }
@@ -576,17 +613,22 @@
     }
 
     /* ---- summary and legend ---- */
-    function renderSummary(segments, entries, domains, length) {
+    function renderSummary(segments, entries, domains, length, derived) {
       var t = state.selected;
       var items = [];
       items.push('<li><strong>' + (t.exons || []).length + '</strong> exon' + ((t.exons || []).length === 1 ? '' : 's') + '</li>');
       if (t.cds_length_nt) { items.push('<li>CDS <strong>' + fmt(t.cds_length_nt) + '</strong> nt in <strong>' + segments.length + '</strong> block' + (segments.length === 1 ? '' : 's') + '</li>'); }
       items.push('<li>transcript span <strong>' + fmt(t.end - t.start + 1) + '</strong> bp</li>');
-      if (length) { items.push('<li>protein <strong>' + fmt(length) + '</strong> aa</li>'); }
+      if (length) { items.push('<li>protein ' + (derived ? 'about ' : '') + '<strong>' + fmt(length) + '</strong> aa' + (derived ? ' <span class="gs-muted">from the CDS</span>' : '') + '</li>'); }
       if (domains) {
         if (domains.unavailable) { items.push('<li class="gs-muted">domains could not be loaded</li>'); }
-        else if (domains.no_matches) { items.push('<li class="gs-muted">no InterProScan match on this protein</li>'); }
-        else {
+        else if (domains.no_matches) {
+          items.push('<li class="gs-muted">' + (domains.source === 'database' ? 'no Pfam domain on this gene in the database'
+                                                                              : 'no InterProScan match on this protein') + '</li>');
+        } else if (domains.source === 'database') {
+          items.push('<li><strong>' + entries.length + '</strong> Pfam domain' + (entries.length === 1 ? '' : 's') +
+                     ' <span class="gs-muted">from the database</span></li>');
+        } else {
           items.push('<li><strong>' + entries.length + '</strong> InterPro entr' + (entries.length === 1 ? 'y' : 'ies') + '</li>');
           if ((domains.sites || []).length) { items.push('<li><strong>' + domains.sites.length + '</strong> residue-level site' + (domains.sites.length === 1 ? '' : 's') + '</li>'); }
           if (domains.architecture) { items.push('<li class="gs-muted">' + esc(domains.architecture) + '</li>'); }

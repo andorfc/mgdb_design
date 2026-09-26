@@ -1,7 +1,10 @@
 """Chart sweep: load each page at the dev ORIGIN in headless Chrome, scroll it
 top to bottom in steps so every lazily drawn figure is asked for, and write
 one JSON line per page: Plotly figures drawn, chart containers, fallbacks that
-say a chart failed, JavaScript errors, bundles served, and overflow.
+say a chart failed, JavaScript errors and MGDB console warnings, bundles
+served, overflow, which Plotly build the page fetched, the trace types it drew,
+and any trace Plotly drew as another type than it asked for (`substituted` --
+what a type missing from the cartesian build looks like).
 
     python3 tools/chart_sweep.py OUT.jsonl < urls.txt
 
@@ -56,6 +59,9 @@ REPORT_JS = r"""
     plotlyTagInHead: !!document.querySelector('head script[src*="plotly"]'),
     plotlyFetched: res.some(r => /plotly/i.test(r.name)),
     bundles: res.filter(r => /\/temp\/bundles\//.test(r.name)).map(r => r.name.replace(/^.*\/temp\/bundles\//, '').replace(/\?.*/, '')),
+    plotlyBuild: res.filter(r => /plotly[^/]*\.js/.test(r.name)).map(r => r.name.replace(/^.*\//, '').replace(/\?.*/, '')),
+    traceTypes: Array.from(new Set(Array.from(drawn).flatMap(el => (el.data || []).map(t => t.type || 'scatter')))).sort(),
+    substituted: Array.from(drawn).flatMap(el => (el._fullData || []).filter(f => el.data[f.index] && el.data[f.index].type && el.data[f.index].type !== f.type).map(f => (el.id || '?') + ':' + el.data[f.index].type + '->' + f.type)),
     cssFiles: res.filter(r => r.initiatorType === 'link' && /\.css/.test(r.name)).length,
     jsFiles: res.filter(r => r.initiatorType === 'script' && /\.js/.test(r.name)).length,
     width: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -140,6 +146,10 @@ def check(path):
                 errs.append((d.get("exception", {}).get("description") or d.get("text", ""))[:160])
             elif e.get("method") == "Log.entryAdded" and e["params"]["entry"]["level"] == "error":
                 errs.append(("log: " + e["params"]["entry"].get("text", ""))[:160])
+            elif e.get("method") == "Runtime.consoleAPICalled" and e["params"].get("type") in ("warning", "error"):
+                text = " ".join(str(a.get("value", a.get("description", ""))) for a in e["params"].get("args", []))
+                if "MGDB" in text or e["params"]["type"] == "error":
+                    errs.append(("console." + e["params"]["type"] + ": " + text)[:200])
         out["errors"] = errs[:5]
         out["path"] = path
         return out

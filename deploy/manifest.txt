@@ -2771,6 +2771,7 @@ src/include/api/v1/lib/mgdb_data.php             include/api/v1/lib/mgdb_data.ph
 src/include/api/v1/data/gene_models.php          include/api/v1/data/gene_models.php
 src/include/api/v1/data/domains.php              include/api/v1/data/domains.php
 src/tools/gene_models_index.py                   tools/gene_models_index.py
+src/tools/gene_models_all.py                     tools/gene_models_all.py
 src/tools/domains_index.py                       tools/domains_index.py
 src/data/gene_models/.htaccess                   data/gene_models/.htaccess
 src/data/domains/.htaccess                       data/domains/.htaccess
@@ -2896,12 +2897,18 @@ src/js/mgdb-exptools-pangenome.js                      js/mgdb-exptools-pangenom
 src/css/mgdb-basket.css                          css/mgdb-basket.css
 src/js/mgdb-basket.js                            js/mgdb-basket.js
 
-# Plotly, self-hosted 2026-09-25: the one copy MGDB.loadPlotly() fetches
-# (PLOTLY_SRC in js/mgdb-modern.js), so a reader scrolling to a chart does not
-# open a connection to a third-party host first. Byte-identical to plotly.min.js
-# in the npm package plotly.js-dist-min@2.35.2 (SHA-256 6d21266ce1bd7d9e...
-# eba4d603, checked against jsDelivr's package metadata). The server's
-# plotly-2.25.2.min.js beside it is not repo-owned: the legacy pan-gene
-# templates still load it.
+# Plotly, self-hosted 2026-09-25 (PLOTLY_BUILDS in js/mgdb-modern.js), so a
+# reader scrolling to a chart does not open a connection to a third-party host
+# first. Two builds, each byte-identical to Plotly's npm release, checked
+# against jsDelivr's package metadata:
+#   plotly-cartesian-2.35.2.min.js  what MGDB.loadPlotly() fetches by default;
+#     plotly.js-cartesian-dist-min@2.35.2, SHA-256 72409fd95b505d17...9ea3e180
+#   plotly-2.35.2.min.js  the full build, for pages that declare
+#     <meta name="mgdb-plotly" content="full"> (BLAST results, Expression
+#     Tools); plotly.js-dist-min@2.35.2, SHA-256 6d21266ce1bd7d9e...eba4d603
+# The server's plotly-2.25.2.min.js beside them is not repo-owned: the legacy
+# pan-gene templates still load it. The .htaccess gives the directory a year's
+# immutable cache, which is safe because every file name carries its version.
 src/js/lib/plotly/plotly-2.35.2.min.js         js/lib/plotly/plotly-2.35.2.min.js
+src/js/lib/plotly/plotly-cartesian-2.35.2.min.js js/lib/plotly/plotly-cartesian-2.35.2.min.js
 src/js/lib/plotly/.htaccess                    js/lib/plotly/.htaccess

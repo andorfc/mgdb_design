@@ -297,11 +297,106 @@ function fptGenesFor(array $accessions) {
  * -------------------------------------------------------------------------- */
 
 /* The model files as the toolkit published them. Both directories name their
-   files AF-<accession>-F1-model_v4.pdb -- the ESMFold ones too. */
+   files AF-<accession>-F1-model_v4.pdb -- the ESMFold ones too. Read by the
+   server only (fptModelText); a page is given fptModelLink(). */
 function fptModelUrl($accession, $species, $tool) {
     $dir = ($tool === 'esmfold' ? 'esm_' : '') . $species;
     return FPT_HOST . '/protein_structure/structures/' . rawurlencode($dir)
          . '/AF-' . rawurlencode($accession) . '-F1-model_v4.pdb';
+}
+
+/* A model file as a page fetches it: from this site, not from
+   fusarium.maizegdb.org. That host sits behind a Cloudflare bot check for
+   visitors off the Iowa State network -- fetched from off campus on
+   2026-09-25 it answered "Performing security verification", from campus the
+   file -- and a browser's cross-origin fetch can neither pass the check nor
+   carry a pass the visitor earned, so off campus the structures and Foldseek
+   pages drew no model while on campus they did. The server is on campus; it
+   fetches each file once and keeps it. */
+function fptModelLink($accession, $tool) {
+    return '/search/fusarium/fusarium_api.php?action=model&model=' . rawurlencode($tool)
+         . '&term=' . rawurlencode($accession);
+}
+
+/* Fetched model files are kept this long after they were last fetched. They
+   do not change -- a new release is a new file name -- so this only bounds the
+   directory. */
+const FPT_MODEL_TTL = 7776000;   // 90 days
+
+/* Where fetched model files are kept: fusarium_cache_path in conf/mgdb.conf,
+   else <search_cache_path>/fusarium. httpd can write there only if the
+   directory carries httpd_sys_rw_content_t (AD-023 explains why a new
+   directory under /home/cache does not); without it every request fetches
+   the file again and nothing else changes. */
+function fptModelCacheDir() {
+    $system = function_exists('getSystemInfo') ? getSystemInfo('mgdb.conf') : array();
+    $base = !empty($system['fusarium_cache_path']) ? $system['fusarium_cache_path']
+          : (!empty($system['search_cache_path']) ? rtrim($system['search_cache_path'], '/') . '/fusarium' : '');
+    if ($base === '') { return null; }
+    if (!is_dir($base)) {
+        if (!@mkdir($base, 0777, true) && !is_dir($base)) { return null; }
+        @chmod($base, 0777);
+    }
+    return is_writable($base) ? $base : null;
+}
+
+/* One model file's text: array(status, text). 200 with the text; 404 when the
+   index has no such model; 502 when fusarium.maizegdb.org did not answer
+   with one. Only a model the index lists can be asked for, so this never
+   fetches a URL a caller chose. */
+function fptModelText($accession, $tool) {
+    $p = fptProtein($accession);
+    if (!$p || !in_array($tool, array('alphafold', 'esmfold'), true) || !$p[$tool]) {
+        return array(404, null);
+    }
+    $dir = fptModelCacheDir();
+    $file = $dir === null ? null : $dir . '/' . $tool . '-' . $p['accession'] . '.pdb';
+    if ($file !== null && is_file($file) && (time() - filemtime($file)) < FPT_MODEL_TTL) {
+        $text = @file_get_contents($file);
+        if (is_string($text) && fptLooksLikePdb($text)) { return array(200, $text); }
+    }
+    list($status, $text) = fptFetch(fptModelUrl($p['accession'], $p['species'], $tool));
+    if ($status !== 200 || !fptLooksLikePdb($text)) { return array(502, null); }
+    if ($file !== null) {
+        $temp = $file . '.' . getmypid() . '.tmp';
+        if (@file_put_contents($temp, $text) !== false && @rename($temp, $file)) {
+            @chmod($file, 0666);
+            /* One write in a hundred sweeps out files past the TTL. */
+            if (mt_rand(1, 100) === 1) {
+                foreach ((array) @glob($dir . '/*.pdb') as $old) {
+                    if (is_file($old) && (time() - @filemtime($old)) > FPT_MODEL_TTL) { @unlink($old); }
+                }
+            }
+        } else {
+            @unlink($temp);
+        }
+    }
+    return array(200, $text);
+}
+
+/* A PDB file, not the HTML of a challenge or an error page. */
+function fptLooksLikePdb($text) {
+    return is_string($text) && preg_match('/^ATOM  /m', $text) === 1
+        && stripos(substr($text, 0, 2048), '<html') === false;
+}
+
+/* GET a URL: array(HTTP status, body); status 0 when nothing came back. */
+function fptFetch($url) {
+    if (!function_exists('curl_init')) { return array(0, null); }
+    $handle = curl_init($url);
+    curl_setopt_array($handle, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 20,
+        CURLOPT_CONNECTTIMEOUT => 6,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS      => 2,
+        CURLOPT_ENCODING       => '',
+        CURLOPT_USERAGENT      => 'MaizeGDB/1.0 (+https://www.maizegdb.org/)',
+    ));
+    $body = curl_exec($handle);
+    $status = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
+    curl_close($handle);
+    return array($body === false ? 0 : $status, $body === false ? null : $body);
 }
 
 function fptLinks(array $p) {
@@ -317,8 +412,8 @@ function fptLinks(array $p) {
         /* PanEffect reads its own ids: the UniProt accession is the one every
            one of its gene pages is filed under. */
         'paneffect' => $p['paneffect'] ? FPT_PANEFFECT . '?id=' . rawurlencode($p['accession']) : null,
-        'alphafold_pdb' => $p['alphafold'] ? fptModelUrl($p['accession'], $p['species'], 'alphafold') : null,
-        'esmfold_pdb'   => $p['esmfold'] ? fptModelUrl($p['accession'], $p['species'], 'esmfold') : null,
+        'alphafold_pdb' => $p['alphafold'] ? fptModelLink($p['accession'], 'alphafold') : null,
+        'esmfold_pdb'   => $p['esmfold'] ? fptModelLink($p['accession'], 'esmfold') : null,
     );
     return $links;
 }
